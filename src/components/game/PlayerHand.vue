@@ -91,7 +91,7 @@ function getCardStyle(index) {
 
 .card-wrapper:hover {
   transform: 
-    translateY(-30px) 
+    translateY(-0px) 
     rotate(0deg) 
     scale(1.08);
   z-index: var(--hover-z-index, 100);

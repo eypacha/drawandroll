@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 bg-gray-50 border-b border-gray-100">
+  <div class="p-4">
     <div class="flex justify-center gap-2">
       <CardBack 
         v-for="(card, index) in opponentHand" 
