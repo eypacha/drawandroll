@@ -85,6 +85,7 @@ export const usePlayersStore = defineStore('players', () => {
     if (slotIndex === null || slotIndex === undefined) return null
     const hero = player.heroes[slotIndex]
     if (!hero) return null
+    if (hero.items.length >= 3) return null
     const index = player.hand.findIndex((card) => card.id === cardId)
     if (index === -1) return null
     const card = player.hand[index]
@@ -101,6 +102,7 @@ export const usePlayersStore = defineStore('players', () => {
     const player = players.value[playerId]
     const hero = player.heroes[slotIndex]
     if (!hero) return false
+    if (hero.items.length >= 3) return false
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
