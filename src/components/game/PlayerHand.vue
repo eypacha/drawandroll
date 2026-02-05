@@ -24,23 +24,15 @@ const players = usePlayersStore()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 
-// Calculate arc position and rotation for each card
 function getCardStyle(index) {
   const total = myHand.value.length
   if (total === 0) return {}
   
-  // Calculate position from center (-0.5 to 0.5)
   const centerOffset = (index - (total - 1) / 2) / Math.max(total - 1, 1)
-  
-  // Rotation: cards at edges rotate more, center card is straight
   const maxRotation = 8 // degrees
   const rotation = centerOffset * maxRotation * 2
-  
-  // Vertical offset for arc effect: cards at edges are lower
-  const maxVerticalOffset = 20 // pixels
-  const verticalOffset = Math.abs(centerOffset) * maxVerticalOffset
-  
-  // Z-index: higher for cards more to the right when hovered
+  const maxVerticalOffset = 25 // pixels
+  const verticalOffset = Math.pow(centerOffset * 2, 2) * maxVerticalOffset
   const zIndex = index + 1
   
   return {
