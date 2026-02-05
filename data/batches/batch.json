@@ -29,8 +29,8 @@
         "es": "Hierro Mariscal"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 15.\nHP 8 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 15.\nHP 8 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 2,
@@ -48,8 +48,8 @@
         "es": "Firme Yelmo"
       },
       "description": {
-        "en": "A tuned edge: ATK +1, DEF +0.\nTradeoffs marked by +0/+0, durability 1.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +1, DEF +0.\nCoste marcado por +0/+0, durabilidad 1.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
       },
       "stats": {
         "atkBonus": 1,
@@ -69,8 +69,8 @@
         "es": "Suave Balsamo"
       },
       "description": {
-        "en": "A measured remedy that restores 2 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 2 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "A small mercy passed between strangers.\nIt reminds the wounded they are not alone.\nThen the fight resumes.",
+        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
       },
       "stats": {
         "healAmount": 2
@@ -86,8 +86,8 @@
         "es": "Amable Renovar"
       },
       "description": {
-        "en": "A measured remedy that restores 1 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 1 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
+        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
       },
       "stats": {
         "healAmount": 1
@@ -103,8 +103,8 @@
         "es": "Piedra Cazador"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 10.\nHP 4 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 10.\nHP 4 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 2,
@@ -122,8 +122,8 @@
         "es": "Amable Despertar"
       },
       "description": {
-        "en": "A measured remedy that restores 2 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 2 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
+        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
       },
       "stats": {
         "healAmount": 2
@@ -139,8 +139,8 @@
         "es": "Juramentado Yelmo"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +1.\nTradeoffs marked by -1/+0, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +1.\nCoste marcado por -1/+0, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 0,
@@ -160,8 +160,8 @@
         "es": "Ceniza Vanguardia"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 11.\nHP 4 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 11.\nHP 4 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 2,
@@ -179,8 +179,8 @@
         "es": "Silente Descanso"
       },
       "description": {
-        "en": "A measured remedy that restores 2 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 2 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
+        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
       },
       "stats": {
         "healAmount": 2
@@ -196,8 +196,8 @@
         "es": "Rapido Giro"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves - off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta - del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
+        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
       },
       "effect": "prevent_death",
       "stats": {
@@ -214,8 +214,8 @@
         "es": "Reluciente Marca"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +1.\nTradeoffs marked by -1/+0, durability 3.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +1.\nCoste marcado por -1/+0, durabilidad 3.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 0,
@@ -235,8 +235,8 @@
         "es": "Gastado Marca"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +2.\nTradeoffs marked by +0/+0, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +2.\nCoste marcado por +0/+0, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
       },
       "stats": {
         "atkBonus": 0,
@@ -256,8 +256,8 @@
         "es": "Vigilante Cazador"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 1 and DEF 15.\nHP 10 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 1 y DEF 15.\nHP 10 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A veteran of street wars, they carry scars instead of titles.\nThey move with a patience that hides sudden violence.\nFew remember their name; fewer forget their presence.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 1,
@@ -275,8 +275,8 @@
         "es": "Sombrio Cazador"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 12.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 12.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 2,
@@ -294,8 +294,8 @@
         "es": "Ultimo Paso"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves 2 off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta 2 del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "No one sees it coming, not even allies.\nA small defiance that shifts the moment.\nIt leaves no trace but the outcome.",
+        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
       },
       "effect": "reduce_damage",
       "stats": {
@@ -312,8 +312,8 @@
         "es": "Salvaje Explorador"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 12.\nHP 6 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 12.\nHP 6 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 3,
@@ -331,8 +331,8 @@
         "es": "Hierro Filo"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 12.\nHP 8 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 12.\nHP 8 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A veteran of street wars, they carry scars instead of titles.\nThey move with a patience that hides sudden violence.\nFew remember their name; fewer forget their presence.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 3,
@@ -350,8 +350,8 @@
         "es": "Sable Vanguardia"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 4 and DEF 11.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 4 y DEF 11.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
       },
       "stats": {
         "atk": 4,
@@ -369,8 +369,8 @@
         "es": "Verdadero Armadura"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +1.\nTradeoffs marked by +0/+0, durability 3.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +1.\nCoste marcado por +0/+0, durabilidad 3.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 0,
@@ -390,8 +390,8 @@
         "es": "Segundo Balsamo"
       },
       "description": {
-        "en": "A measured remedy that restores 1 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 1 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
+        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
       },
       "stats": {
         "healAmount": 1
@@ -407,8 +407,8 @@
         "es": "Hierro Cazador"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 11.\nHP 7 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 11.\nHP 7 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 3,
@@ -426,8 +426,8 @@
         "es": "Sable Vanguardia 2"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 4 and DEF 11.\nHP 4 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 4 y DEF 11.\nHP 4 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "Raised in border hamlets, they learned to read danger in silence.\nTheir oath was written in ash and kept close to the heart.\nThey fight as if the ground itself depends on it.",
+        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
       },
       "stats": {
         "atk": 4,
@@ -445,8 +445,8 @@
         "es": "Silente Filo"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 10.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 10.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 3,
@@ -464,8 +464,8 @@
         "es": "Breve Remiendo"
       },
       "description": {
-        "en": "A measured remedy that restores 3 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 3 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "A small mercy passed between strangers.\nIt reminds the wounded they are not alone.\nThen the fight resumes.",
+        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
       },
       "stats": {
         "healAmount": 3
@@ -481,8 +481,8 @@
         "es": "Ceniza Vanguardia 2"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 11.\nHP 6 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 11.\nHP 6 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 3,
@@ -500,8 +500,8 @@
         "es": "Silente Mariscal"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 1 and DEF 10.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 1 y DEF 10.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
       },
       "stats": {
         "atk": 1,
@@ -519,8 +519,8 @@
         "es": "Sable Mariscal"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 11.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 11.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
+        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
       },
       "stats": {
         "atk": 3,
@@ -538,8 +538,8 @@
         "es": "Nuevo Llama"
       },
       "description": {
-        "en": "A measured remedy that restores 3 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 3 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
+        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
       },
       "stats": {
         "healAmount": 3
@@ -555,8 +555,8 @@
         "es": "Juramentado Banda"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +2.\nTradeoffs marked by +0/+0, durability 3.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +2.\nCoste marcado por +0/+0, durabilidad 3.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
       },
       "stats": {
         "atkBonus": 0,
@@ -576,8 +576,8 @@
         "es": "Oculto Desvanecer"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves 2 off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta 2 del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
+        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
       },
       "effect": "reduce_damage",
       "stats": {
@@ -594,8 +594,8 @@
         "es": "Ceniza Jinete"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 1 and DEF 10.\nHP 4 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 1 y DEF 10.\nHP 4 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
+        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
       },
       "stats": {
         "atk": 1,
@@ -613,8 +613,8 @@
         "es": "Ultimo Respuesta"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves - off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta - del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
+        "es": "Un habito nacido de sustos y calles vacias.\nCompra un respiro cuando no deberia haberlo.\nLuego se gasta, sin ceremonia."
       },
       "effect": "prevent_death",
       "stats": {
@@ -631,8 +631,8 @@
         "es": "Silente Pulso"
       },
       "description": {
-        "en": "A measured remedy that restores 2 HP.\nUsed at the right time, it turns a loss into a stand.\nNo miracles, only another breath.",
-        "es": "Un remedio medido que restaura 2 HP.\nUsado a tiempo, convierte una perdida en aguante.\nSin milagros, solo otro respiro."
+        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
+        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
       },
       "stats": {
         "healAmount": 2
@@ -648,8 +648,8 @@
         "es": "Contra Vuelta"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves 2 off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta 2 del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "No one sees it coming, not even allies.\nA small defiance that shifts the moment.\nIt leaves no trace but the outcome.",
+        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
       },
       "effect": "reduce_damage",
       "stats": {
@@ -666,8 +666,8 @@
         "es": "Guardado Respuesta"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves - off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta - del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
+        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
       },
       "effect": "cancel_critical",
       "stats": {
@@ -684,8 +684,8 @@
         "es": "Verdadero Arnes"
       },
       "description": {
-        "en": "A tuned edge: ATK +2, DEF +0.\nTradeoffs marked by +0/-1, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +2, DEF +0.\nCoste marcado por +0/-1, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 2,
@@ -705,8 +705,8 @@
         "es": "Implacable Glaive"
       },
       "description": {
-        "en": "A tuned edge: ATK +2, DEF +0.\nTradeoffs marked by +0/-2, durability 1.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +2, DEF +0.\nCoste marcado por +0/-2, durabilidad 1.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 2,
@@ -726,8 +726,8 @@
         "es": "Agudo Coraza"
       },
       "description": {
-        "en": "A tuned edge: ATK +3, DEF +0.\nTradeoffs marked by +0/-1, durability 1.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +3, DEF +0.\nCoste marcado por +0/-1, durabilidad 1.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 3,
@@ -747,8 +747,8 @@
         "es": "Instantaneo Respuesta"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves - off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta - del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
+        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
       },
       "effect": "prevent_death",
       "stats": {
@@ -765,8 +765,8 @@
         "es": "Hierro Guardian"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 1 and DEF 11.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 1 y DEF 11.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 1,
@@ -784,8 +784,8 @@
         "es": "Salvaje Centinela"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 3 and DEF 13.\nHP 8 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 3 y DEF 13.\nHP 8 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
+        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
       },
       "stats": {
         "atk": 3,
@@ -803,8 +803,8 @@
         "es": "Silente Jinete"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 10.\nHP 5 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 10.\nHP 5 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "Raised in border hamlets, they learned to read danger in silence.\nTheir oath was written in ash and kept close to the heart.\nThey fight as if the ground itself depends on it.",
+        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
       },
       "stats": {
         "atk": 2,
@@ -822,8 +822,8 @@
         "es": "Justo Guardia"
       },
       "description": {
-        "en": "A split-second answer when the roll is known.\nIt shaves - off the edge of the blow.\nOne reaction, one moment, then it is gone.",
-        "es": "Una respuesta en el instante en que el dado ya hablo.\nRecorta - del filo del golpe.\nUna reaccion, un momento, y se acaba."
+        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
+        "es": "Un habito nacido de sustos y calles vacias.\nCompra un respiro cuando no deberia haberlo.\nLuego se gasta, sin ceremonia."
       },
       "effect": "cancel_critical",
       "stats": {
@@ -840,8 +840,8 @@
         "es": "Implacable Banda"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +2.\nTradeoffs marked by -1/+0, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +2.\nCoste marcado por -1/+0, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
+        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
       },
       "stats": {
         "atkBonus": 0,
@@ -861,8 +861,8 @@
         "es": "Reluciente Egida"
       },
       "description": {
-        "en": "A tuned edge: ATK +1, DEF +0.\nTradeoffs marked by +0/-1, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +1, DEF +0.\nCoste marcado por +0/-1, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
       },
       "stats": {
         "atkBonus": 1,
@@ -882,8 +882,8 @@
         "es": "Carmesi Guardian"
       },
       "description": {
-        "en": "Forged to hold the line with ATK 2 and DEF 14.\nHP 8 keeps them standing when the board tightens.\nTheir numbers shape the story of every clash.",
-        "es": "Forjado para sostener la linea con ATK 2 y DEF 14.\nHP 8 lo mantiene en pie cuando la mesa se tensa.\nSus numeros cuentan la historia de cada choque."
+        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
+        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
       },
       "stats": {
         "atk": 2,
@@ -901,8 +901,8 @@
         "es": "Gastado Arnes"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +2.\nTradeoffs marked by -1/+0, durability 3.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +2.\nCoste marcado por -1/+0, durabilidad 3.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
       },
       "stats": {
         "atkBonus": 0,
@@ -922,8 +922,8 @@
         "es": "Implacable Marca"
       },
       "description": {
-        "en": "A tuned edge: ATK +2, DEF +0.\nTradeoffs marked by +0/-1, durability 1.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +2, DEF +0.\nCoste marcado por +0/-1, durabilidad 1.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
       },
       "stats": {
         "atkBonus": 2,
@@ -943,8 +943,8 @@
         "es": "Gastado Talismán"
       },
       "description": {
-        "en": "A tuned edge: ATK +0, DEF +1.\nTradeoffs marked by +0/+0, durability 2.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +0, DEF +1.\nCoste marcado por +0/+0, durabilidad 2.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
+        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
       },
       "stats": {
         "atkBonus": 0,
@@ -964,8 +964,8 @@
         "es": "Silente Armadura"
       },
       "description": {
-        "en": "A tuned edge: ATK +2, DEF +0.\nTradeoffs marked by +0/+0, durability 1.\nIt changes the bearer more than it changes the fight.",
-        "es": "Un filo afinado: ATK +2, DEF +0.\nCoste marcado por +0/+0, durabilidad 1.\nCambia al portador mas de lo que cambia la pelea."
+        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
+        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
       },
       "stats": {
         "atkBonus": 2,
