@@ -5,11 +5,7 @@
       v-else-if="!game.isPlaying" 
       @start-game="initGame" 
     />
-    <div class="flex flex-1 flex-col items-center justify-center" v-else>
-      <OpponentHand />
-      <GameTable />
-      <PlayerHand />
-    </div>
+    <GameBoard v-else />
   </div>
 </template>
 
@@ -27,9 +23,7 @@ import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peer
 // Components
 import PreGameScreen from '@/components/game/PreGameScreen.vue'
 import StartGameScreen from '@/components/game/StartGameScreen.vue'
-import OpponentHand from '@/components/game/OpponentHand.vue'
-import PlayerHand from '@/components/game/PlayerHand.vue'
-import GameTable from '@/components/game/GameTable.vue'
+import GameBoard from '@/components/game/GameBoard.vue'
 
 // Batch data
 import batchData from '@/../data/batches/batch-ce5e35aa-f0a3-426b-8eb6-239f51ba639b.json'
