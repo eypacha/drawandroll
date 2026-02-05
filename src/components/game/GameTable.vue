@@ -14,9 +14,9 @@
               class="item-under"
               :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
             >
-              <Card :card="item" />
+              <Card :card="item" :hide-cost="true" />
             </div>
-            <Card :card="getHeroDisplay(slot.hero)" class="hero-card" />
+            <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
           </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>
@@ -40,9 +40,9 @@
               class="item-under"
               :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
             >
-              <Card :card="item" />
+              <Card :card="item" :hide-cost="true" />
             </div>
-            <Card :card="getHeroDisplay(slot.hero)" class="hero-card" />
+            <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
           </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>

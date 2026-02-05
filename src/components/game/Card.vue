@@ -14,7 +14,7 @@
     </div>
 
     <!-- Card Cost (Floating circle, top-right) -->
-    <div class="absolute self-end mt-1 mr-1">
+    <div v-if="!hideCost" class="absolute self-end mt-1 mr-1">
       <span class="w-5 h-5 rounded-full bg-amber-400 text-gray-900 flex items-center justify-center font-bold text-sm shadow border-2 border-white">
         {{ card.cost }}
       </span>
@@ -68,6 +68,10 @@ const props = defineProps({
   card: {
     type: Object,
     required: true
+  },
+  hideCost: {
+    type: Boolean,
+    default: false
   }
 })
 
