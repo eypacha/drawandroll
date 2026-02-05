@@ -63,7 +63,8 @@ function initGame() {
       deckCards: deck.cards,
       playerAHand: playerACards,
       playerBHand: playerBCards,
-      initialTurn
+      initialTurn,
+      turnPhase: game.turnPhase
     }
   })
 }
@@ -83,7 +84,8 @@ function handleMessage(data) {
     }
 
     // Sincroniza turno inicial
-    game.startGame(data.payload.initialTurn)
+    const initialTurnPhase = data.payload.turnPhase || 'recruit'
+    game.startGame(data.payload.initialTurn, initialTurnPhase)
   }
 }
 
