@@ -1,5 +1,5 @@
 <template>
-  <div class="start-game-screen flex-1 flex flex-col items-center justify-center gap-4 p-8">
+  <div class="flex-1 flex flex-col items-center justify-center gap-4 p-8 min-h-[400px] relative">
     <div class="text-center">
       <button 
         @click="$emit('start-game')"
@@ -14,10 +14,3 @@
 <script setup>
 defineEmits(['start-game'])
 </script>
-
-<style scoped>
-.start-game-screen {
-  min-height: 400px;
-  position: relative;
-}
-</style>

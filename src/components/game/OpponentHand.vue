@@ -1,10 +1,10 @@
 <template>
-  <div class="opponent-hand-container">
-    <div class="opponent-hand">
+  <div class="fixed top-0 left-0 right-0 h-[100px] flex justify-center items-start pointer-events-none z-[100]">
+    <div class="flex justify-center items-start pointer-events-auto">
       <div 
         v-for="(card, index) in opponentHand" 
         :key="card.id" 
-        class="card-wrapper"
+        class="card-wrapper transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-top -ml-[55px] first:ml-0"
         :style="getCardStyle(index)"
       >
         <CardBack />
@@ -44,38 +44,11 @@ function getCardStyle(index) {
 </script>
 
 <style scoped>
-.opponent-hand-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.opponent-hand {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  pointer-events: auto;
-}
-
 .card-wrapper {
-  margin-left: -55px;
   transform: 
     translateY(calc(-50% + var(--vertical-offset, 0px))) 
     rotate(var(--rotation, 0deg));
-  transform-origin: top center;
   z-index: var(--z-index, 1);
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.card-wrapper:first-child {
-  margin-left: 0;
 }
 
 .card-wrapper :deep(.card-back) {
