@@ -25,14 +25,14 @@ export const useGameStore = defineStore('game', () => {
   const isEnded = computed(() => phase.value === 'ended')
 
   // Actions
-  function startGame() {
+  function startGame(initialTurn = 'player_a') {
     phase.value = 'playing'
     turn.value = 1
     resources.value = {
       player_a: MAX_RESOURCES,
       player_b: MAX_RESOURCES
     }
-    currentTurn.value = 'player_a'
+    currentTurn.value = initialTurn
     turnPhase.value = 'draw'
     winner.value = null
   }

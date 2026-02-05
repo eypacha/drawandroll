@@ -37,6 +37,10 @@ const deck = useDeckStore()
 const players = usePlayersStore()
 
 function initGame() {
+  if (!connection.isHost) {
+    return
+  }
+
   // Load and shuffle deck
   deck.loadBatch(batchData)
   deck.shuffle()
@@ -48,34 +52,20 @@ function initGame() {
   players.addToHand('player_a', playerACards)
   players.addToHand('player_b', playerBCards)
   
-  game.startGame()
-  
+  // Turno inicial al azar
+  const initialTurn = Math.random() < 0.5 ? 'player_a' : 'player_b'
+  game.startGame(initialTurn)
+
   // Sync state with opponent
   sendMessage({
     type: 'game_init',
     payload: {
       deckCards: deck.cards,
       playerAHand: playerACards,
-      playerBHand: playerBCards
+      playerBHand: playerBCards,
+      initialTurn
     }
   })
-    // Turno inicial al azar
-    const initialTurn = Math.random() < 0.5 ? 'player_a' : 'player_b'
-    game.phase = 'playing'
-    game.currentTurn = initialTurn
-    game.turnPhase = 'draw'
-    game.winner = null
-
-    // Sync state with opponent
-    sendMessage({
-      type: 'game_init',
-      payload: {
-        deckCards: deck.cards,
-        playerAHand: playerACards,
-        playerBHand: playerBCards,
-        initialTurn
-      }
-    })
 }
 
 function handleMessage(data) {
@@ -93,10 +83,7 @@ function handleMessage(data) {
     }
 
     // Sincroniza turno inicial
-    game.phase = 'playing'
-    game.currentTurn = data.payload.initialTurn
-    game.turnPhase = 'draw'
-    game.winner = null
+    game.startGame(data.payload.initialTurn)
   }
 }
 
