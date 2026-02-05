@@ -87,6 +87,11 @@ function handleMessage(data) {
     const initialTurnPhase = data.payload.turnPhase || 'recruit'
     game.startGame(data.payload.initialTurn, initialTurnPhase)
   }
+
+  if (data.type === 'recruit_hero') {
+    const { playerId, card } = data.payload
+    players.addHeroFromRemote(playerId, card)
+  }
 }
 
 onMounted(() => {

@@ -5,7 +5,9 @@
         v-for="(card, index) in myHand" 
         :key="card.id" 
         class="card-wrapper"
+        :class="{ 'is-playable': canRecruit && card.type === 'hero' }"
         :style="getCardStyle(index)"
+        @click="tryRecruit(card)"
       >
         <Card :card="card" class="hand-card" />
       </div>
@@ -15,14 +17,31 @@
 
 <script setup>
 import { computed } from 'vue'
-import { usePlayersStore, useConnectionStore } from '@/stores'
+import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
+import { sendMessage } from '@/services/peerService'
 import Card from './Card.vue'
 
 const connection = useConnectionStore()
 const players = usePlayersStore()
+const game = useGameStore()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
+const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+
+function tryRecruit(card) {
+  if (!canRecruit.value) return
+  if (card.type !== 'hero') return
+  const played = players.playHeroFromHand(myPlayerId.value, card.id)
+  if (!played) return
+  sendMessage({
+    type: 'recruit_hero',
+    payload: {
+      playerId: myPlayerId.value,
+      card: played
+    }
+  })
+}
 
 function getCardStyle(index) {
   const total = myHand.value.length
@@ -74,19 +93,23 @@ function getCardStyle(index) {
   transform-origin: bottom center;
   z-index: var(--z-index, 1);
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
+  cursor: default;
 }
 
 .card-wrapper:first-child {
   margin-left: 0;
 }
 
-.card-wrapper:hover {
+.card-wrapper.is-playable:hover {
   transform: 
     translateY(-0px) 
     rotate(0deg) 
     scale(1.08);
   z-index: var(--hover-z-index, 100);
+}
+
+.card-wrapper.is-playable {
+  cursor: pointer;
 }
 
 .card-wrapper :deep(.hand-card) {
