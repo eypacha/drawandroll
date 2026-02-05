@@ -1,6 +1,9 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
+
+const MAX_RESOURCES = 10
+
 /**
  * Game Store
  * Manages global game state: phases, turns, victory
@@ -8,6 +11,11 @@ import { defineStore } from 'pinia'
 export const useGameStore = defineStore('game', () => {
   // State
   const phase = ref('setup') // 'setup' | 'playing' | 'ended'
+  const turn = ref(0)
+  const resources = ref({
+    player_a: MAX_RESOURCES,
+    player_b: MAX_RESOURCES
+  })
   const currentTurn = ref('player_a') // 'player_a' | 'player_b'
   const turnPhase = ref('draw') // 'draw' | 'recruit' | 'equip' | 'combat' | 'end'
   const winner = ref(null) // null | 'player_a' | 'player_b'
@@ -19,6 +27,11 @@ export const useGameStore = defineStore('game', () => {
   // Actions
   function startGame() {
     phase.value = 'playing'
+    turn.value = 1
+    resources.value = {
+      player_a: MAX_RESOURCES,
+      player_b: MAX_RESOURCES
+    }
     currentTurn.value = 'player_a'
     turnPhase.value = 'draw'
     winner.value = null
@@ -26,6 +39,11 @@ export const useGameStore = defineStore('game', () => {
 
   function $reset() {
     phase.value = 'setup'
+    turn.value = 0
+    resources.value = {
+      player_a: MAX_RESOURCES,
+      player_b: MAX_RESOURCES
+    }
     currentTurn.value = 'player_a'
     turnPhase.value = 'draw'
     winner.value = null
@@ -34,6 +52,8 @@ export const useGameStore = defineStore('game', () => {
   return {
     // State
     phase,
+    resources,
+    turn,
     currentTurn,
     turnPhase,
     winner,

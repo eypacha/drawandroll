@@ -4,6 +4,8 @@
     <GameTable />
     <PlayerHand />
     <TurnStatus />
+    <ResourceDisplayPlayer />
+    <ResourceDisplayOpponent />
   </div>
 </template>
 
@@ -12,4 +14,6 @@ import OpponentHand from './OpponentHand.vue'
 import GameTable from './GameTable.vue'
 import PlayerHand from './PlayerHand.vue'
 import TurnStatus from './TurnStatus.vue'
+import ResourceDisplayPlayer from './ResourceDisplayPlayer.vue'
+import ResourceDisplayOpponent from './ResourceDisplayOpponent.vue'
 </script>
