@@ -59,6 +59,23 @@ function initGame() {
       playerBHand: playerBCards
     }
   })
+    // Turno inicial al azar
+    const initialTurn = Math.random() < 0.5 ? 'player_a' : 'player_b'
+    game.phase = 'playing'
+    game.currentTurn = initialTurn
+    game.turnPhase = 'draw'
+    game.winner = null
+
+    // Sync state with opponent
+    sendMessage({
+      type: 'game_init',
+      payload: {
+        deckCards: deck.cards,
+        playerAHand: playerACards,
+        playerBHand: playerBCards,
+        initialTurn
+      }
+    })
 }
 
 function handleMessage(data) {
@@ -68,11 +85,18 @@ function handleMessage(data) {
     // Sync initial game state from host
     deck.loadBatch(batchData)
     deck.cards = data.payload.deckCards
-    
-    players.addToHand('player_a', data.payload.playerAHand)
-    players.addToHand('player_b', data.payload.playerBHand)
-    
-    game.startGame()
+
+    // Solo repartir cartas si aún no tienen 7
+    if (players.players.player_a.hand.length === 0 && players.players.player_b.hand.length === 0) {
+      players.addToHand('player_a', data.payload.playerAHand)
+      players.addToHand('player_b', data.payload.playerBHand)
+    }
+
+    // Sincroniza turno inicial
+    game.phase = 'playing'
+    game.currentTurn = data.payload.initialTurn
+    game.turnPhase = 'draw'
+    game.winner = null
   }
 }
 

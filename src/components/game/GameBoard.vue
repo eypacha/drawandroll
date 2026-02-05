@@ -3,9 +3,7 @@
     <OpponentHand />
     <GameTable />
     <PlayerHand />
-    <div class="absolute bottom-0 right-0 py-2 px-4">
-       Your turn
-    </div>
+    <TurnStatus />
   </div>
 </template>
 
@@ -13,4 +11,5 @@
 import OpponentHand from './OpponentHand.vue'
 import GameTable from './GameTable.vue'
 import PlayerHand from './PlayerHand.vue'
+import TurnStatus from './TurnStatus.vue'
 </script>
