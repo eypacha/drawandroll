@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 right-0 h-[100px] flex justify-center items-start pointer-events-none z-[100]">
+  <div class="h-[100px] flex justify-center items-start pointer-events-none z-[100]">
     <div class="flex justify-center items-start pointer-events-auto">
       <div 
         v-for="(card, index) in opponentHand" 
