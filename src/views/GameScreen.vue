@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-400 font-sans pb-36">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-400 font-sans">
     <PreGameScreen v-if="!connection.isConnected" />
     <StartGameScreen 
       v-else-if="!game.isPlaying" 

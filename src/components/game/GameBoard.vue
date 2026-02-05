@@ -1,8 +1,11 @@
 <template>
-  <div class="flex flex-1 flex-col items-center justify-center">
+  <div class="relative h-screen overflow-hidden w-full flex flex-1 flex-col items-center justify-center">
     <OpponentHand />
     <GameTable />
     <PlayerHand />
+    <div class="absolute bottom-0 right-0 p-4">
+       Your turn
+    </div>
   </div>
 </template>
 
