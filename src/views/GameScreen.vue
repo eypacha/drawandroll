@@ -92,6 +92,11 @@ function handleMessage(data) {
     const { playerId, card, cost, slotIndex } = data.payload
     players.addHeroFromRemote(playerId, card, cost, slotIndex)
   }
+
+  if (data.type === 'equip_item') {
+    const { playerId, card, cost, slotIndex } = data.payload
+    players.addItemFromRemote(playerId, card, cost, slotIndex)
+  }
 }
 
 onMounted(() => {

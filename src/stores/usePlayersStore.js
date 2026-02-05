@@ -55,7 +55,7 @@ export const usePlayersStore = defineStore('players', () => {
     }
     player.resources -= cost
     player.hand.splice(index, 1)
-    player.heroes[slotIndex] = card
+    player.heroes[slotIndex] = { card, items: [] }
     return { card, cost, slotIndex }
   }
 
@@ -76,7 +76,39 @@ export const usePlayersStore = defineStore('players', () => {
     if (typeof cost === 'number') {
       player.resources = Math.max(0, player.resources - cost)
     }
-    player.heroes[slotIndex] = card
+    player.heroes[slotIndex] = { card, items: [] }
+    return true
+  }
+
+  function playItemFromHand(playerId, cardId, slotIndex) {
+    const player = players.value[playerId]
+    if (slotIndex === null || slotIndex === undefined) return null
+    const hero = player.heroes[slotIndex]
+    if (!hero) return null
+    const index = player.hand.findIndex((card) => card.id === cardId)
+    if (index === -1) return null
+    const card = player.hand[index]
+    if (card.type !== 'item') return null
+    const cost = card.cost
+    if (player.resources < cost) return null
+    player.resources -= cost
+    player.hand.splice(index, 1)
+    hero.items.push(card)
+    return { card, cost, slotIndex }
+  }
+
+  function addItemFromRemote(playerId, card, cost, slotIndex) {
+    const player = players.value[playerId]
+    const hero = player.heroes[slotIndex]
+    if (!hero) return false
+    const index = player.hand.findIndex((c) => c.id === card.id)
+    if (index !== -1) {
+      player.hand.splice(index, 1)
+    }
+    if (typeof cost === 'number') {
+      player.resources = Math.max(0, player.resources - cost)
+    }
+    hero.items.push(card)
     return true
   }
 
@@ -109,6 +141,8 @@ export const usePlayersStore = defineStore('players', () => {
     addToHand,
     playHeroFromHand,
     addHeroFromRemote,
+    playItemFromHand,
+    addItemFromRemote,
     selectCard,
     clearSelection,
     refreshResources,

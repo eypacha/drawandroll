@@ -6,10 +6,10 @@
         :key="card.id" 
         class="card-wrapper"
         :class="{ 
-          'is-playable': canRecruit && card.type === 'hero',
+          'is-playable': canAct && (card.type === 'hero' || card.type === 'item'),
           'is-selected': selectedCardId === card.id
         }"
-        :style="getCardStyle(index)"
+        :style="{ ...getCardStyle(index), '--highlight-color': getHighlightColor(card) }"
         @click="toggleSelect(card)"
       >
         <Card :card="card" class="hand-card" />
@@ -29,16 +29,16 @@ const game = useGameStore()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
-const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const canAct = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
 const selectedCardId = computed(() => players.players[myPlayerId.value].selectedCardId)
 
 function toggleSelect(card) {
-  if (!canRecruit.value) return
-  if (card.type !== 'hero') return
   if (selectedCardId.value === card.id) {
     players.clearSelection(myPlayerId.value)
     return
   }
+  if (!canAct.value) return
+  if (card.type !== 'hero' && card.type !== 'item') return
   players.selectCard(myPlayerId.value, card.id)
 }
 
@@ -59,6 +59,16 @@ function getCardStyle(index) {
     '--z-index': zIndex,
     '--hover-z-index': total + 10
   }
+}
+
+function getHighlightColor(card) {
+  const map = {
+    hero: 'rgba(245, 158, 11, 0.9)',
+    item: 'rgba(139, 92, 246, 0.9)',
+    healing: 'rgba(16, 185, 129, 0.9)',
+    reactive: 'rgba(59, 130, 246, 0.9)'
+  }
+  return map[card.type] || 'rgba(245, 158, 11, 0.9)'
 }
 </script>
 
@@ -113,7 +123,7 @@ function getCardStyle(index) {
 
 .card-wrapper.is-selected :deep(.hand-card) {
   box-shadow:
-    0 0 0 3px rgba(245, 158, 11, 0.8),
+    0 0 0 3px var(--highlight-color, rgba(245, 158, 11, 0.8)),
     0 12px 25px -8px rgba(0, 0, 0, 0.35);
 }
 

@@ -98,20 +98,18 @@ Un turno se resuelve siempre en este orden:
 - El jugador roba cartas del mazo compartido.
 - La cantidad de robo es fija (definida por implementación).
 
-### 3️⃣ Reclutamiento
+### 3️⃣ Reclutamiento y equipamiento
 - El jugador puede jugar cartas de **héroe** pagando su costo.
 - No puede superar el límite de 3 héroes en mesa.
-
-### 4️⃣ Equipamiento
-- El jugador puede equipar ítems a héroes.
+- El jugador puede equipar **ítems** a sus héroes en esta misma fase.
 - Cada héroe tiene slots limitados (definido por plantilla).
 - Los ítems modifican stats de forma inmediata.
 
-### 5️⃣ Combate
+### 4️⃣ Combate
 - El jugador puede declarar ataques con sus héroes.
 - El sistema de combate se define en `COMBAT_SYSTEM.md`.
 
-### 6️⃣ Fin de turno
+### 5️⃣ Fin de turno
 - Se verifica la condición de derrota:
   - si el jugador activo termina el turno sin héroes → pierde.
 

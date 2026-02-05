@@ -7,7 +7,17 @@
           :key="slot.key"
           class="table-slot"
         >
-          <Card v-if="slot.card" :card="slot.card" />
+          <div v-if="slot.hero" class="hero-stack">
+            <div
+              v-for="(item, index) in slot.hero.items"
+              :key="item.id"
+              class="item-under"
+              :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
+            >
+              <Card :card="item" />
+            </div>
+            <Card :card="slot.hero.card" class="hero-card" />
+          </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>
       </div>
@@ -17,11 +27,23 @@
           :key="slot.key"
           class="table-slot"
           :class="{
-            'slot-hoverable': canPlaceSelected && !slot.card
+            'slot-hoverable': canPlaceHero && !slot.hero,
+            'slot-hoverable-hero': canEquipItem && slot.hero
           }"
+          :style="{ '--slot-highlight': slotHighlightColor, '--slot-highlight-soft': slotHighlightSoft }"
           @click="tryPlace(slot.index)"
         >
-          <Card v-if="slot.card" :card="slot.card" />
+          <div v-if="slot.hero" class="hero-stack">
+            <div
+              v-for="(item, index) in slot.hero.items"
+              :key="item.id"
+              class="item-under"
+              :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
+            >
+              <Card :card="item" />
+            </div>
+            <Card :card="slot.hero.card" class="hero-card" />
+          </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>
       </div>
@@ -52,7 +74,7 @@ const mySlots = computed(() => {
   return Array.from({ length: 3 }, (_, index) => ({
     key: `my-${index}`,
     index,
-    card: myHeroes.value[index] || null
+    hero: myHeroes.value[index] || null
   }))
 })
 
@@ -60,7 +82,7 @@ const opponentSlots = computed(() => {
   return Array.from({ length: 3 }, (_, index) => ({
     key: `opp-${index}`,
     index,
-    card: opponentHeroes.value[index] || null
+    hero: opponentHeroes.value[index] || null
   }))
 })
 
@@ -71,26 +93,65 @@ const selectedCard = computed(() => {
 
 const canAffordSelected = computed(() => {
   if (!selectedCard.value) return false
-  const cost = players.getRecruitCost(myPlayerId.value, selectedCard.value.cost)
+  const cost = selectedCard.value.type === 'hero'
+    ? players.getRecruitCost(myPlayerId.value, selectedCard.value.cost)
+    : selectedCard.value.cost
   return players.players[myPlayerId.value].resources >= cost
 })
 
-const canPlaceSelected = computed(() => canRecruit.value && !!selectedCard.value && canAffordSelected.value)
+const canPlaceHero = computed(() => canRecruit.value && selectedCard.value?.type === 'hero' && canAffordSelected.value)
+const canEquipItem = computed(() => canRecruit.value && selectedCard.value?.type === 'item' && canAffordSelected.value)
+
+const slotHighlightColor = computed(() => {
+  const map = {
+    hero: 'rgba(245, 158, 11, 0.9)',
+    item: 'rgba(139, 92, 246, 0.9)',
+    healing: 'rgba(16, 185, 129, 0.9)',
+    reactive: 'rgba(59, 130, 246, 0.9)'
+  }
+  return map[selectedCard.value?.type] || 'rgba(245, 158, 11, 0.9)'
+})
+
+const slotHighlightSoft = computed(() => {
+  const map = {
+    hero: 'rgba(245, 158, 11, 0.35)',
+    item: 'rgba(139, 92, 246, 0.35)',
+    healing: 'rgba(16, 185, 129, 0.35)',
+    reactive: 'rgba(59, 130, 246, 0.35)'
+  }
+  return map[selectedCard.value?.type] || 'rgba(245, 158, 11, 0.35)'
+})
 
 function tryPlace(slotIndex) {
-  if (!canPlaceSelected.value) return
-  const played = players.playHeroFromHand(myPlayerId.value, selectedCardId.value, slotIndex)
-  if (!played) return
-  players.clearSelection(myPlayerId.value)
-  sendMessage({
-    type: 'recruit_hero',
-    payload: {
-      playerId: myPlayerId.value,
-      card: played.card,
-      cost: played.cost,
-      slotIndex: played.slotIndex
-    }
-  })
+  if (canEquipItem.value) {
+    const played = players.playItemFromHand(myPlayerId.value, selectedCardId.value, slotIndex)
+    if (!played) return
+    players.clearSelection(myPlayerId.value)
+    sendMessage({
+      type: 'equip_item',
+      payload: {
+        playerId: myPlayerId.value,
+        card: played.card,
+        cost: played.cost,
+        slotIndex: played.slotIndex
+      }
+    })
+    return
+  }
+  if (canPlaceHero.value) {
+    const played = players.playHeroFromHand(myPlayerId.value, selectedCardId.value, slotIndex)
+    if (!played) return
+    players.clearSelection(myPlayerId.value)
+    sendMessage({
+      type: 'recruit_hero',
+      payload: {
+        playerId: myPlayerId.value,
+        card: played.card,
+        cost: played.cost,
+        slotIndex: played.slotIndex
+      }
+    })
+  }
 }
 </script>
 
@@ -109,10 +170,36 @@ function tryPlace(slotIndex) {
 }
 
 .table-slot.slot-hoverable:hover {
-  border-color: rgba(245, 158, 11, 0.9);
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35);
+  border-color: var(--slot-highlight, rgba(245, 158, 11, 0.9));
+  box-shadow: 0 0 0 3px var(--slot-highlight-soft, rgba(245, 158, 11, 0.35));
   background: rgba(255, 255, 255, 0.35);
   cursor: pointer;
+}
+
+.table-slot.slot-hoverable-hero:hover {
+  border-color: var(--slot-highlight, rgba(245, 158, 11, 0.9));
+  box-shadow: 0 0 0 3px var(--slot-highlight-soft, rgba(245, 158, 11, 0.35));
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+.hero-stack {
+  position: relative;
+  width: 176px;
+  height: 264px;
+}
+
+.hero-card {
+  position: relative;
+  z-index: 2;
+}
+
+.item-under {
+  position: absolute;
+  inset: 0;
+  transform: translateY(var(--item-offset, 16px));
+  z-index: 1;
+  pointer-events: none;
 }
 
 .slot-placeholder {

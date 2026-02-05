@@ -20,7 +20,6 @@ const phaseLabel = computed(() => {
   const map = {
     draw: 'Draw',
     recruit: 'Recruit',
-    equip: 'Equip',
     combat: 'Combat',
     end: 'End'
   }

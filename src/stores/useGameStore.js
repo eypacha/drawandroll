@@ -17,7 +17,7 @@ export const useGameStore = defineStore('game', () => {
     player_b: MAX_RESOURCES
   })
   const currentTurn = ref('player_a') // 'player_a' | 'player_b'
-  const turnPhase = ref('draw') // 'draw' | 'recruit' | 'equip' | 'combat' | 'end'
+  const turnPhase = ref('draw') // 'draw' | 'recruit' | 'combat' | 'end'
   const winner = ref(null) // null | 'player_a' | 'player_b'
 
   // Getters
