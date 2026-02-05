@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col items-center justify-center gap-6 p-6 min-h-[400px] relative">
+  <div class="flex-1 -mt-10 flex flex-col items-center justify-center gap-6 p-6 min-h-[400px] relative">
     <div class="w-full max-w-5xl grid grid-rows-2 gap-8">
       <div class="grid grid-cols-3 gap-6 place-items-center">
         <div

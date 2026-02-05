@@ -100,7 +100,7 @@ function getCardStyle(index) {
   margin-left: 0;
 }
 
-.card-wrapper.is-playable:hover {
+.card-wrapper:hover {
   transform: 
     translateY(-0px) 
     rotate(0deg) 
