@@ -5,9 +5,12 @@
         v-for="(card, index) in myHand" 
         :key="card.id" 
         class="card-wrapper"
-        :class="{ 'is-playable': canRecruit && card.type === 'hero' }"
+        :class="{ 
+          'is-playable': canRecruit && card.type === 'hero',
+          'is-selected': selectedCardId === card.id
+        }"
         :style="getCardStyle(index)"
-        @click="tryRecruit(card)"
+        @click="toggleSelect(card)"
       >
         <Card :card="card" class="hand-card" />
       </div>
@@ -18,7 +21,6 @@
 <script setup>
 import { computed } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
-import { sendMessage } from '@/services/peerService'
 import Card from './Card.vue'
 
 const connection = useConnectionStore()
@@ -28,20 +30,16 @@ const game = useGameStore()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const selectedCardId = computed(() => players.players[myPlayerId.value].selectedCardId)
 
-function tryRecruit(card) {
+function toggleSelect(card) {
   if (!canRecruit.value) return
   if (card.type !== 'hero') return
-  const played = players.playHeroFromHand(myPlayerId.value, card.id)
-  if (!played) return
-  sendMessage({
-    type: 'recruit_hero',
-    payload: {
-      playerId: myPlayerId.value,
-      card: played.card,
-      cost: played.cost
-    }
-  })
+  if (selectedCardId.value === card.id) {
+    players.clearSelection(myPlayerId.value)
+    return
+  }
+  players.selectCard(myPlayerId.value, card.id)
 }
 
 function getCardStyle(index) {
@@ -111,6 +109,12 @@ function getCardStyle(index) {
 
 .card-wrapper.is-playable {
   cursor: pointer;
+}
+
+.card-wrapper.is-selected :deep(.hand-card) {
+  box-shadow:
+    0 0 0 3px rgba(245, 158, 11, 0.8),
+    0 12px 25px -8px rgba(0, 0, 0, 0.35);
 }
 
 .card-wrapper :deep(.hand-card) {

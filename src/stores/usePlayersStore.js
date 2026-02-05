@@ -9,10 +9,11 @@ export const usePlayersStore = defineStore('players', () => {
   // Initial player state factory
   const createPlayer = () => ({
     hand: [],
-    heroes: [], // max 3
+    heroes: [null, null, null], // 3 fixed slots
     resources: 5,
     maxResources: 5,
-    heroesLost: 0
+    heroesLost: 0,
+    selectedCardId: null
   })
 
   // State
@@ -36,33 +37,55 @@ export const usePlayersStore = defineStore('players', () => {
     players.value[playerId].hand.push(...cards)
   }
 
-  function playHeroFromHand(playerId, cardId) {
+  function playHeroFromHand(playerId, cardId, slotIndex = null) {
     const player = players.value[playerId]
-    if (player.heroes.length >= 3) return null
+    const heroCount = player.heroes.filter(Boolean).length
+    if (heroCount >= 3) return null
     const index = player.hand.findIndex((card) => card.id === cardId)
     if (index === -1) return null
     const card = player.hand[index]
     if (card.type !== 'hero') return null
     const cost = getRecruitCost.value(playerId, card.cost)
     if (player.resources < cost) return null
+    if (slotIndex !== null) {
+      if (player.heroes[slotIndex]) return null
+    } else {
+      slotIndex = player.heroes.findIndex((slot) => !slot)
+      if (slotIndex === -1) return null
+    }
     player.resources -= cost
     player.hand.splice(index, 1)
-    player.heroes.push(card)
-    return { card, cost }
+    player.heroes[slotIndex] = card
+    return { card, cost, slotIndex }
   }
 
-  function addHeroFromRemote(playerId, card, cost) {
+  function addHeroFromRemote(playerId, card, cost, slotIndex = null) {
     const player = players.value[playerId]
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
     }
-    if (player.heroes.length >= 3) return false
+    const heroCount = player.heroes.filter(Boolean).length
+    if (heroCount >= 3) return false
+    if (slotIndex !== null) {
+      if (player.heroes[slotIndex]) return false
+    } else {
+      slotIndex = player.heroes.findIndex((slot) => !slot)
+      if (slotIndex === -1) return false
+    }
     if (typeof cost === 'number') {
       player.resources = Math.max(0, player.resources - cost)
     }
-    player.heroes.push(card)
+    player.heroes[slotIndex] = card
     return true
+  }
+
+  function selectCard(playerId, cardId) {
+    players.value[playerId].selectedCardId = cardId
+  }
+
+  function clearSelection(playerId) {
+    players.value[playerId].selectedCardId = null
   }
 
   function refreshResources(playerId) {
@@ -86,6 +109,8 @@ export const usePlayersStore = defineStore('players', () => {
     addToHand,
     playHeroFromHand,
     addHeroFromRemote,
+    selectCard,
+    clearSelection,
     refreshResources,
     $reset
   }
