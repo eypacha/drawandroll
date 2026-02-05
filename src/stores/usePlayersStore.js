@@ -13,7 +13,8 @@ export const usePlayersStore = defineStore('players', () => {
     resources: 5,
     maxResources: 5,
     heroesLost: 0,
-    selectedCardId: null
+    selectedCardId: null,
+    hoveredCardId: null
   })
 
   // State
@@ -122,6 +123,14 @@ export const usePlayersStore = defineStore('players', () => {
     players.value[playerId].selectedCardId = null
   }
 
+  function setHoveredCard(playerId, cardId) {
+    players.value[playerId].hoveredCardId = cardId
+  }
+
+  function clearHoveredCard(playerId) {
+    players.value[playerId].hoveredCardId = null
+  }
+
   function refreshResources(playerId) {
     players.value[playerId].resources = players.value[playerId].maxResources
   }
@@ -147,6 +156,8 @@ export const usePlayersStore = defineStore('players', () => {
     addItemFromRemote,
     selectCard,
     clearSelection,
+    setHoveredCard,
+    clearHoveredCard,
     refreshResources,
     $reset
   }

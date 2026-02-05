@@ -5,7 +5,7 @@
         v-for="(card, index) in opponentHand" 
         :key="card.id" 
         class="card-wrapper transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-top -ml-[55px] first:ml-0"
-        :style="getCardStyle(index)"
+        :style="getCardStyle(index, card)"
       >
         <CardBack />
       </div>
@@ -23,8 +23,9 @@ const players = usePlayersStore()
 
 const opponentPlayerId = computed(() => connection.isHost ? 'player_b' : 'player_a')
 const opponentHand = computed(() => players.players[opponentPlayerId.value].hand)
+const opponentHoveredId = computed(() => players.players[opponentPlayerId.value].hoveredCardId)
 
-function getCardStyle(index) {
+function getCardStyle(index, card) {
   const total = opponentHand.value.length
   if (total === 0) return {}
   
@@ -34,11 +35,13 @@ function getCardStyle(index) {
   const maxVerticalOffset = 20 // pixels
   const verticalOffset = (1 - Math.pow(centerOffset * 2, 2)) * maxVerticalOffset
   const zIndex = index + 1
+  const hoverOffset = opponentHoveredId.value === card.id ? 18 : 0
   
   return {
     '--rotation': `${rotation}deg`,
     '--vertical-offset': `${verticalOffset}px`,
-    '--z-index': zIndex
+    '--z-index': zIndex,
+    '--hover-offset': `${hoverOffset}px`
   }
 }
 </script>
@@ -46,7 +49,7 @@ function getCardStyle(index) {
 <style scoped>
 .card-wrapper {
   transform: 
-    translateY(calc(-50% + var(--vertical-offset, 0px))) 
+    translateY(calc(-50% + var(--vertical-offset, 0px) + var(--hover-offset, 0px))) 
     rotate(var(--rotation, 0deg));
   z-index: var(--z-index, 1);
 }

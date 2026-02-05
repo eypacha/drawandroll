@@ -112,6 +112,15 @@ function handleMessage(data) {
     deck.removeCardById(card.id)
     players.addToHand(playerId, [card])
   }
+
+  if (data.type === 'hover_card') {
+    const { playerId, cardId } = data.payload
+    if (cardId) {
+      players.setHoveredCard(playerId, cardId)
+    } else {
+      players.clearHoveredCard(playerId)
+    }
+  }
 }
 
 onMounted(() => {

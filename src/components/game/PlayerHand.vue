@@ -11,6 +11,8 @@
         }"
         :style="{ ...getCardStyle(index), '--highlight-color': getHighlightColor(card) }"
         @click="toggleSelect(card)"
+        @mouseenter="onHover(card)"
+        @mouseleave="onHoverEnd(card)"
       >
         <Card :card="card" class="hand-card" />
       </div>
@@ -21,6 +23,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
+import { sendMessage } from '@/services/peerService'
 import Card from './Card.vue'
 
 const connection = useConnectionStore()
@@ -69,6 +72,23 @@ function getHighlightColor(card) {
     reactive: 'rgba(59, 130, 246, 0.9)'
   }
   return map[card.type] || 'rgba(245, 158, 11, 0.9)'
+}
+
+function onHover(card) {
+  players.setHoveredCard(myPlayerId.value, card.id)
+  sendMessage({
+    type: 'hover_card',
+    payload: { playerId: myPlayerId.value, cardId: card.id }
+  })
+}
+
+function onHoverEnd(card) {
+  if (players.players[myPlayerId.value].hoveredCardId !== card.id) return
+  players.clearHoveredCard(myPlayerId.value)
+  sendMessage({
+    type: 'hover_card',
+    payload: { playerId: myPlayerId.value, cardId: null }
+  })
 }
 </script>
 
