@@ -107,6 +107,7 @@ Un turno se resuelve siempre en este orden:
 
 ### 4️⃣ Combate
 - El jugador puede declarar ataques con sus héroes.
+- **En el turno 1 no hay fase de combate.** (Se pasa directo al fin de turno.)
 - El sistema de combate se define en `COMBAT_SYSTEM.md`.
 
 ### 5️⃣ Fin de turno

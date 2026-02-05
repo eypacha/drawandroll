@@ -1,6 +1,6 @@
 <template>
   <div class="flex-1 -mt-10 flex flex-col items-center justify-center gap-6 p-6 min-h-[400px] relative">
-    <div class="w-full max-w-5xl grid grid-rows-2 gap-8 [transform:perspective(2000px)_rotateX(45deg)]">
+    <div class="w-full max-w-5xl grid grid-rows-2 gap-18 [transform:perspective(2000px)_rotateX(45deg)]">
       <div class="grid grid-cols-3 gap-6 place-items-center">
         <div
           v-for="slot in opponentSlots"
@@ -12,7 +12,7 @@
               v-for="(item, index) in slot.hero.items"
               :key="item.id"
               class="item-under"
-              :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
+              :style="{ '--item-offset': `${-(index + 1) * 25}px`, '--item-z': `${9 - index}` }"
             >
               <Card :card="item" :hide-cost="true" />
             </div>
@@ -38,7 +38,7 @@
               v-for="(item, index) in slot.hero.items"
               :key="item.id"
               class="item-under"
-              :style="{ '--item-offset': `${-(index + 1) * 25}px` }"
+              :style="{ '--item-offset': `${-(index + 1) * 25}px`, '--item-z': `${9 - index}` }"
             >
               <Card :card="item" :hide-cost="true" />
             </div>
@@ -215,14 +215,14 @@ function getHeroDisplay(hero) {
 
 .hero-card {
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 .item-under {
   position: absolute;
   inset: 0;
   transform: translateY(var(--item-offset, 16px));
-  z-index: 1;
+  z-index: var(--item-z, 1);
   pointer-events: none;
 }
 

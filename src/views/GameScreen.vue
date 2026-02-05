@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
   useConnectionStore, 
@@ -35,6 +35,10 @@ const connection = useConnectionStore()
 const game = useGameStore()
 const deck = useDeckStore()
 const players = usePlayersStore()
+const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
+const isDrawing = ref(false)
+const DRAW_COUNT = 2
+const DRAW_DELAY_MS = 350
 
 function initGame() {
   if (!connection.isHost) {
@@ -97,6 +101,17 @@ function handleMessage(data) {
     const { playerId, card, cost, slotIndex } = data.payload
     players.addItemFromRemote(playerId, card, cost, slotIndex)
   }
+
+  if (data.type === 'advance_phase') {
+    const { turn, currentTurn, turnPhase } = data.payload
+    game.setTurnState(turn, currentTurn, turnPhase)
+  }
+
+  if (data.type === 'draw_card') {
+    const { playerId, card } = data.payload
+    deck.removeCardById(card.id)
+    players.addToHand(playerId, [card])
+  }
 }
 
 onMounted(() => {
@@ -128,4 +143,40 @@ onMounted(() => {
     }, 100)
   }
 })
+
+async function drawSequence() {
+  if (isDrawing.value) return
+  isDrawing.value = true
+
+  for (let i = 0; i < DRAW_COUNT; i++) {
+    const drawn = deck.draw(1)
+    if (drawn.length === 0) break
+    players.addToHand(myPlayerId.value, drawn)
+    sendMessage({
+      type: 'draw_card',
+      payload: { playerId: myPlayerId.value, card: drawn[0] }
+    })
+    await new Promise((resolve) => setTimeout(resolve, DRAW_DELAY_MS))
+  }
+
+  isDrawing.value = false
+  game.advancePhase()
+  sendMessage({
+    type: 'advance_phase',
+    payload: {
+      turn: game.turn,
+      currentTurn: game.currentTurn,
+      turnPhase: game.turnPhase
+    }
+  })
+}
+
+watch(
+  () => [game.turnPhase, game.currentTurn],
+  ([phase, current]) => {
+    if (phase === 'draw' && current === myPlayerId.value) {
+      drawSequence()
+    }
+  }
+)
 </script>

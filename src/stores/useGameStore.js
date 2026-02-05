@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { usePlayersStore } from './usePlayersStore'
 
 
 const MAX_RESOURCES = 10
@@ -9,6 +10,7 @@ const MAX_RESOURCES = 10
  * Manages global game state: phases, turns, victory
  */
 export const useGameStore = defineStore('game', () => {
+  const players = usePlayersStore()
   // State
   const phase = ref('setup') // 'setup' | 'playing' | 'ended'
   const turn = ref(0)
@@ -36,6 +38,48 @@ export const useGameStore = defineStore('game', () => {
     // First player skips draw phase on turn 1
     turnPhase.value = initialTurnPhase
     winner.value = null
+    players.refreshResources(currentTurn.value)
+  }
+
+  function advancePhase() {
+    if (phase.value !== 'playing') return
+    if (turnPhase.value === 'draw') {
+      turnPhase.value = 'recruit'
+      return
+    }
+    if (turnPhase.value === 'recruit') {
+      if (turn.value === 1) {
+        turnPhase.value = 'end'
+        return
+      }
+      turnPhase.value = 'combat'
+      return
+    }
+    if (turnPhase.value === 'combat') {
+      turnPhase.value = 'end'
+      return
+    }
+    if (turnPhase.value === 'end') {
+      endTurn()
+    }
+  }
+
+  function endTurn() {
+    currentTurn.value = currentTurn.value === 'player_a' ? 'player_b' : 'player_a'
+    if (currentTurn.value === 'player_a') {
+      turn.value += 1
+    }
+    turnPhase.value = 'draw'
+    players.refreshResources(currentTurn.value)
+  }
+
+  function setTurnState(nextTurn, nextCurrent, nextPhase) {
+    turn.value = nextTurn
+    currentTurn.value = nextCurrent
+    turnPhase.value = nextPhase
+    if (nextPhase === 'draw') {
+      players.refreshResources(nextCurrent)
+    }
   }
 
   function $reset() {
@@ -63,6 +107,9 @@ export const useGameStore = defineStore('game', () => {
     isEnded,
     // Actions
     startGame,
+    advancePhase,
+    endTurn,
+    setTurnState,
     $reset
   }
 })

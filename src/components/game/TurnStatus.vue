@@ -5,12 +5,20 @@
     <div class="text-xs font-normal opacity-80">
       {{ phaseLabel }}
     </div>
+    <button
+      v-if="isMyTurn && advanceLabel"
+      class="mt-2 px-3 py-1 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+      @click="advance"
+    >
+      {{ advanceLabel }}
+    </button>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useGameStore, useConnectionStore } from '@/stores'
+import { sendMessage } from '@/services/peerService'
 
 const game = useGameStore()
 const connection = useConnectionStore()
@@ -25,4 +33,26 @@ const phaseLabel = computed(() => {
   }
   return map[game.turnPhase] || ''
 })
+
+const advanceLabel = computed(() => {
+  if (game.turnPhase === 'combat') return 'End Turn'
+  if (game.turnPhase === 'recruit') {
+    return game.turn === 1 ? 'End Turn' : 'To Combat'
+  }
+  if (game.turnPhase === 'end') return 'End Turn'
+  return ''
+})
+
+function advance() {
+  if (!isMyTurn.value) return
+  game.advancePhase()
+  sendMessage({
+    type: 'advance_phase',
+    payload: {
+      turn: game.turn,
+      currentTurn: game.currentTurn,
+      turnPhase: game.turnPhase
+    }
+  })
+}
 </script>

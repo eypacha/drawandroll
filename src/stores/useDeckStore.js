@@ -33,6 +33,12 @@ export const useDeckStore = defineStore('deck', () => {
     return cards.value.splice(0, count)
   }
 
+  function removeCardById(cardId) {
+    const index = cards.value.findIndex((card) => card.id === cardId)
+    if (index === -1) return null
+    return cards.value.splice(index, 1)[0]
+  }
+
   function discard(card) {
     discardPile.value.push(card)
   }
@@ -55,6 +61,7 @@ export const useDeckStore = defineStore('deck', () => {
     loadBatch,
     shuffle,
     draw,
+    removeCardById,
     discard,
     $reset
   }
