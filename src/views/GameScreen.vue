@@ -55,52 +55,8 @@
       <p class="text-center text-xs uppercase tracking-widest text-gray-400 mb-2">
         Your hand ({{ myHand.length }} cards)
       </p>
-      <div class="flex justify-center gap-2 min-h-36">
-        <div 
-          v-for="(card, index) in myHand" 
-          :key="card.id" 
-          class="w-20 h-32 rounded border bg-white flex flex-col overflow-hidden cursor-pointer transition-transform hover:-translate-y-2 hover:shadow-lg"
-          :class="{
-            'border-amber-400': card.type === 'hero',
-            'border-violet-400': card.type === 'item',
-            'border-emerald-400': card.type === 'healing',
-            'border-blue-400': card.type === 'reactive'
-          }"
-        >
-          <!-- Card header -->
-          <div class="flex justify-between items-center px-1.5 py-1 bg-gray-50 text-[0.6rem] uppercase">
-            <span class="text-gray-500">{{ card.type }}</span>
-            <span class="w-4 h-4 rounded-full bg-amber-400 text-gray-900 flex items-center justify-center font-bold text-[0.6rem]">
-              {{ card.cost }}
-            </span>
-          </div>
-          
-          <!-- Card body -->
-          <div class="flex-1 flex flex-col justify-center p-1.5 text-center">
-            <div class="text-[0.6rem] text-gray-400 capitalize mb-1">
-              {{ formatTemplate(card.template) }}
-            </div>
-            <div class="flex flex-col gap-0.5 text-[0.65rem] font-medium text-gray-700">
-              <template v-if="card.type === 'hero'">
-                <span>ATK {{ card.stats.atk }}</span>
-                <span>DEF {{ card.stats.def }}</span>
-                <span>HP {{ card.stats.hp }}</span>
-              </template>
-              <template v-else-if="card.type === 'item'">
-                <span v-if="card.stats.atkBonus">+{{ card.stats.atkBonus }} ATK</span>
-                <span v-if="card.stats.defBonus">+{{ card.stats.defBonus }} DEF</span>
-                <span v-if="card.stats.defModifier < 0">{{ card.stats.defModifier }} DEF</span>
-                <span>DUR {{ card.stats.durability }}</span>
-              </template>
-              <template v-else-if="card.type === 'healing'">
-                <span>+{{ card.stats.healAmount }} HP</span>
-              </template>
-              <template v-else-if="card.type === 'reactive'">
-                <span class="text-[0.55rem]">{{ formatTemplate(card.effect) }}</span>
-              </template>
-            </div>
-          </div>
-        </div>
+      <div class="flex justify-center gap-4 min-h-36">
+        <Card v-for="(card, index) in myHand" :key="card.id" :card="card" />
       </div>
     </div>
   </div>
@@ -118,7 +74,9 @@ import {
 import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peerService'
 
 // Import batch data
+
 import batchData from '@/../data/batches/batch-ce5e35aa-f0a3-426b-8eb6-239f51ba639b.json'
+import Card from '@/components/Card.vue'
 
 const route = useRoute()
 const router = useRouter()
