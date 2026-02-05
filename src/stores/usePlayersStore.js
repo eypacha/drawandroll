@@ -43,18 +43,24 @@ export const usePlayersStore = defineStore('players', () => {
     if (index === -1) return null
     const card = player.hand[index]
     if (card.type !== 'hero') return null
+    const cost = getRecruitCost.value(playerId, card.cost)
+    if (player.resources < cost) return null
+    player.resources -= cost
     player.hand.splice(index, 1)
     player.heroes.push(card)
-    return card
+    return { card, cost }
   }
 
-  function addHeroFromRemote(playerId, card) {
+  function addHeroFromRemote(playerId, card, cost) {
     const player = players.value[playerId]
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
     }
     if (player.heroes.length >= 3) return false
+    if (typeof cost === 'number') {
+      player.resources = Math.max(0, player.resources - cost)
+    }
     player.heroes.push(card)
     return true
   }

@@ -38,7 +38,8 @@ function tryRecruit(card) {
     type: 'recruit_hero',
     payload: {
       playerId: myPlayerId.value,
-      card: played
+      card: played.card,
+      cost: played.cost
     }
   })
 }

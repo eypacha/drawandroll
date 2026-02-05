@@ -90,7 +90,7 @@ function handleMessage(data) {
 
   if (data.type === 'recruit_hero') {
     const { playerId, card } = data.payload
-    players.addHeroFromRemote(playerId, card)
+    players.addHeroFromRemote(playerId, card, data.payload.cost)
   }
 }
 
