@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-white font-sans pb-36">
+  <div class="min-h-screen flex flex-col bg-gray-400 font-sans pb-36">
     <OpponentHand />
     <GameStatus @start-game="initGame" />
     <PlayerHand />

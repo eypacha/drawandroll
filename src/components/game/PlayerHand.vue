@@ -100,6 +100,5 @@ function getCardStyle(index) {
 .card-wrapper:hover :deep(.hand-card) {
   box-shadow: 
     0 25px 50px -12px rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(255, 215, 0, 0.5);
 }
 </style>

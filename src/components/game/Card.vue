@@ -9,7 +9,7 @@
     }"
   >
     <!-- Card Name (Top) -->
-    <div class="px-2 py-2 bg-gray-50 text-base leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
+    <div class="px-2 py-1 bg-gray-50 text-xs leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
       {{ card.name?.en || card.name }}
     </div>
 
@@ -20,6 +20,18 @@
       </span>
     </div>
 
+    <!-- Card Image (Middle) -->
+    <div class="w-full h-28 bg-gray-200 flex items-center justify-center overflow-hidden">
+      <img 
+        v-if="card.imageUrl" 
+        :src="card.imageUrl" 
+        alt="Card Image" 
+        class="object-cover w-full h-full"
+      />
+      <div v-else class="text-gray-400 text-sm italic">
+        No Image
+      </div>
+    </div>
     <!-- Card Stats & Template (Middle) -->
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
       <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
@@ -46,7 +58,7 @@
         </template>
       </div>
       <!-- Description (Below stats) -->
-      <div class="mt-2 text-xs text-gray-500 font-normal italic leading-tight">
+      <div class="mt-2 text-[10px] text-gray-500 font-normal italic leading-tight">
         {{ card.description?.en || card.description }}
       </div>
     </div>

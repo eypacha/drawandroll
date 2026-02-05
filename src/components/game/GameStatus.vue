@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1 flex flex-col items-center justify-center gap-4 p-8">
     <!-- Connection status -->
-    <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-400">
+    <div class="flex items-center gap-2 text-xs uppercase tracking-widest">
       <span 
         class="w-2 h-2 rounded-full"
         :class="{
