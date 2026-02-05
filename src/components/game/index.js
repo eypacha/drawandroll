@@ -1,3 +1,4 @@
+export { default as GameTable } from './GameTable.vue'
 export { default as Card } from './Card.vue'
 export { default as CardBack } from './CardBack.vue'
 export { default as OpponentHand } from './OpponentHand.vue'

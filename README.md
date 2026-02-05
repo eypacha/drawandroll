@@ -13,9 +13,7 @@ No es un TCG, no es MTG-like, no es un deckbuilder.
 - **Framework**: Vue 3
 - **Estilos**: Tailwind CSS
 - **Estado**: simple y explícito (sin overengineering)
-- **Objetivo técnico**: prototipo jugable rápido, fácil de iterar
-
-No se prioriza optimización ni arquitectura definitiva.
+- **Objetivo técnico**: PMV pulido con optimización, arquitectura limpia y experiencia de usuario refinada
 
 ---
 
@@ -67,11 +65,16 @@ El PMV debe permitir:
 - Repetir partidas en la misma sesión
 - Ajustar números y probabilidades rápidamente
 
+El PMV **prioriza**:
+- pulido estético
+- UX fluida
+- rendimiento optimizado
+- código mantenible
+
 El PMV **no necesita**:
 - gran variedad de cartas
-- arte final
 - sonido
-- animaciones complejas
+- animaciones excesivamente complejas
 
 ---
 
@@ -89,6 +92,19 @@ El diseño prioriza:
 - tensión
 - legibilidad
 - decisiones incómodas
+
+---
+
+## Calidad y pulido
+
+Este PMV se enfoca en **calidad de ejecución**:
+
+- **Optimización de rendimiento**: código eficiente, renderizado optimizado, gestión de estado ligera
+- **Pulido estético y UX**: interfaz refinada, transiciones fluidas, feedback visual claro
+- **Código limpio y mantenible**: arquitectura clara, patrones consistentes, documentación adecuada
+- **Experiencia profesional**: el juego debe sentirse completo y pulido, no como un prototipo
+
+Aunque es un PMV en alcance, la **calidad de ejecución es prioritaria**.
 
 ---
 

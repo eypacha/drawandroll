@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gray-400 font-sans pb-36">
     <OpponentHand />
-    <GameStatus @start-game="initGame" />
+    <GameTable @start-game="initGame" />
     <PlayerHand />
   </div>
 </template>
@@ -20,7 +20,7 @@ import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peer
 // Components
 import OpponentHand from '@/components/game/OpponentHand.vue'
 import PlayerHand from '@/components/game/PlayerHand.vue'
-import GameStatus from '@/components/game/GameStatus.vue'
+import GameTable from '@/components/game/GameTable.vue'
 
 // Batch data
 import batchData from '@/../data/batches/batch-ce5e35aa-f0a3-426b-8eb6-239f51ba639b.json'
