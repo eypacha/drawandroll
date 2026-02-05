@@ -36,12 +36,13 @@
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
       <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
         <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
-          <span title="Ataque">⚔️ {{ card.stats.atk }}</span>
-          <span title="Defensa">🛡️ {{ card.stats.def }}</span>
-          <span title="Vida">❤️ {{ card.stats.hp }}</span>
+          <span title="Ataque" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
+          <span title="Defensa" :class="getStatClass('def')">🛡️ {{ card.stats.def }}</span>
+          <span title="Vida" :class="getStatClass('hp')">❤️ {{ card.stats.hp }}</span>
         </span>
         <span v-else-if="card.type === 'item'" class="flex flex-row gap-2 items-center justify-center">
           <span v-if="card.stats.atkBonus" title="Ataque extra">⚔️ +{{ card.stats.atkBonus }}</span>
+          <span v-if="card.stats.atkModifier < 0" title="Penalización ataque">⚔️ {{ card.stats.atkModifier }}</span>
           <span v-if="card.stats.defBonus" title="Defensa extra">🛡️ +{{ card.stats.defBonus }}</span>
           <span v-if="card.stats.defModifier < 0" title="Penalización defensa">🛡️ {{ card.stats.defModifier }}</span>
           <span title="Durabilidad">🔋 {{ card.stats.durability }}</span>
@@ -72,5 +73,12 @@ const props = defineProps({
 
 function formatTemplate(template) {
   return template?.replace?.(/_/g, ' ') || ''
+}
+
+function getStatClass(statKey) {
+  const delta = props.card?.statDelta?.[statKey] || 0
+  if (delta > 0) return 'text-emerald-600'
+  if (delta < 0) return 'text-red-600'
+  return 'text-gray-700'
 }
 </script>

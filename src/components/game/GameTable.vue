@@ -16,7 +16,7 @@
             >
               <Card :card="item" />
             </div>
-            <Card :card="slot.hero.card" class="hero-card" />
+            <Card :card="getHeroDisplay(slot.hero)" class="hero-card" />
           </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>
@@ -42,7 +42,7 @@
             >
               <Card :card="item" />
             </div>
-            <Card :card="slot.hero.card" class="hero-card" />
+            <Card :card="getHeroDisplay(slot.hero)" class="hero-card" />
           </div>
           <div v-else class="slot-placeholder">Empty</div>
         </div>
@@ -151,6 +151,30 @@ function tryPlace(slotIndex) {
         slotIndex: played.slotIndex
       }
     })
+  }
+}
+
+function getHeroDisplay(hero) {
+  const base = hero.card.stats || { atk: 0, def: 0, hp: 0 }
+  const delta = { atk: 0, def: 0, hp: 0 }
+  for (const item of hero.items || []) {
+    const stats = item.stats || {}
+    if (typeof stats.atkBonus === 'number') delta.atk += stats.atkBonus
+    if (typeof stats.atkModifier === 'number') delta.atk += stats.atkModifier
+    if (typeof stats.defBonus === 'number') delta.def += stats.defBonus
+    if (typeof stats.defModifier === 'number') delta.def += stats.defModifier
+    if (typeof stats.hpBonus === 'number') delta.hp += stats.hpBonus
+    if (typeof stats.hpModifier === 'number') delta.hp += stats.hpModifier
+  }
+  return {
+    ...hero.card,
+    baseStats: base,
+    statDelta: delta,
+    stats: {
+      atk: base.atk + delta.atk,
+      def: base.def + delta.def,
+      hp: base.hp + delta.hp
+    }
   }
 }
 </script>
