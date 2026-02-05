@@ -35,30 +35,22 @@
     <!-- Card Stats & Template (Middle) -->
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
       <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
-        <template v-if="card.type === 'hero'">
-          <span class="flex flex-row gap-2 items-center justify-center">
-            <span title="Ataque">⚔️ {{ card.stats.atk }}</span>
-            <span title="Defensa">🛡️ {{ card.stats.def }}</span>
-            <span title="Vida">❤️ {{ card.stats.hp }}</span>
-          </span>
-        </template>
-        <template v-else-if="card.type === 'item'">
-          <span class="flex flex-row gap-2 items-center justify-center">
-            <span v-if="card.stats.atkBonus" title="Ataque extra">⚔️ +{{ card.stats.atkBonus }}</span>
-            <span v-if="card.stats.defBonus" title="Defensa extra">🛡️ +{{ card.stats.defBonus }}</span>
-            <span v-if="card.stats.defModifier < 0" title="Penalización defensa">🛡️ {{ card.stats.defModifier }}</span>
-            <span title="Durabilidad">🔋 {{ card.stats.durability }}</span>
-          </span>
-        </template>
-        <template v-else-if="card.type === 'healing'">
-          <span>+{{ card.stats.healAmount }} HP</span>
-        </template>
-        <template v-else-if="card.type === 'reactive'">
-          <span class="text-xs">{{ formatTemplate(card.effect) }}</span>
-        </template>
+        <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
+          <span title="Ataque">⚔️ {{ card.stats.atk }}</span>
+          <span title="Defensa">🛡️ {{ card.stats.def }}</span>
+          <span title="Vida">❤️ {{ card.stats.hp }}</span>
+        </span>
+        <span v-else-if="card.type === 'item'" class="flex flex-row gap-2 items-center justify-center">
+          <span v-if="card.stats.atkBonus" title="Ataque extra">⚔️ +{{ card.stats.atkBonus }}</span>
+          <span v-if="card.stats.defBonus" title="Defensa extra">🛡️ +{{ card.stats.defBonus }}</span>
+          <span v-if="card.stats.defModifier < 0" title="Penalización defensa">🛡️ {{ card.stats.defModifier }}</span>
+          <span title="Durabilidad">🔋 {{ card.stats.durability }}</span>
+        </span>
+        <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} HP</span>
+        <span v-else-if="card.type === 'reactive'" class="text-xs">{{ formatTemplate(card.effect) }}</span>
       </div>
       <!-- Description (Below stats) -->
-      <div class="mt-2 text-[10px] text-gray-500 font-normal italic leading-tight">
+      <div class="text-[10px] text-gray-500 font-normal italic leading-tight">
         {{ card.description?.en || card.description }}
       </div>
     </div>
