@@ -1,8 +1,15 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gray-400 font-sans pb-36">
-    <OpponentHand />
-    <GameTable @start-game="initGame" />
-    <PlayerHand />
+    <PreGameScreen v-if="!connection.isConnected" />
+    <StartGameScreen 
+      v-else-if="!game.isPlaying" 
+      @start-game="initGame" 
+    />
+    <template v-else>
+      <OpponentHand />
+      <GameTable />
+      <PlayerHand />
+    </template>
   </div>
 </template>
 
@@ -18,6 +25,8 @@ import {
 import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peerService'
 
 // Components
+import PreGameScreen from '@/components/game/PreGameScreen.vue'
+import StartGameScreen from '@/components/game/StartGameScreen.vue'
 import OpponentHand from '@/components/game/OpponentHand.vue'
 import PlayerHand from '@/components/game/PlayerHand.vue'
 import GameTable from '@/components/game/GameTable.vue'
