@@ -31,9 +31,9 @@ const BATCH_SIZE = 50;
 
 // Distribution percentages (must sum to 1.0)
 const DISTRIBUTION = {
-  hero: 0.30,      // ~30% = 15 cards
+  hero: 0.40,      // ~40% = 20 cards
   item: 0.30,      // ~30% = 15 cards
-  reactive: 0.25,  // ~25% = 12-13 cards
+  reactive: 0.15,  // ~15% = 7-8 cards
   healing: 0.15    // ~15% = 7-8 cards
 };
 
@@ -348,8 +348,8 @@ function main() {
     mkdirSync(outputDir, { recursive: true });
   }
   
-  // Write batch file
-  const filename = `batch-${batch.batch_id}.json`;
+  // Write batch file (overwrite)
+  const filename = 'batch.json';
   const filepath = join(outputDir, filename);
   writeFileSync(filepath, JSON.stringify(batch, null, 2));
   

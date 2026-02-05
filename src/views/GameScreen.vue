@@ -26,7 +26,7 @@ import StartGameScreen from '@/components/game/StartGameScreen.vue'
 import GameBoard from '@/components/game/GameBoard.vue'
 
 // Batch data
-import batchData from '@/../data/batches/batch-ce5e35aa-f0a3-426b-8eb6-239f51ba639b.json'
+import batchData from '@/../data/batches/batch.json'
 
 const route = useRoute()
 const router = useRouter()
