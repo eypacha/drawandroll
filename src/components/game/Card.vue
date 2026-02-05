@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-36 h-56 rounded-xl border bg-white flex flex-col overflow-hidden cursor-pointer transition-transform hover:-translate-y-2 hover:shadow-2xl shadow-lg relative"
+    class="w-44 h-66 rounded-xl border bg-white flex flex-col overflow-hidden cursor-pointer transition-transform hover:-translate-y-2 hover:shadow-2xl shadow-lg relative"
     :class="{
       'border-amber-400': card.type === 'hero',
       'border-violet-400': card.type === 'item',
@@ -9,13 +9,13 @@
     }"
   >
     <!-- Card Name (Top) -->
-    <div class="px-2 py-2 bg-gray-50 text-base font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
+    <div class="px-2 py-2 bg-gray-50 text-base leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
       {{ card.name?.en || card.name }}
     </div>
 
     <!-- Card Cost (Floating circle, top-right) -->
-    <div class="absolute self-end mt-2 mr-2">
-      <span class="w-8 h-8 rounded-full bg-amber-400 text-gray-900 flex items-center justify-center font-bold text-lg shadow border-2 border-white">
+    <div class="absolute self-end mt-1 mr-1">
+      <span class="w-5 h-5 rounded-full bg-amber-400 text-gray-900 flex items-center justify-center font-bold text-sm shadow border-2 border-white">
         {{ card.cost }}
       </span>
     </div>
@@ -24,15 +24,19 @@
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
       <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
         <template v-if="card.type === 'hero'">
-          <span>ATK {{ card.stats.atk }}</span>
-          <span>DEF {{ card.stats.def }}</span>
-          <span>HP {{ card.stats.hp }}</span>
+          <span class="flex flex-row gap-2 items-center justify-center">
+            <span title="Ataque">⚔️ {{ card.stats.atk }}</span>
+            <span title="Defensa">🛡️ {{ card.stats.def }}</span>
+            <span title="Vida">❤️ {{ card.stats.hp }}</span>
+          </span>
         </template>
         <template v-else-if="card.type === 'item'">
-          <span v-if="card.stats.atkBonus">+{{ card.stats.atkBonus }} ATK</span>
-          <span v-if="card.stats.defBonus">+{{ card.stats.defBonus }} DEF</span>
-          <span v-if="card.stats.defModifier < 0">{{ card.stats.defModifier }} DEF</span>
-          <span>DUR {{ card.stats.durability }}</span>
+          <span class="flex flex-row gap-2 items-center justify-center">
+            <span v-if="card.stats.atkBonus" title="Ataque extra">⚔️ +{{ card.stats.atkBonus }}</span>
+            <span v-if="card.stats.defBonus" title="Defensa extra">🛡️ +{{ card.stats.defBonus }}</span>
+            <span v-if="card.stats.defModifier < 0" title="Penalización defensa">🛡️ {{ card.stats.defModifier }}</span>
+            <span title="Durabilidad">🔋 {{ card.stats.durability }}</span>
+          </span>
         </template>
         <template v-else-if="card.type === 'healing'">
           <span>+{{ card.stats.healAmount }} HP</span>

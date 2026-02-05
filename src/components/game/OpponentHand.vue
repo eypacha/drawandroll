@@ -1,14 +1,11 @@
 <template>
   <div class="p-4 bg-gray-50 border-b border-gray-100">
-    <div class="flex justify-center gap-2 min-h-24">
+    <div class="flex justify-center gap-2">
       <CardBack 
         v-for="(card, index) in opponentHand" 
         :key="card.id" 
       />
     </div>
-    <p class="text-center text-xs uppercase tracking-widest text-gray-400 mt-2">
-      Opponent ({{ opponentHand.length }} cards)
-    </p>
   </div>
 </template>
 
