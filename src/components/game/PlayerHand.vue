@@ -6,11 +6,13 @@
         :key="card.id" 
         class="card-wrapper"
         :class="{ 
-          'is-playable': canAct && (card.type === 'hero' || card.type === 'item'),
-          'is-selected': selectedCardId === card.id
+          'is-draggable': canDragCard(card),
+          'is-dragging': draggedCardId === card.id
         }"
-        :style="{ ...getCardStyle(index), '--highlight-color': getHighlightColor(card) }"
-        @click="toggleSelect(card)"
+        :style="getCardStyle(index)"
+        :draggable="canDragCard(card)"
+        @dragstart="onDragStart($event, card)"
+        @dragend="onDragEnd(card)"
         @mouseenter="onHover(card)"
         @mouseleave="onHoverEnd(card)"
       >
@@ -21,7 +23,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onUnmounted } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
@@ -34,16 +36,12 @@ const gameActions = useGameActions()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canAct = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
-const selectedCardId = computed(() => players.players[myPlayerId.value].selectedCardId)
+const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
+let dragPreviewEl = null
 
-function toggleSelect(card) {
-  if (selectedCardId.value === card.id) {
-    players.clearSelection(myPlayerId.value)
-    return
-  }
-  if (!canAct.value) return
-  if (card.type !== 'hero' && card.type !== 'item') return
-  players.selectCard(myPlayerId.value, card.id)
+function canDragCard(card) {
+  if (!canAct.value) return false
+  return card.type === 'hero' || card.type === 'item'
 }
 
 function getCardStyle(index) {
@@ -65,14 +63,68 @@ function getCardStyle(index) {
   }
 }
 
-function getHighlightColor(card) {
-  const map = {
-    hero: 'rgba(245, 158, 11, 0.9)',
-    item: 'rgba(139, 92, 246, 0.9)',
-    healing: 'rgba(16, 185, 129, 0.9)',
-    reactive: 'rgba(59, 130, 246, 0.9)'
+function onDragStart(event, card) {
+  if (!canDragCard(card)) {
+    event.preventDefault()
+    return
   }
-  return map[card.type] || 'rgba(245, 158, 11, 0.9)'
+
+  removeDragPreview()
+  players.setDraggedCard(myPlayerId.value, card.id)
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-card-id', card.id)
+    event.dataTransfer.setData('text/plain', card.id)
+
+    const sourceCardEl = event.currentTarget?.querySelector?.('.hand-card')
+    if (sourceCardEl instanceof HTMLElement) {
+      const rect = sourceCardEl.getBoundingClientRect()
+      const sourceStyles = window.getComputedStyle(sourceCardEl)
+      const wrapper = document.createElement('div')
+      wrapper.style.position = 'fixed'
+      wrapper.style.left = '-10000px'
+      wrapper.style.top = '-10000px'
+      wrapper.style.width = `${rect.width}px`
+      wrapper.style.height = `${rect.height}px`
+      wrapper.style.pointerEvents = 'none'
+      wrapper.style.borderRadius = sourceStyles.borderRadius || '0px'
+      wrapper.style.overflow = 'hidden'
+      wrapper.style.zIndex = '9999'
+      wrapper.style.margin = '0'
+      wrapper.style.padding = '0'
+
+      const clonedCard = sourceCardEl.cloneNode(true)
+      if (clonedCard instanceof HTMLElement) {
+        clonedCard.style.width = `${rect.width}px`
+        clonedCard.style.height = `${rect.height}px`
+        clonedCard.style.transform = 'none'
+        clonedCard.style.transition = 'none'
+        clonedCard.style.margin = '0'
+        clonedCard.style.borderRadius = sourceStyles.borderRadius || '0px'
+        clonedCard.style.overflow = 'hidden'
+        wrapper.appendChild(clonedCard)
+        document.body.appendChild(wrapper)
+        dragPreviewEl = wrapper
+
+        const offsetX = Math.max(0, Math.min(rect.width, event.clientX - rect.left))
+        const offsetY = Math.max(0, Math.min(rect.height, event.clientY - rect.top))
+        event.dataTransfer.setDragImage(wrapper, offsetX, offsetY)
+      }
+    }
+  }
+  gameActions.setHoveredCard(card.id)
+}
+
+function onDragEnd(card) {
+  players.clearDraggedCard(myPlayerId.value)
+  gameActions.clearHoveredCard(card.id)
+  removeDragPreview()
+}
+
+function removeDragPreview() {
+  if (!dragPreviewEl) return
+  dragPreviewEl.remove()
+  dragPreviewEl = null
 }
 
 function onHover(card) {
@@ -80,8 +132,13 @@ function onHover(card) {
 }
 
 function onHoverEnd(card) {
+  if (draggedCardId.value === card.id) return
   gameActions.clearHoveredCard(card.id)
 }
+
+onUnmounted(() => {
+  removeDragPreview()
+})
 </script>
 
 <style scoped>
@@ -129,14 +186,18 @@ function onHoverEnd(card) {
   z-index: var(--hover-z-index, 100);
 }
 
-.card-wrapper.is-playable {
-  cursor: pointer;
+.card-wrapper.is-draggable {
+  cursor: grab;
 }
 
-.card-wrapper.is-selected :deep(.hand-card) {
-  box-shadow:
-    0 0 0 3px var(--highlight-color, rgba(245, 158, 11, 0.8)),
-    0 12px 25px -8px rgba(0, 0, 0, 0.35);
+.card-wrapper.is-dragging {
+  opacity: 0;
+}
+
+.card-wrapper,
+.card-wrapper * {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .card-wrapper :deep(.hand-card) {

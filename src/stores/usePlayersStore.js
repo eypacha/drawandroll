@@ -13,7 +13,7 @@ export const usePlayersStore = defineStore('players', () => {
     resources: 5,
     maxResources: 5,
     heroesLost: 0,
-    selectedCardId: null,
+    draggedCardId: null,
     hoveredCardId: null
   })
 
@@ -115,12 +115,12 @@ export const usePlayersStore = defineStore('players', () => {
     return true
   }
 
-  function selectCard(playerId, cardId) {
-    players.value[playerId].selectedCardId = cardId
+  function setDraggedCard(playerId, cardId) {
+    players.value[playerId].draggedCardId = cardId
   }
 
-  function clearSelection(playerId) {
-    players.value[playerId].selectedCardId = null
+  function clearDraggedCard(playerId) {
+    players.value[playerId].draggedCardId = null
   }
 
   function setHoveredCard(playerId, cardId) {
@@ -154,8 +154,8 @@ export const usePlayersStore = defineStore('players', () => {
     addHeroFromRemote,
     playItemFromHand,
     addItemFromRemote,
-    selectCard,
-    clearSelection,
+    setDraggedCard,
+    clearDraggedCard,
     setHoveredCard,
     clearHoveredCard,
     refreshResources,

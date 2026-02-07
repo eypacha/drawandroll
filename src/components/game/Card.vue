@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-44 h-66 rounded-xl border-2 bg-white flex flex-col overflow-hidden cursor-pointer shadow-lg relative"
+    class="w-44 h-66 rounded-xl border-2 bg-white flex flex-col overflow-hidden cursor-pointer shadow-lg relative select-none"
     :class="{
       'border-amber-400': card.type === 'hero',
       'border-violet-400': card.type === 'item',

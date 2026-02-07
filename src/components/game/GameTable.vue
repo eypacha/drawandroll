@@ -26,11 +26,13 @@
           :key="slot.key"
           class="table-slot"
           :class="{
-            'slot-hoverable': canPlaceHero && !slot.hero,
-            'slot-hoverable-hero': canEquipItem && slot.hero
+            'slot-drop-valid': isDropCandidate(slot.index),
+            'slot-drag-active': isDropCandidate(slot.index) && activeDropSlot === slot.index
           }"
-          :style="{ '--slot-highlight': slotHighlightColor, '--slot-highlight-soft': slotHighlightSoft }"
-          @click="tryPlace(slot.index)"
+          :style="getSlotStyle(slot.index)"
+          @dragover="onSlotDragOver(slot.index, $event)"
+          @dragleave="onSlotDragLeave(slot.index)"
+          @drop="onSlotDrop(slot.index, $event)"
         >
           <div v-if="slot.hero" class="hero-stack">
             <div
@@ -51,7 +53,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
@@ -66,8 +68,18 @@ const opponentPlayerId = computed(() => connection.isHost ? 'player_b' : 'player
 const myHeroes = computed(() => players.players[myPlayerId.value].heroes)
 const opponentHeroes = computed(() => players.players[opponentPlayerId.value].heroes)
 const myHand = computed(() => players.players[myPlayerId.value].hand)
-const selectedCardId = computed(() => players.players[myPlayerId.value].selectedCardId)
 const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
+const activeDropSlot = ref(null)
+
+watch(
+  () => draggedCardId.value,
+  (nextDraggedCardId) => {
+    if (!nextDraggedCardId) {
+      activeDropSlot.value = null
+    }
+  }
+)
 
 const mySlots = computed(() => {
   return Array.from({ length: 3 }, (_, index) => ({
@@ -85,51 +97,110 @@ const opponentSlots = computed(() => {
   }))
 })
 
-const selectedCard = computed(() => {
-  if (!selectedCardId.value) return null
-  return myHand.value.find((card) => card.id === selectedCardId.value) || null
-})
+function getCardFromHand(cardId) {
+  if (!cardId) return null
+  return myHand.value.find((card) => card.id === cardId) || null
+}
 
-const canAffordSelected = computed(() => {
-  if (!selectedCard.value) return false
-  const cost = selectedCard.value.type === 'hero'
-    ? players.getRecruitCost(myPlayerId.value, selectedCard.value.cost)
-    : selectedCard.value.cost
-  return players.players[myPlayerId.value].resources >= cost
-})
+function getDraggedCardId(event) {
+  const customId = event.dataTransfer?.getData('application/x-card-id')
+  if (customId) return customId
+  const plain = event.dataTransfer?.getData('text/plain')
+  if (plain) return plain
+  return draggedCardId.value || null
+}
 
-const canPlaceHero = computed(() => canRecruit.value && selectedCard.value?.type === 'hero' && canAffordSelected.value)
-const canEquipItem = computed(() => canRecruit.value && selectedCard.value?.type === 'item' && canAffordSelected.value)
+function canDropOnSlot(slotIndex, cardId) {
+  if (!canRecruit.value) return false
+  const card = getCardFromHand(cardId)
+  if (!card) return false
 
-const slotHighlightColor = computed(() => {
-  const map = {
-    hero: 'rgba(245, 158, 11, 0.9)',
-    item: 'rgba(139, 92, 246, 0.9)',
-    healing: 'rgba(16, 185, 129, 0.9)',
-    reactive: 'rgba(59, 130, 246, 0.9)'
+  const slotHero = myHeroes.value[slotIndex]
+  const playerResources = players.players[myPlayerId.value].resources
+
+  if (card.type === 'hero') {
+    if (slotHero) return false
+    const cost = players.getRecruitCost(myPlayerId.value, card.cost)
+    return playerResources >= cost
   }
-  return map[selectedCard.value?.type] || 'rgba(245, 158, 11, 0.9)'
-})
 
-const slotHighlightSoft = computed(() => {
-  const map = {
-    hero: 'rgba(245, 158, 11, 0.35)',
-    item: 'rgba(139, 92, 246, 0.35)',
-    healing: 'rgba(16, 185, 129, 0.35)',
-    reactive: 'rgba(59, 130, 246, 0.35)'
+  if (card.type === 'item') {
+    if (!slotHero) return false
+    if ((slotHero.items || []).length >= 3) return false
+    return playerResources >= card.cost
   }
-  return map[selectedCard.value?.type] || 'rgba(245, 158, 11, 0.35)'
-})
 
-function tryPlace(slotIndex) {
-  if (canEquipItem.value) {
-    const played = gameActions.playItemToSlot(slotIndex, selectedCardId.value)
-    if (!played) return
+  return false
+}
+
+function getSlotStyle(slotIndex) {
+  const card = getCardFromHand(draggedCardId.value)
+  if (!card || !canDropOnSlot(slotIndex, draggedCardId.value)) {
+    return {}
+  }
+  const map = {
+    hero: {
+      '--slot-highlight': 'rgba(245, 158, 11, 0.9)',
+      '--slot-highlight-soft': 'rgba(245, 158, 11, 0.35)'
+    },
+    item: {
+      '--slot-highlight': 'rgba(139, 92, 246, 0.9)',
+      '--slot-highlight-soft': 'rgba(139, 92, 246, 0.35)'
+    }
+  }
+  return map[card.type] || {}
+}
+
+function isDropCandidate(slotIndex) {
+  return canDropOnSlot(slotIndex, draggedCardId.value)
+}
+
+function onSlotDragOver(slotIndex, event) {
+  const cardId = getDraggedCardId(event)
+  if (!cardId || !canDropOnSlot(slotIndex, cardId)) {
+    if (activeDropSlot.value === slotIndex) {
+      activeDropSlot.value = null
+    }
     return
   }
-  if (canPlaceHero.value) {
-    gameActions.playHeroToSlot(slotIndex, selectedCardId.value)
+
+  event.preventDefault()
+  activeDropSlot.value = slotIndex
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
   }
+}
+
+function onSlotDragLeave(slotIndex) {
+  if (activeDropSlot.value === slotIndex) {
+    activeDropSlot.value = null
+  }
+}
+
+function onSlotDrop(slotIndex, event) {
+  event.preventDefault()
+  activeDropSlot.value = null
+
+  const cardId = getDraggedCardId(event)
+  if (!cardId || !canDropOnSlot(slotIndex, cardId)) {
+    players.clearDraggedCard(myPlayerId.value)
+    return
+  }
+
+  const card = getCardFromHand(cardId)
+  if (!card) {
+    players.clearDraggedCard(myPlayerId.value)
+    return
+  }
+
+  if (card.type === 'hero') {
+    gameActions.playHeroToSlot(slotIndex, cardId)
+  }
+  if (card.type === 'item') {
+    gameActions.playItemToSlot(slotIndex, cardId)
+  }
+
+  players.clearDraggedCard(myPlayerId.value)
 }
 
 function getHeroDisplay(hero) {
@@ -171,18 +242,15 @@ function getHeroDisplay(hero) {
   cursor: default;
 }
 
-.table-slot.slot-hoverable:hover {
+.table-slot.slot-drop-valid {
   border-color: var(--slot-highlight, rgba(245, 158, 11, 0.9));
   box-shadow: 0 0 0 3px var(--slot-highlight-soft, rgba(245, 158, 11, 0.35));
   background: rgba(255, 255, 255, 0.35);
   cursor: pointer;
 }
 
-.table-slot.slot-hoverable-hero:hover {
-  border-color: var(--slot-highlight, rgba(245, 158, 11, 0.9));
-  box-shadow: 0 0 0 3px var(--slot-highlight-soft, rgba(245, 158, 11, 0.35));
-  background: rgba(255, 255, 255, 0.35);
-  cursor: pointer;
+.table-slot.slot-drag-active {
+  transform: translateY(-2px);
 }
 
 .hero-stack {

@@ -23,7 +23,6 @@ export function useGameActions() {
   function playHeroToSlot(slotIndex, cardId) {
     const played = players.playHeroFromHand(myPlayerId.value, cardId, slotIndex)
     if (!played) return null
-    players.clearSelection(myPlayerId.value)
     sendMessage({
       type: 'recruit_hero',
       payload: {
@@ -39,7 +38,6 @@ export function useGameActions() {
   function playItemToSlot(slotIndex, cardId) {
     const played = players.playItemFromHand(myPlayerId.value, cardId, slotIndex)
     if (!played) return null
-    players.clearSelection(myPlayerId.value)
     sendMessage({
       type: 'equip_item',
       payload: {
