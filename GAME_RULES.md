@@ -116,28 +116,7 @@ Un turno se resuelve siempre en este orden:
 
 ---
 
-## 8. Sistema de presión por pérdidas
-
-Este sistema es **obligatorio** y no puede omitirse.
-
-- Cada vez que un jugador pierde un héroe:
-  - el **costo de reclutar héroes** para ese jugador aumenta.
-
-Escalado:
-- 1er héroe perdido → +1 costo
-- 2do héroe perdido → +2 costo
-- 3ro héroe perdido → +3 costo
-- etc.
-
-Características:
-- El castigo es **personal**, no global.
-- No se reduce durante la partida.
-- No se resetea por tiempo ni por robo.
-- No se resetea salvo que la partida termine.
-
----
-
-## 9. Ítems / Armas
+## 8. Ítems / Armas
 
 - Los ítems:
   - modifican stats
@@ -151,7 +130,7 @@ Características:
 
 ---
 
-## 10. Curación
+## 9. Curación
 
 - No existe curación automática.
 - El daño **persiste entre turnos**.
@@ -165,7 +144,7 @@ Características:
 
 ---
 
-## 11. Cartas reactivas defensivas
+## 10. Cartas reactivas defensivas
 
 - Solo el **defensor** puede usar cartas reactivas.
 - Máximo **1 carta reactiva por ataque**.
@@ -178,7 +157,7 @@ Características:
 
 ---
 
-## 12. Reglas explícitamente prohibidas
+## 11. Reglas explícitamente prohibidas
 
 En el PMV **no existen**:
 
@@ -196,7 +175,7 @@ Cualquier implementación de estos puntos es incorrecta.
 
 ---
 
-## 13. Autoridad del documento
+## 12. Autoridad del documento
 
 - Este documento tiene prioridad sobre:
   - comentarios en código

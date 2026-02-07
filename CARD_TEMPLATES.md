@@ -34,7 +34,7 @@ Todos los héroes tienen:
 - HP
 - Costo base de reclutamiento
 
-El costo final se ve afectado por el sistema de presión por pérdidas
+El costo final de reclutamiento se deriva del costo base definido por la plantilla.
 (`GAME_RULES.md`).
 
 ---

@@ -147,7 +147,6 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
   - solo cura héroes vivos
 - La curación:
   - no revive héroes
-  - no resetea presión por pérdidas
 - Si la curación evita que el HP llegue a 0:
   - el héroe sobrevive
 - Si el HP llega a 0:
