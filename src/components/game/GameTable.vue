@@ -18,7 +18,6 @@
             </div>
             <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
           </div>
-          <div v-else class="slot-placeholder">Empty</div>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-6 place-items-center">
@@ -44,7 +43,6 @@
             </div>
             <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
           </div>
-          <div v-else class="slot-placeholder">Empty</div>
         </div>
       </div>
     </div>
@@ -204,12 +202,5 @@ function getHeroDisplay(hero) {
   transform: translateY(var(--item-offset, 16px));
   z-index: var(--item-z, 1);
   pointer-events: none;
-}
-
-.slot-placeholder {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(0, 0, 0, 0.35);
 }
 </style>

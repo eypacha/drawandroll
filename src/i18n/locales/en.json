@@ -4,6 +4,63 @@
     "description": "This is a sample application to demonstrate internationalization.",
     "welcome": "Welcome to our application"
   },
+  "main": {
+    "tagline": "Tactical Card Combat",
+    "creating": "Creating...",
+    "newGame": "New game",
+    "shareLink": "Share this link with your opponent:",
+    "copy": "Copy",
+    "copied": "Copied",
+    "waitingOpponentJoin": "Waiting for opponent to join...",
+    "status": "Status",
+    "yourId": "Your ID"
+  },
+  "game": {
+    "waitingOpponent": "Waiting for opponent...",
+    "startGame": "Start game",
+    "waitingHostStart": "Waiting for host to start...",
+    "emptySlot": "Empty"
+  },
+  "turn": {
+    "yourTurn": "Your turn",
+    "opponentTurn": "Opponent turn",
+    "phase": {
+      "draw": "Draw",
+      "recruit": "Recruit",
+      "combat": "Combat",
+      "end": "End"
+    },
+    "action": {
+      "endTurn": "End turn",
+      "toCombat": "To combat"
+    }
+  },
+  "card": {
+    "imageAlt": "Card image",
+    "noImage": "No image",
+    "types": {
+      "hero": "Hero",
+      "item": "Item",
+      "healing": "Healing",
+      "reactive": "Reactive"
+    },
+    "effects": {
+      "reduce_damage": "Reduce damage",
+      "cancel_critical": "Cancel critical",
+      "prevent_death": "Prevent death"
+    },
+    "stats": {
+      "attack": "Attack",
+      "defense": "Defense",
+      "health": "Health",
+      "attackBonus": "Attack bonus",
+      "attackPenalty": "Attack penalty",
+      "defenseBonus": "Defense bonus",
+      "defensePenalty": "Defense penalty",
+      "durability": "Durability",
+      "hpShort": "HP"
+    }
+  },
   "pause": {
     "title": "Pause",
     "language": "Language",

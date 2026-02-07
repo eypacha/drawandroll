@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center p-8 bg-white font-sans">
     <h1 class="text-4xl font-light tracking-widest m-0">Draw & Roll</h1>
-    <p class="text-gray-500 mt-2 mb-8 text-sm uppercase tracking-[0.2em]">Tactical Card Combat</p>
+    <p class="text-gray-500 mt-2 mb-8 text-sm uppercase tracking-[0.2em]">{{ t('main.tagline') }}</p>
     
     <div class="flex flex-col gap-4">
       <button 
@@ -9,12 +9,12 @@
         :disabled="isCreating"
         class="px-8 py-4 text-base border border-gray-900 bg-gray-900 text-white cursor-pointer transition-colors hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ isCreating ? 'Creating...' : 'New Game' }}
+        {{ isCreating ? t('main.creating') : t('main.newGame') }}
       </button>
     </div>
 
     <div v-if="roomLink" class="mt-8 text-center">
-      <p class="text-gray-700 mb-4">Share this link with your opponent:</p>
+      <p class="text-gray-700 mb-4">{{ t('main.shareLink') }}</p>
       <div class="flex gap-2 mb-4">
         <input 
           type="text" 
@@ -27,15 +27,15 @@
           @click="copyLink"
           class="px-4 py-2 border border-gray-900 bg-white cursor-pointer hover:bg-gray-100 transition-colors"
         >
-          {{ copied ? '✓' : 'Copy' }}
+          {{ copied ? t('main.copied') : t('main.copy') }}
         </button>
       </div>
-      <p class="text-gray-500 italic">Waiting for opponent to join...</p>
+      <p class="text-gray-500 italic">{{ t('main.waitingOpponentJoin') }}</p>
     </div>
 
     <div v-if="connection.status !== 'disconnected'" class="mt-8 p-4 bg-gray-100 rounded text-sm text-gray-600">
-      <p class="m-1">Status: {{ connection.status }}</p>
-      <p v-if="connection.peerId" class="m-1">Your ID: {{ connection.peerId }}</p>
+      <p class="m-1">{{ t('main.status') }}: {{ connection.status }}</p>
+      <p v-if="connection.peerId" class="m-1">{{ t('main.yourId') }}: {{ connection.peerId }}</p>
     </div>
   </div>
 </template>
@@ -43,11 +43,13 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useConnectionStore } from '@/stores'
 import { initPeer, onMessage } from '@/services/peerService'
 
 const router = useRouter()
 const connection = useConnectionStore()
+const { t } = useI18n()
 
 const isCreating = ref(false)
 const roomLink = ref(null)

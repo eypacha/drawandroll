@@ -4,6 +4,63 @@
     "description": "Esta es una aplicación de ejemplo para demostrar la internacionalización.",
     "welcome": "Bienvenido a nuestra aplicación"
   },
+  "main": {
+    "tagline": "Tactical Card Combat",
+    "creating": "Creando...",
+    "newGame": "Nueva partida",
+    "shareLink": "Comparte este enlace con tu oponente:",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "waitingOpponentJoin": "Esperando que se una el oponente...",
+    "status": "Estado",
+    "yourId": "Tu ID"
+  },
+  "game": {
+    "waitingOpponent": "Esperando oponente...",
+    "startGame": "Iniciar partida",
+    "waitingHostStart": "Esperando que el host inicie...",
+    "emptySlot": "Vacío"
+  },
+  "turn": {
+    "yourTurn": "Tu turno",
+    "opponentTurn": "Turno rival",
+    "phase": {
+      "draw": "Robo",
+      "recruit": "Reclutamiento",
+      "combat": "Combate",
+      "end": "Fin"
+    },
+    "action": {
+      "endTurn": "Terminar turno",
+      "toCombat": "Ir a combate"
+    }
+  },
+  "card": {
+    "imageAlt": "Imagen de carta",
+    "noImage": "Sin imagen",
+    "types": {
+      "hero": "Héroe",
+      "item": "Ítem",
+      "healing": "Curación",
+      "reactive": "Reactiva"
+    },
+    "effects": {
+      "reduce_damage": "Reducir daño",
+      "cancel_critical": "Cancelar crítico",
+      "prevent_death": "Evitar muerte"
+    },
+    "stats": {
+      "attack": "Ataque",
+      "defense": "Defensa",
+      "health": "Vida",
+      "attackBonus": "Ataque extra",
+      "attackPenalty": "Penalización de ataque",
+      "defenseBonus": "Defensa extra",
+      "defensePenalty": "Penalización de defensa",
+      "durability": "Durabilidad",
+      "hpShort": "HP"
+    }
+  },
   "pause": {
     "title": "Pausa",
     "language": "Idioma",

@@ -10,7 +10,7 @@
   >
     <!-- Card Name (Top) -->
     <div class="px-2 py-1 bg-gray-50 text-xs leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
-      {{ card.name?.en || card.name }}
+      {{ localizedName }}
     </div>
 
     <!-- Card Cost (Floating circle, top-right) -->
@@ -25,45 +25,48 @@
       <img 
         v-if="card.imageUrl" 
         :src="card.imageUrl" 
-        alt="Card Image" 
+        :alt="t('card.imageAlt')" 
         class="object-cover w-full h-full"
       />
       <div v-else class="text-gray-400 text-sm italic">
-        No Image
+        {{ t('card.noImage') }}
       </div>
     </div>
     <!-- Card Stats & Template (Middle) -->
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
       <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
         <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
-          <span title="Ataque" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
-          <span title="Defensa" :class="getStatClass('def')">🛡️ {{ card.stats.def }}</span>
-          <span title="Vida" :class="getStatClass('hp')">❤️ {{ card.stats.hp }}</span>
+          <span :title="t('card.stats.attack')" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
+          <span :title="t('card.stats.defense')" :class="getStatClass('def')">🛡️ {{ card.stats.def }}</span>
+          <span :title="t('card.stats.health')" :class="getStatClass('hp')">❤️ {{ card.stats.hp }}</span>
         </span>
         <span v-else-if="card.type === 'item'" class="flex flex-row gap-2 items-center justify-center">
-          <span v-if="card.stats.atkBonus" title="Ataque extra">⚔️ +{{ card.stats.atkBonus }}</span>
-          <span v-if="card.stats.atkModifier < 0" title="Penalización ataque">⚔️ {{ card.stats.atkModifier }}</span>
-          <span v-if="card.stats.defBonus" title="Defensa extra">🛡️ +{{ card.stats.defBonus }}</span>
-          <span v-if="card.stats.defModifier < 0" title="Penalización defensa">🛡️ {{ card.stats.defModifier }}</span>
-          <span title="Durabilidad">🔋 {{ card.stats.durability }}</span>
+          <span v-if="card.stats.atkBonus" :title="t('card.stats.attackBonus')">⚔️ +{{ card.stats.atkBonus }}</span>
+          <span v-if="card.stats.atkModifier < 0" :title="t('card.stats.attackPenalty')">⚔️ {{ card.stats.atkModifier }}</span>
+          <span v-if="card.stats.defBonus" :title="t('card.stats.defenseBonus')">🛡️ +{{ card.stats.defBonus }}</span>
+          <span v-if="card.stats.defModifier < 0" :title="t('card.stats.defensePenalty')">🛡️ {{ card.stats.defModifier }}</span>
+          <span :title="t('card.stats.durability')">🔋 {{ card.stats.durability }}</span>
         </span>
-        <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} HP</span>
+        <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} {{ t('card.stats.hpShort') }}</span>
         <span v-else-if="card.type === 'reactive'" class="text-xs">{{ formatTemplate(card.effect) }}</span>
       </div>
       <!-- Description (Below stats) -->
       <div class="text-[10px] text-gray-500 font-normal italic leading-tight">
-        {{ card.description?.en || card.description }}
+        {{ localizedDescription }}
       </div>
     </div>
 
     <!-- Card Type (Bottom) -->
     <div class="px-2 py-1 bg-gray-100 text-xs uppercase tracking-widest text-gray-500 border-t border-gray-200 text-center">
-      {{ card.type }}
+      {{ localizedType }}
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 const props = defineProps({
   card: {
     type: Object,
@@ -75,8 +78,38 @@ const props = defineProps({
   }
 })
 
+const { t, locale } = useI18n()
+
+function resolveLocalizedText(value) {
+  if (!value) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'object') {
+    const byLocale = value[locale.value]
+    if (typeof byLocale === 'string') return byLocale
+    if (typeof value.es === 'string') return value.es
+    if (typeof value.en === 'string') return value.en
+    const firstText = Object.values(value).find((entry) => typeof entry === 'string')
+    if (firstText) return firstText
+  }
+  return String(value)
+}
+
+const localizedName = computed(() => resolveLocalizedText(props.card?.name))
+const localizedDescription = computed(() => resolveLocalizedText(props.card?.description))
+const localizedType = computed(() => {
+  const rawType = props.card?.type || ''
+  if (!rawType) return ''
+  const key = `card.types.${rawType}`
+  const translated = t(key)
+  return translated === key ? rawType : translated
+})
+
 function formatTemplate(template) {
-  return template?.replace?.(/_/g, ' ') || ''
+  if (!template) return ''
+  const key = `card.effects.${template}`
+  const translated = t(key)
+  if (translated !== key) return translated
+  return template.replace(/_/g, ' ')
 }
 
 function getStatClass(statKey) {

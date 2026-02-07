@@ -5,21 +5,23 @@
         @click="$emit('start-game')"
         class="px-6 py-3 bg-gray-900 text-white text-sm tracking-wide hover:bg-gray-700 transition-colors"
       >
-        Start Game
+        {{ t('game.startGame') }}
       </button>
     </div>
     <div v-else class="text-center text-gray-700 text-sm tracking-wide">
-      Waiting for host to start...
+      {{ t('game.waitingHostStart') }}
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConnectionStore } from '@/stores'
 
 const connection = useConnectionStore()
 const isHost = computed(() => connection.isHost)
+const { t } = useI18n()
 
 defineEmits(['start-game'])
 </script>
