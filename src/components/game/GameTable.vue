@@ -6,6 +6,10 @@
           v-for="slot in opponentSlots"
           :key="slot.key"
           class="table-slot"
+          :class="{
+            'slot-attack-target': isAttackTarget(slot.index)
+          }"
+          @click="onOpponentSlotClick(slot.index)"
         >
           <div v-if="slot.hero" class="hero-stack">
             <div
@@ -27,9 +31,12 @@
           class="table-slot"
           :class="{
             'slot-drop-valid': isDropCandidate(slot.index),
-            'slot-drag-active': isDropCandidate(slot.index) && activeDropSlot === slot.index
+            'slot-drag-active': isDropCandidate(slot.index) && activeDropSlot === slot.index,
+            'slot-attack-selectable': canSelectAttacker(slot.index),
+            'slot-attack-selected': selectedAttackerSlot === slot.index
           }"
           :style="getSlotStyle(slot.index)"
+          @click="onMySlotClick(slot.index)"
           @dragover="onSlotDragOver(slot.index, $event)"
           @dragleave="onSlotDragLeave(slot.index)"
           @drop="onSlotDrop(slot.index, $event)"
@@ -43,7 +50,12 @@
             >
               <Card :card="item" :hide-cost="true" />
             </div>
-            <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
+            <Card
+              :card="getHeroDisplay(slot.hero)"
+              :hide-cost="true"
+              class="hero-card"
+              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase }"
+            />
           </div>
         </div>
       </div>
@@ -54,13 +66,14 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
+import { usePlayersStore, useConnectionStore, useGameStore, useCombatStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
 
 const players = usePlayersStore()
 const connection = useConnectionStore()
 const game = useGameStore()
+const combat = useCombatStore()
 const gameActions = useGameActions()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
@@ -69,14 +82,25 @@ const myHeroes = computed(() => players.players[myPlayerId.value].heroes)
 const opponentHeroes = computed(() => players.players[opponentPlayerId.value].heroes)
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const canCombat = computed(() => game.turnPhase === 'combat' && game.currentTurn === myPlayerId.value)
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
 const activeDropSlot = ref(null)
+const selectedAttackerSlot = ref(null)
 
 watch(
   () => draggedCardId.value,
   (nextDraggedCardId) => {
     if (!nextDraggedCardId) {
       activeDropSlot.value = null
+    }
+  }
+)
+
+watch(
+  () => [canCombat.value, combat.isRolling],
+  ([nextCanCombat, nextIsRolling]) => {
+    if (!nextCanCombat || nextIsRolling) {
+      selectedAttackerSlot.value = null
     }
   }
 )
@@ -203,26 +227,52 @@ function onSlotDrop(slotIndex, event) {
   players.clearDraggedCard(myPlayerId.value)
 }
 
+function canSelectAttacker(slotIndex) {
+  if (!canCombat.value) return false
+  if (combat.isRolling) return false
+  return players.canHeroAttack(myPlayerId.value, slotIndex)
+}
+
+function isAttackTarget(slotIndex) {
+  if (!canCombat.value) return false
+  if (combat.isRolling) return false
+  if (selectedAttackerSlot.value === null) return false
+  return Boolean(opponentHeroes.value[slotIndex])
+}
+
+function onMySlotClick(slotIndex) {
+  if (!canCombat.value) return
+  if (!canSelectAttacker(slotIndex)) return
+  if (selectedAttackerSlot.value === slotIndex) {
+    selectedAttackerSlot.value = null
+    return
+  }
+  selectedAttackerSlot.value = slotIndex
+}
+
+async function onOpponentSlotClick(slotIndex) {
+  if (!isAttackTarget(slotIndex)) return
+  const attackerSlot = selectedAttackerSlot.value
+  if (attackerSlot === null) return
+  selectedAttackerSlot.value = null
+  await gameActions.attackHero(attackerSlot, slotIndex)
+}
+
 function getHeroDisplay(hero) {
   const base = hero.card.stats || { atk: 0, def: 0, hp: 0 }
-  const delta = { atk: 0, def: 0, hp: 0 }
-  for (const item of hero.items || []) {
-    const stats = item.stats || {}
-    if (typeof stats.atkBonus === 'number') delta.atk += stats.atkBonus
-    if (typeof stats.atkModifier === 'number') delta.atk += stats.atkModifier
-    if (typeof stats.defBonus === 'number') delta.def += stats.defBonus
-    if (typeof stats.defModifier === 'number') delta.def += stats.defModifier
-    if (typeof stats.hpBonus === 'number') delta.hp += stats.hpBonus
-    if (typeof stats.hpModifier === 'number') delta.hp += stats.hpModifier
-  }
+  const current = players.getHeroCombatStats(hero)
   return {
     ...hero.card,
     baseStats: base,
-    statDelta: delta,
+    statDelta: {
+      atk: current.atk - (base.atk || 0),
+      def: current.def - (base.def || 0),
+      hp: current.hp - (base.hp || 0)
+    },
     stats: {
-      atk: base.atk + delta.atk,
-      def: base.def + delta.def,
-      hp: base.hp + delta.hp
+      atk: current.atk,
+      def: current.def,
+      hp: current.hp
     }
   }
 }
@@ -253,6 +303,24 @@ function getHeroDisplay(hero) {
   transform: translateY(-2px);
 }
 
+.table-slot.slot-attack-selectable {
+  border-color: rgba(37, 99, 235, 0.9);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+}
+
+.table-slot.slot-attack-selected {
+  border-color: rgba(29, 78, 216, 1);
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.38);
+  transform: translateY(-2px);
+}
+
+.table-slot.slot-attack-target {
+  border-color: rgba(220, 38, 38, 0.92);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+  cursor: crosshair;
+}
+
 .hero-stack {
   position: relative;
   width: 176px;
@@ -262,6 +330,10 @@ function getHeroDisplay(hero) {
 .hero-card {
   position: relative;
   z-index: 10;
+}
+
+.hero-card.hero-card-exhausted {
+  opacity: 0.78;
 }
 
 .item-under {

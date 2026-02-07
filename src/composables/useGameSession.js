@@ -10,6 +10,7 @@ import {
 import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peerService'
 import batchData from '@/../data/batches/batch.json'
 import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
+import { useGameActions } from './useGameActions'
 
 const DRAW_DELAY_MS = 350
 
@@ -22,6 +23,7 @@ export function useGameSession() {
   const deck = useDeckStore()
   const players = usePlayersStore()
   const combat = useCombatStore()
+  const gameActions = useGameActions()
   const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 
   const isDrawing = ref(false)
@@ -154,6 +156,20 @@ export function useGameSession() {
 
   function handlePeerMessage(data) {
     if (!data?.type) return false
+
+    if (data.type === 'combat_request') {
+      return gameActions.handleCombatRequest(data.payload || {})
+    }
+
+    if (data.type === 'combat_roll_start') {
+      gameActions.receiveCombatRollStart(data.payload || {})
+      return true
+    }
+
+    if (data.type === 'combat_roll_result') {
+      gameActions.receiveCombatRollResult(data.payload || {})
+      return true
+    }
 
     if (data.type === 'restart_request') {
       incomingRestartRequest.value = {

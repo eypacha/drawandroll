@@ -35,6 +35,19 @@
       "toCombat": "Ir a combate"
     }
   },
+  "combat": {
+    "yourAttackRolling": "Tu ataque en curso",
+    "opponentAttackRolling": "Ataque rival en curso",
+    "yourAttackResult": "Resultado de tu ataque",
+    "opponentAttackResult": "Resultado del ataque rival",
+    "attackerDie": "Dado atacante",
+    "defenderDie": "Dado defensor",
+    "rollingHint": "Tirando dados...",
+    "total": "Total",
+    "damage": "Daño",
+    "critical": "Crítico",
+    "fumble": "Pifia"
+  },
   "card": {
     "imageAlt": "Imagen de carta",
     "noImage": "Sin imagen",

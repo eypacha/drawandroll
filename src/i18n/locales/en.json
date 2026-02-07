@@ -35,6 +35,19 @@
       "toCombat": "To combat"
     }
   },
+  "combat": {
+    "yourAttackRolling": "Your attack is rolling",
+    "opponentAttackRolling": "Opponent attack is rolling",
+    "yourAttackResult": "Your attack result",
+    "opponentAttackResult": "Opponent attack result",
+    "attackerDie": "Attacker die",
+    "defenderDie": "Defender die",
+    "rollingHint": "Rolling dice...",
+    "total": "Total",
+    "damage": "Damage",
+    "critical": "Critical",
+    "fumble": "Fumble"
+  },
   "card": {
     "imageAlt": "Card image",
     "noImage": "No image",

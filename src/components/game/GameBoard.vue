@@ -2,6 +2,7 @@
   <div class="relative h-screen overflow-hidden w-full flex flex-1 flex-col items-center justify-center">
     <OpponentHand />
     <GameTable />
+    <CombatOverlay />
     <PlayerHand />
     <TurnStatus />
     <ResourceDisplayPlayer />
@@ -12,6 +13,7 @@
 <script setup>
 import OpponentHand from './OpponentHand.vue'
 import GameTable from './GameTable.vue'
+import CombatOverlay from './CombatOverlay.vue'
 import PlayerHand from './PlayerHand.vue'
 import TurnStatus from './TurnStatus.vue'
 import ResourceDisplayPlayer from './ResourceDisplayPlayer.vue'

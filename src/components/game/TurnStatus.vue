@@ -8,6 +8,8 @@
     <button
       v-if="isMyTurn && advanceLabel"
       class="mt-2 px-3 py-1 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+      :disabled="combat.isRolling"
+      :class="{ 'opacity-60 cursor-not-allowed': combat.isRolling }"
       @click="advance"
     >
       {{ advanceLabel }}
@@ -18,11 +20,12 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useGameStore, useConnectionStore } from '@/stores'
+import { useGameStore, useConnectionStore, useCombatStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 
 const game = useGameStore()
 const connection = useConnectionStore()
+const combat = useCombatStore()
 const gameActions = useGameActions()
 const { t } = useI18n()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
@@ -48,6 +51,7 @@ const advanceLabel = computed(() => {
 
 function advance() {
   if (!isMyTurn.value) return
+  if (combat.isRolling) return
   gameActions.advancePhase()
 }
 </script>

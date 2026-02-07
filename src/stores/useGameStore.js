@@ -53,6 +53,7 @@ export const useGameStore = defineStore('game', () => {
         return
       }
       turnPhase.value = 'combat'
+      players.resetCombatActions(currentTurn.value)
       return
     }
     if (turnPhase.value === 'combat') {
@@ -77,6 +78,9 @@ export const useGameStore = defineStore('game', () => {
     turn.value = nextTurn
     currentTurn.value = nextCurrent
     turnPhase.value = nextPhase
+    if (nextPhase === 'combat') {
+      players.resetCombatActions(nextCurrent)
+    }
     if (nextPhase === 'draw') {
       players.refreshResources(nextCurrent)
     }
