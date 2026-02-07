@@ -1,8 +1,11 @@
 import batchData from '@/../data/batches/batch.json'
 
-export function createGameMessageRouter({ deck, game, players }) {
+export function createGameMessageRouter({ deck, game, players, resetLocalGameState }) {
   const handlers = {
     game_init(payload) {
+      if (typeof resetLocalGameState === 'function') {
+        resetLocalGameState()
+      }
       deck.loadBatch(batchData)
       deck.cards = payload.deckCards
       const initialTurnPhase = payload.turnPhase || 'recruit'

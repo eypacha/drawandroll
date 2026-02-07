@@ -4,6 +4,19 @@
     "description": "This is a sample application to demonstrate internationalization.",
     "welcome": "Welcome to our application"
   },
+  "pause": {
+    "title": "Pause",
+    "language": "Language",
+    "restart": "Restart game",
+    "restartPending": "Request sent. Waiting for opponent response.",
+    "restartDeclined": "Your opponent declined the restart."
+  },
+  "restart": {
+    "popupTitle": "Restart request",
+    "popupMessage": "Your opponent wants to restart the game. Accept?",
+    "keepPlaying": "Keep playing",
+    "acceptRestart": "Accept restart"
+  },
   "footer": {
     "rights": "All rights reserved."
   },

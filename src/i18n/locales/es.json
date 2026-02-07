@@ -4,6 +4,19 @@
     "description": "Esta es una aplicación de ejemplo para demostrar la internacionalización.",
     "welcome": "Bienvenido a nuestra aplicación"
   },
+  "pause": {
+    "title": "Pausa",
+    "language": "Idioma",
+    "restart": "Reiniciar partida",
+    "restartPending": "Solicitud enviada. Esperando respuesta del oponente.",
+    "restartDeclined": "El oponente rechazó el reinicio."
+  },
+  "restart": {
+    "popupTitle": "Solicitud de reinicio",
+    "popupMessage": "Tu oponente quiere reiniciar la partida. ¿Aceptar?",
+    "keepPlaying": "Seguir jugando",
+    "acceptRestart": "Aceptar reinicio"
+  },
   "footer": {
     "rights": "Todos los derechos reservados."
   },
