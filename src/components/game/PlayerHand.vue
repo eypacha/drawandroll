@@ -23,12 +23,13 @@
 <script setup>
 import { computed } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
-import { sendMessage } from '@/services/peerService'
+import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
 
 const connection = useConnectionStore()
 const players = usePlayersStore()
 const game = useGameStore()
+const gameActions = useGameActions()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
@@ -75,20 +76,11 @@ function getHighlightColor(card) {
 }
 
 function onHover(card) {
-  players.setHoveredCard(myPlayerId.value, card.id)
-  sendMessage({
-    type: 'hover_card',
-    payload: { playerId: myPlayerId.value, cardId: card.id }
-  })
+  gameActions.setHoveredCard(card.id)
 }
 
 function onHoverEnd(card) {
-  if (players.players[myPlayerId.value].hoveredCardId !== card.id) return
-  players.clearHoveredCard(myPlayerId.value)
-  sendMessage({
-    type: 'hover_card',
-    payload: { playerId: myPlayerId.value, cardId: null }
-  })
+  gameActions.clearHoveredCard(card.id)
 }
 </script>
 

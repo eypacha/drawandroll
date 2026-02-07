@@ -1,4 +1,4 @@
-import { onMounted, computed, ref, watch } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   useConnectionStore,
@@ -8,6 +8,7 @@ import {
 } from '@/stores'
 import { initPeer, connectToPeer, sendMessage, onMessage } from '@/services/peerService'
 import batchData from '@/../data/batches/batch.json'
+import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
 
 const DRAW_DELAY_MS = 350
 
@@ -19,8 +20,12 @@ export function useGameSession() {
   const game = useGameStore()
   const deck = useDeckStore()
   const players = usePlayersStore()
+  const routeGameMessage = createGameMessageRouter({ deck, game, players })
   const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
   const isDrawing = ref(false)
+  let unsubscribeMessages = null
+  let waitForReady = null
+  let waitForConnect = null
 
   async function initGame() {
     if (!connection.isHost) {
@@ -56,47 +61,6 @@ export function useGameSession() {
     })
   }
 
-  function handleMessage(data) {
-    console.log('[Game] Received:', data)
-
-    if (data.type === 'game_init') {
-      deck.loadBatch(batchData)
-      deck.cards = data.payload.deckCards
-      const initialTurnPhase = data.payload.turnPhase || 'recruit'
-      game.startGame(data.payload.initialTurn, initialTurnPhase)
-    }
-
-    if (data.type === 'recruit_hero') {
-      const { playerId, card, cost, slotIndex } = data.payload
-      players.addHeroFromRemote(playerId, card, cost, slotIndex)
-    }
-
-    if (data.type === 'equip_item') {
-      const { playerId, card, cost, slotIndex } = data.payload
-      players.addItemFromRemote(playerId, card, cost, slotIndex)
-    }
-
-    if (data.type === 'advance_phase') {
-      const { turn, currentTurn, turnPhase } = data.payload
-      game.setTurnState(turn, currentTurn, turnPhase)
-    }
-
-    if (data.type === 'draw_card') {
-      const { playerId, card } = data.payload
-      deck.removeCardById(card.id)
-      players.addToHand(playerId, [card])
-    }
-
-    if (data.type === 'hover_card') {
-      const { playerId, cardId } = data.payload
-      if (cardId) {
-        players.setHoveredCard(playerId, cardId)
-      } else {
-        players.clearHoveredCard(playerId)
-      }
-    }
-  }
-
   onMounted(() => {
     const roomId = route.query.id
     if (!roomId) {
@@ -104,24 +68,41 @@ export function useGameSession() {
       return
     }
 
-    onMessage(handleMessage)
+    unsubscribeMessages = onMessage(routeGameMessage)
 
     if (!connection.isConnected) {
       initPeer()
 
-      const waitForReady = setInterval(() => {
+      waitForReady = setInterval(() => {
         if (connection.isReady) {
           clearInterval(waitForReady)
+          waitForReady = null
           connectToPeer(roomId)
 
-          const waitForConnect = setInterval(() => {
+          waitForConnect = setInterval(() => {
             if (connection.isConnected) {
               clearInterval(waitForConnect)
+              waitForConnect = null
               sendMessage({ type: 'join', payload: { peerId: connection.peerId } })
             }
           }, 100)
         }
       }, 100)
+    }
+  })
+
+  onUnmounted(() => {
+    if (waitForReady) {
+      clearInterval(waitForReady)
+      waitForReady = null
+    }
+    if (waitForConnect) {
+      clearInterval(waitForConnect)
+      waitForConnect = null
+    }
+    if (unsubscribeMessages) {
+      unsubscribeMessages()
+      unsubscribeMessages = null
     }
   })
 

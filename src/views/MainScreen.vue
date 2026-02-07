@@ -41,10 +41,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useConnectionStore } from '@/stores'
-import { initPeer, onMessage, disconnect } from '@/services/peerService'
+import { initPeer, onMessage } from '@/services/peerService'
 
 const router = useRouter()
 const connection = useConnectionStore()
@@ -80,7 +80,7 @@ function copyLink() {
 }
 
 // Listen for connection, then navigate to game
-onMessage((data) => {
+const unsubscribeMessages = onMessage((data) => {
   if (data.type === 'join') {
     router.push({ name: 'Game', query: { id: connection.peerId } })
   }
@@ -96,5 +96,6 @@ const checkConnection = setInterval(() => {
 
 onUnmounted(() => {
   clearInterval(checkConnection)
+  unsubscribeMessages()
 })
 </script>

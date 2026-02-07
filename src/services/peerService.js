@@ -8,7 +8,7 @@ import { useConnectionStore } from '@/stores/useConnectionStore'
 
 let peer = null
 let connection = null
-let messageHandler = null
+const messageHandlers = new Set()
 
 /**
  * Initialize peer with optional custom ID
@@ -71,8 +71,12 @@ function handleConnection(conn, asHost) {
   
   conn.on('data', (data) => {
     console.log('[Peer] Received:', data)
-    if (messageHandler) {
-      messageHandler(data)
+    for (const handler of messageHandlers) {
+      try {
+        handler(data)
+      } catch (err) {
+        console.error('[Peer] Message handler error:', err)
+      }
     }
   })
   
@@ -104,7 +108,13 @@ export function sendMessage(data) {
  * Register handler for incoming messages
  */
 export function onMessage(handler) {
-  messageHandler = handler
+  if (typeof handler !== 'function') {
+    return () => {}
+  }
+  messageHandlers.add(handler)
+  return () => {
+    messageHandlers.delete(handler)
+  }
 }
 
 /**
@@ -122,6 +132,8 @@ export function disconnect() {
     peer.destroy()
     peer = null
   }
+
+  messageHandlers.clear()
   
   store.$reset()
 }

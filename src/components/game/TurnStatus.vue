@@ -18,10 +18,11 @@
 <script setup>
 import { computed } from 'vue'
 import { useGameStore, useConnectionStore } from '@/stores'
-import { sendMessage } from '@/services/peerService'
+import { useGameActions } from '@/composables/useGameActions'
 
 const game = useGameStore()
 const connection = useConnectionStore()
+const gameActions = useGameActions()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const isMyTurn = computed(() => game.currentTurn === myPlayerId.value)
 const phaseLabel = computed(() => {
@@ -45,14 +46,6 @@ const advanceLabel = computed(() => {
 
 function advance() {
   if (!isMyTurn.value) return
-  game.advancePhase()
-  sendMessage({
-    type: 'advance_phase',
-    payload: {
-      turn: game.turn,
-      currentTurn: game.currentTurn,
-      turnPhase: game.turnPhase
-    }
-  })
+  gameActions.advancePhase()
 }
 </script>

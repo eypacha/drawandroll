@@ -55,12 +55,13 @@
 <script setup>
 import { computed } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
-import { sendMessage } from '@/services/peerService'
+import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
 
 const players = usePlayersStore()
 const connection = useConnectionStore()
 const game = useGameStore()
+const gameActions = useGameActions()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const opponentPlayerId = computed(() => connection.isHost ? 'player_b' : 'player_a')
@@ -124,33 +125,12 @@ const slotHighlightSoft = computed(() => {
 
 function tryPlace(slotIndex) {
   if (canEquipItem.value) {
-    const played = players.playItemFromHand(myPlayerId.value, selectedCardId.value, slotIndex)
+    const played = gameActions.playItemToSlot(slotIndex, selectedCardId.value)
     if (!played) return
-    players.clearSelection(myPlayerId.value)
-    sendMessage({
-      type: 'equip_item',
-      payload: {
-        playerId: myPlayerId.value,
-        card: played.card,
-        cost: played.cost,
-        slotIndex: played.slotIndex
-      }
-    })
     return
   }
   if (canPlaceHero.value) {
-    const played = players.playHeroFromHand(myPlayerId.value, selectedCardId.value, slotIndex)
-    if (!played) return
-    players.clearSelection(myPlayerId.value)
-    sendMessage({
-      type: 'recruit_hero',
-      payload: {
-        playerId: myPlayerId.value,
-        card: played.card,
-        cost: played.cost,
-        slotIndex: played.slotIndex
-      }
-    })
+    gameActions.playHeroToSlot(slotIndex, selectedCardId.value)
   }
 }
 
