@@ -37,7 +37,7 @@ const deck = useDeckStore()
 const players = usePlayersStore()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const isDrawing = ref(false)
-const DRAW_COUNT = 2
+const DRAW_COUNT = 1
 const DRAW_DELAY_MS = 350
 
 function initGame() {
