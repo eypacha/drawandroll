@@ -22,7 +22,7 @@
     </div>
 
     <!-- Card Image (Middle) -->
-    <div class="w-full h-28 bg-gray-200 flex items-center justify-center overflow-hidden">
+    <div class="w-full h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
       <img 
         v-if="card.imageUrl" 
         :src="card.imageUrl" 
@@ -35,7 +35,7 @@
     </div>
     <!-- Card Stats & Template (Middle) -->
     <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
-      <div class="flex flex-col gap-1 text-sm font-semibold text-gray-700">
+      <div class="flex flex-col gap-1 font-semibold text-gray-700">
         <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
           <span :title="t('card.stats.attack')" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
           <span :title="t('card.stats.defense')" :class="getStatClass('def')">🛡️ {{ card.stats.def }}</span>
