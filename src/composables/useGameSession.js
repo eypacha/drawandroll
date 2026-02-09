@@ -80,18 +80,15 @@ export function useGameSession() {
         }
       })
 
-      await drawSequence(7, {
-        playerId: 'player_a',
-        syncEachDraw: true,
-        advancePhaseAfterDraw: false,
-        delayMs: DRAW_DELAY_MS
-      })
-      await drawSequence(7, {
-        playerId: 'player_b',
-        syncEachDraw: true,
-        advancePhaseAfterDraw: false,
-        delayMs: DRAW_DELAY_MS
-      })
+      const secondPlayerId = initialTurn === 'player_a' ? 'player_b' : 'player_a'
+      for (const playerId of [initialTurn, secondPlayerId]) {
+        await drawSequence(7, {
+          playerId,
+          syncEachDraw: true,
+          advancePhaseAfterDraw: false,
+          delayMs: DRAW_DELAY_MS
+        })
+      }
     } finally {
       isRestarting.value = false
     }
