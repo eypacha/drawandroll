@@ -43,6 +43,7 @@ El juego utiliza los siguientes tipos de cartas:
 2. **Ítems / Armas**
 3. **Curación**
 4. **Cartas reactivas defensivas**
+5. **Cartas de contraataque**
 
 No existen subtipos activos, tags ni keywords sistémicas en el PMV.
 
@@ -59,6 +60,7 @@ No existen subtipos activos, tags ni keywords sistémicas en el PMV.
   - equipar ítems
   - usar curación
   - usar reactivos defensivos
+  - usar contraataques defensivos
 
 ---
 
@@ -144,16 +146,27 @@ Un turno se resuelve siempre en este orden:
 
 ---
 
-## 10. Cartas reactivas defensivas
+## 10. Reacciones defensivas (reactive + counterattack)
 
 - Solo el **defensor** puede usar cartas reactivas.
-- Máximo **1 carta reactiva por ataque**.
-- No existen reacciones del atacante.
-- No existen cadenas de reacciones.
+- En la ventana defensiva se pueden jugar **múltiples cartas** mientras haya recursos.
+- Máximo **1 counterattack por ataque**.
+- No existen reacciones del atacante dentro de esa ventana.
 - Las cartas reactivas:
   - se destruyen al usarse
   - no crean estados persistentes
   - no cambian reglas del juego
+
+### 10.1 Counterattack
+- `counterattack` tiene daño base fijo (`stats.counterDamage`) y costo.
+- Cada `counterattack` resuelve con doble tirada:
+  - d20 del defensor (contraataque)
+  - d20 del atacante (contradefensa)
+- Fórmula:
+  - `counterFinal = max(0, (counterDamage + d20Contraataque) - (DEF atacante + d20Contradefensa))`
+- Si el d20 de contraataque es 20 natural, suma bono crítico.
+- Si el d20 de contraataque es 1 natural, el contraataque hace 0 daño.
+- Los contraataques se aplican en orden de juego y pueden matar al atacante.
 
 ---
 

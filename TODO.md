@@ -41,7 +41,8 @@ Actualizado: 2026-02-09
 ### Tipos de carta no jugables aun
 - [ ] Jugar cartas `healing` desde mano.
 - [x] Jugar cartas `reactive` en ventana defensiva.
-- [x] Ventana unica de reaccion del defensor durante combate (seleccion manual o pasar, con timeout).
+- [x] Jugar cartas `counterattack` en ventana defensiva.
+- [x] Ventana multi-carta del defensor durante combate (seleccion manual y pasar).
 
 ### Sistema de combate incompleto
 - [ ] Critico natural 20 y fallo critico natural 1 segun regla cerrada.

@@ -43,7 +43,11 @@ export const useCombatStore = defineStore('combat', () => {
       defenderHpBefore: null,
       defenderHpAfter: null,
       defenderDefeated: false,
-      reactive: null,
+      attackerHpBefore: null,
+      attackerHpAfter: null,
+      attackerDefeated: false,
+      counterDamageTotal: 0,
+      reactions: [],
       startedAt: Number(payload.startedAt) || Date.now()
     }
 
@@ -141,17 +145,27 @@ export const useCombatStore = defineStore('combat', () => {
     reactionWindow.value = null
   }
 
-  function setReactionResponse(combatId, cardId = null) {
+  function setReactionResponse(combatId, payload = {}) {
     if (!combatId) return false
-    reactionResponses.value[combatId] = { cardId: cardId || null, receivedAt: Date.now() }
+    if (!Array.isArray(reactionResponses.value[combatId])) {
+      reactionResponses.value[combatId] = []
+    }
+    reactionResponses.value[combatId].push({
+      cardId: payload?.cardId || null,
+      pass: Boolean(payload?.pass),
+      receivedAt: Date.now()
+    })
     return true
   }
 
   function consumeReactionResponse(combatId) {
     if (!combatId) return undefined
-    if (!(combatId in reactionResponses.value)) return undefined
-    const response = reactionResponses.value[combatId]
-    delete reactionResponses.value[combatId]
+    const queue = reactionResponses.value[combatId]
+    if (!Array.isArray(queue) || queue.length === 0) return undefined
+    const response = queue.shift()
+    if (queue.length === 0) {
+      delete reactionResponses.value[combatId]
+    }
     return response
   }
 
@@ -167,12 +181,16 @@ export const useCombatStore = defineStore('combat', () => {
       defenderTotal: Number(payload.defenderTotal) || 0,
       baseDamage: Number(payload.baseDamage ?? activeRoll.value.baseDamage ?? 0),
       damage: Number(payload.damage) || 0,
+      counterDamageTotal: Number(payload.counterDamageTotal) || 0,
       isCritical: Boolean(payload.isCritical),
       isFumble: Boolean(payload.isFumble),
+      attackerHpBefore: Number(payload.attackerHpBefore ?? 0),
+      attackerHpAfter: Number(payload.attackerHpAfter ?? 0),
+      attackerDefeated: Boolean(payload.attackerDefeated),
       defenderHpBefore: Number(payload.defenderHpBefore ?? 0),
       defenderHpAfter: Number(payload.defenderHpAfter ?? 0),
       defenderDefeated: Boolean(payload.defenderDefeated),
-      reactive: payload.reactive || null,
+      reactions: Array.isArray(payload.reactions) ? payload.reactions : [],
       finishedAt: Date.now()
     }
     pendingCombatContext.value = null

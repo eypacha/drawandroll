@@ -57,7 +57,7 @@ function canDragCard(card) {
 
 function canSelectReactive(card) {
   if (!canReactNow.value) return false
-  if (card?.type !== 'reactive') return false
+  if (card?.type !== 'reactive' && card?.type !== 'counterattack') return false
   return myResources.value >= Number(card.cost || 0)
 }
 

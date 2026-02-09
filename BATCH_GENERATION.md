@@ -42,10 +42,11 @@ Cada lote debe respetar una distribución aproximada por tipo.
 
 Distribución recomendada (ajustable en código):
 
-- **Héroes**: ~30%
+- **Héroes**: ~25%
 - **Ítems / Armas**: ~30%
-- **Cartas reactivas defensivas**: ~25%
+- **Cartas reactivas defensivas**: ~15%
 - **Curación**: ~15%
+- **Contraataques**: ~15%
 
 La implementación:
 - puede variar levemente estas proporciones

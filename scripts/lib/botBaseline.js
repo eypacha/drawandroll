@@ -1,8 +1,9 @@
 const DISCARD_TYPE_PRIORITY = {
   reactive: 0,
-  healing: 1,
-  item: 2,
-  hero: 3
+  counterattack: 1,
+  healing: 2,
+  item: 3,
+  hero: 4
 }
 
 function byCostThenIndexDesc(a, b) {

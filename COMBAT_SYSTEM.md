@@ -59,14 +59,14 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 ---
 
-### 4️⃣ Ventana de reacción (ÚNICA)
+### 4️⃣ Ventana de reacción defensiva
 - **Solo el defensor** puede reaccionar.
-- Puede jugar **como máximo 1 carta reactiva o curación**.
+- Puede jugar **múltiples cartas** (reactive/counterattack/healing) mientras tenga recursos.
+- Límite: **máximo 1 counterattack por ataque**.
 - La tirada **ya es conocida**.
 - Si el defensor no reacciona en este momento:
   - pierde la oportunidad
-- No existen reacciones del atacante.
-- No existen contra-reacciones.
+- El atacante no puede jugar cartas en esta ventana.
 
 ---
 
@@ -79,6 +79,8 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 - Si el HP del héroe defensor llega a **0**:
   - el héroe muere
   - sale del juego
+- Luego se resuelven los `counterattack` ya jugados en orden FIFO.
+- Los `counterattack` pueden matar al héroe atacante.
 - No se pueden jugar cartas en este paso.
 
 ---
@@ -122,11 +124,11 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 ---
 
-## 6. Cartas reactivas en combate
+## 6. Cartas reactivas y contraataques en combate
 
 - Solo pueden jugarse en la **ventana de reacción**.
 - Solo el defensor puede jugarlas.
-- Máximo **1 reactivo por ataque**.
+- Se pueden encadenar varias cartas por ataque, limitadas por recursos.
 - Ejemplos válidos de efectos:
   - reducir daño
   - cancelar crítico
@@ -137,6 +139,14 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
   - se destruyen al usarse
   - no crean estados persistentes
   - no modifican reglas base
+
+Para `counterattack`:
+- daño base bajo en `stats.counterDamage`
+- doble tirada por carta:
+  - d20 del defensor (contraataque)
+  - d20 del atacante (contradefensa)
+- fórmula:
+  - `max(0, (counterDamage + d20Contraataque) - (DEF atacante + d20Contradefensa))`
 
 ---
 

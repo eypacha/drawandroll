@@ -209,6 +209,8 @@ function applyCombatResult(state, result, stats) {
     defenderPlayerId,
     defenderSlot,
     damage = 0,
+    attackerHpAfter = null,
+    attackerDefeated = false,
     defenderHpAfter = null,
     defenderDefeated = false
   } = result
@@ -220,6 +222,21 @@ function applyCombatResult(state, result, stats) {
   if (!defenderPlayer) return false
   const defenderHero = ensureHeroState(defenderPlayer.heroes[defenderSlot])
   if (!defenderHero) return false
+
+  const attackerPlayer = state.players[attackerPlayerId]
+  const attackerBoardHero = ensureHeroState(attackerPlayer?.heroes?.[attackerSlot])
+  if (attackerBoardHero) {
+    if (attackerDefeated) {
+      attackerPlayer.heroes[attackerSlot] = null
+      attackerPlayer.heroesLost += 1
+      stats.heroesKilledTotal += 1
+      if (attackerPlayerId === 'player_a') stats.heroesKilledByPlayerA += 1
+      if (attackerPlayerId === 'player_b') stats.heroesKilledByPlayerB += 1
+    } else if (typeof attackerHpAfter === 'number') {
+      const maxHp = getHeroMaxHp(attackerBoardHero)
+      attackerBoardHero.currentHp = Math.max(0, Math.min(attackerHpAfter, maxHp))
+    }
+  }
 
   if (defenderDefeated) {
     defenderPlayer.heroes[defenderSlot] = null
@@ -268,18 +285,26 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   }
 
   const defenderHpBefore = defenderStats.hp
-  const reactivePlay = chooseDefenderReactive(state, defenderPlayerId, {
+  const reactionContext = resolveDefenderReactions(state, defenderPlayerId, {
     damage,
     isCritical,
     criticalBonus: COMBAT_CRITICAL_BONUS,
-    defenderHpBefore
-  })
-  if (reactivePlay) {
-    damage = reactivePlay.damage
-    isCritical = reactivePlay.isCritical
-  }
+    defenderHpBefore,
+    attackerDef: attackerStats.def,
+    counterDamage: 0,
+    counterCriticalCount: 0,
+    counterFumbleCount: 0,
+    counterattackUsed: false
+  }, rng, stats)
+  damage = reactionContext.damage
+  isCritical = reactionContext.isCritical
+  const counterDamageTotal = reactionContext.counterDamage
+  const reactions = reactionContext.reactions
   const defenderHpAfter = Math.max(0, defenderHpBefore - damage)
   const defenderDefeated = defenderHpAfter <= 0
+  const attackerHpBefore = attackerStats.hp
+  const attackerHpAfter = Math.max(0, attackerHpBefore - counterDamageTotal)
+  const attackerDefeated = attackerHpAfter <= 0
 
   const result = {
     attackerPlayerId,
@@ -291,17 +316,24 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
     attackerTotal: attackerStats.atk + attackerRoll,
     defenderTotal: defenderStats.def + defenderRoll,
     damage,
+    counterDamageTotal,
     isCritical,
     isFumble,
+    attackerHpBefore,
+    attackerHpAfter,
+    attackerDefeated,
     defenderHpBefore,
     defenderHpAfter,
-    defenderDefeated
+    defenderDefeated,
+    reactions
   }
 
   stats.totalAttacks += 1
   stats.totalDamageDealt += damage
+  stats.totalCounterDamageDealt += counterDamageTotal
   if (isCritical) stats.criticalCount += 1
   if (isFumble) stats.fumbleCount += 1
+  if (attackerDefeated) stats.attackerDeathsByCounter += 1
 
   applyCombatResult(state, result, stats)
   return result
@@ -337,26 +369,74 @@ function applyReactiveEffect(card, { damage, isCritical, criticalBonus, defender
   return null
 }
 
-function chooseDefenderReactive(state, defenderPlayerId, context) {
+function evaluateReactionCandidate(card, context, rng) {
+  if (card?.type === 'reactive') {
+    const applied = applyReactiveEffect(card, context)
+    if (!applied) return null
+    return {
+      type: 'reactive',
+      card,
+      nextDamage: applied.damage,
+      nextIsCritical: applied.isCritical,
+      counterDamage: context.counterDamage,
+      counterCriticalCount: context.counterCriticalCount,
+      counterFumbleCount: context.counterFumbleCount,
+      counterattackUsed: false,
+      counterDamageAdded: 0
+    }
+  }
+
+  if (card?.type === 'counterattack') {
+    if (context.counterattackUsed) return null
+    const counterDamage = Math.max(0, Number(card?.stats?.counterDamage || 0))
+    const counterAttackRoll = rng.int(1, 20)
+    const counterDefenseRoll = rng.int(1, 20)
+    const isFumble = counterAttackRoll === 1
+    const isCritical = counterAttackRoll === 20
+    const attackerDef = Math.max(0, Number(context.attackerDef || 0))
+    let counterFinal = Math.max(
+      0,
+      (counterDamage + counterAttackRoll) - (attackerDef + counterDefenseRoll)
+    )
+    if (isFumble) counterFinal = 0
+    if (isCritical) counterFinal += COMBAT_CRITICAL_BONUS
+    return {
+      type: 'counterattack',
+      card,
+      nextDamage: context.damage,
+      nextIsCritical: context.isCritical,
+      counterDamage: context.counterDamage + counterFinal,
+      counterCriticalCount: context.counterCriticalCount + (isCritical ? 1 : 0),
+      counterFumbleCount: context.counterFumbleCount + (isFumble ? 1 : 0),
+      counterattackUsed: true,
+      counterDamageAdded: counterFinal
+    }
+  }
+
+  return null
+}
+
+function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
   const defender = state.players[defenderPlayerId]
   if (!defender) return null
 
   const candidates = defender.hand
     .map((card, handIndex) => ({ card, handIndex }))
-    .filter(({ card }) => card?.type === 'reactive')
+    .filter(({ card }) => card?.type === 'reactive' || card?.type === 'counterattack')
     .filter(({ card }) => defender.resources >= Number(card?.cost || 0))
 
   if (candidates.length === 0) return null
 
   let bestChoice = null
   for (const candidate of candidates) {
-    const applied = applyReactiveEffect(candidate.card, context)
+    const applied = evaluateReactionCandidate(candidate.card, context, rng)
     if (!applied) continue
 
-    const nextHp = Math.max(0, context.defenderHpBefore - applied.damage)
+    const nextHp = Math.max(0, context.defenderHpBefore - applied.nextDamage)
     const score = {
       survives: nextHp > 0 ? 1 : 0,
-      damageSaved: Math.max(0, context.damage - applied.damage),
+      damageSaved: Math.max(0, context.damage - applied.nextDamage),
+      counterDamage: Math.max(0, applied.counterDamage - context.counterDamage),
       remainingHp: nextHp,
       handIndex: -candidate.handIndex
     }
@@ -375,6 +455,10 @@ function chooseDefenderReactive(state, defenderPlayerId, context) {
       if (score.damageSaved > prevScore.damageSaved) bestChoice = { candidate, applied, score }
       continue
     }
+    if (score.counterDamage !== prevScore.counterDamage) {
+      if (score.counterDamage > prevScore.counterDamage) bestChoice = { candidate, applied, score }
+      continue
+    }
     if (score.remainingHp !== prevScore.remainingHp) {
       if (score.remainingHp > prevScore.remainingHp) bestChoice = { candidate, applied, score }
       continue
@@ -386,10 +470,44 @@ function chooseDefenderReactive(state, defenderPlayerId, context) {
 
   if (!bestChoice) return null
 
-  const card = bestChoice.candidate.card
-  defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
-  defender.resources = Math.max(0, defender.resources - Number(card?.cost || 0))
-  return bestChoice.applied
+  return bestChoice
+}
+
+function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) {
+  const defender = state.players[defenderPlayerId]
+  if (!defender) return context
+
+  const nextContext = { ...context, reactions: [] }
+  while (true) {
+    const bestChoice = chooseDefenderReactionCard(state, defenderPlayerId, nextContext, rng)
+    if (!bestChoice) break
+    const card = bestChoice.candidate.card
+    const cost = Number(card?.cost || 0)
+    if (defender.resources < cost) break
+
+    nextContext.damage = bestChoice.applied.nextDamage
+    nextContext.isCritical = bestChoice.applied.nextIsCritical
+    nextContext.counterDamage = bestChoice.applied.counterDamage
+    nextContext.counterCriticalCount = bestChoice.applied.counterCriticalCount
+    nextContext.counterFumbleCount = bestChoice.applied.counterFumbleCount
+    nextContext.counterattackUsed = Boolean(bestChoice.applied.counterattackUsed || nextContext.counterattackUsed)
+    defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
+    defender.resources = Math.max(0, defender.resources - cost)
+    nextContext.reactions.push({
+      type: card.type,
+      cardId: card.id,
+      effect: card.effect || null,
+      cost,
+      resourcesAfter: defender.resources,
+      counterDamageAdded: bestChoice.applied.counterDamageAdded
+    })
+    if (card.type === 'counterattack') {
+      stats.counterattacksUsed += 1
+      stats.counterattackDamageDealt += bestChoice.applied.counterDamageAdded
+    }
+  }
+
+  return nextContext
 }
 
 function discardFromHand(state, playerId, cardIds, stats) {
@@ -557,6 +675,10 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     criticalCount: 0,
     fumbleCount: 0,
     totalDamageDealt: 0,
+    totalCounterDamageDealt: 0,
+    counterattacksUsed: 0,
+    counterattackDamageDealt: 0,
+    attackerDeathsByCounter: 0,
     cardsDrawnTotal: 0,
     cardsRecruitedTotal: 0,
     itemsEquippedTotal: 0,
@@ -672,8 +794,10 @@ export function aggregateResults(games) {
 
   const totalAttacks = sum('totalAttacks')
   const totalDamage = sum('totalDamageDealt')
+  const totalCounterDamage = sum('totalCounterDamageDealt')
   const criticalCount = sum('criticalCount')
   const fumbleCount = sum('fumbleCount')
+  const counterattacksUsed = sum('counterattacksUsed')
 
   return {
     games: gameCount,
@@ -698,11 +822,18 @@ export function aggregateResults(games) {
       totalAttacks,
       avgAttacksPerGame: gameCount > 0 ? totalAttacks / gameCount : 0,
       totalDamage,
+      totalCounterDamage,
       avgDamagePerGame: gameCount > 0 ? totalDamage / gameCount : 0,
+      avgCounterDamagePerGame: gameCount > 0 ? totalCounterDamage / gameCount : 0,
       criticalCount,
       fumbleCount,
       critsPer100Attacks: totalAttacks > 0 ? (criticalCount / totalAttacks) * 100 : 0,
       fumblesPer100Attacks: totalAttacks > 0 ? (fumbleCount / totalAttacks) * 100 : 0
+    },
+    reactions: {
+      counterattacksUsed,
+      avgCounterattacksPerGame: gameCount > 0 ? counterattacksUsed / gameCount : 0,
+      attackerDeathsByCounter: sum('attackerDeathsByCounter')
     },
     economy: {
       cardsDrawnTotal: sum('cardsDrawnTotal'),

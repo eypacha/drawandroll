@@ -1,76 +1,76 @@
 {
-  "batch_id": "faf27e79-1222-46d1-a05a-a2486d002ebe",
-  "created_at": "2026-02-05T13:01:13.579Z",
+  "batch_id": "3ca88ad1-fbca-412f-9f53-c040e6f419f1",
+  "created_at": "2026-02-09T18:37:39.596Z",
   "config": {
     "batch_size": 50,
     "distribution": {
-      "hero": 0.4,
+      "hero": 0.25,
       "item": 0.3,
       "reactive": 0.15,
-      "healing": 0.15
+      "healing": 0.15,
+      "counterattack": 0.15
     }
   },
   "summary": {
     "total": 50,
     "by_type": {
-      "hero": 19,
-      "item": 15,
+      "hero": 13,
+      "item": 13,
       "reactive": 8,
-      "healing": 8
+      "healing": 8,
+      "counterattack": 8
     }
   },
   "cards": [
     {
-      "id": "5cd4038d-6197-45de-a9c3-9af86857010f",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "Wild Outrider",
-        "es": "Hierro Mariscal"
-      },
-      "description": {
-        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 2,
-        "def": 15,
-        "hp": 8
-      },
-      "cost": 4
-    },
-    {
-      "id": "f284d0ed-9787-4ade-8cbc-f91af60065cf",
+      "id": "5517a3e1-d27d-49ce-b887-bea7064c7fa8",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "Relentless Helm",
-        "es": "Firme Yelmo"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
+        "en": "",
+        "es": ""
       },
       "stats": {
-        "atkBonus": 1,
+        "atkBonus": 2,
         "defBonus": 0,
         "atkModifier": 0,
         "defModifier": 0,
-        "durability": 1
+        "durability": 2
       },
       "cost": 2
     },
     {
-      "id": "4071047b-a6f8-4c9c-a907-057303b529d7",
+      "id": "0489f774-e82e-434d-8047-2bb30360a976",
       "type": "healing",
       "template": "emergency_heal",
       "name": {
-        "en": "Second Balm",
-        "es": "Suave Balsamo"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A small mercy passed between strangers.\nIt reminds the wounded they are not alone.\nThen the fight resumes.",
-        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 3
+      },
+      "cost": 2
+    },
+    {
+      "id": "0cfa633a-7673-434f-b4c4-0e04ad2086e1",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
       },
       "stats": {
         "healAmount": 2
@@ -78,356 +78,16 @@
       "cost": 2
     },
     {
-      "id": "7e4329d3-f61b-4bd0-a55b-2b0eefb4cb31",
-      "type": "healing",
-      "template": "minor_heal",
-      "name": {
-        "en": "Quiet Salve",
-        "es": "Amable Renovar"
-      },
-      "description": {
-        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
-        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
-      },
-      "stats": {
-        "healAmount": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "1feda12f-ca72-48cb-831a-91d375e114c4",
-      "type": "hero",
-      "template": "fragile_support",
-      "name": {
-        "en": "Silent Vanguard",
-        "es": "Piedra Cazador"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 2,
-        "def": 10,
-        "hp": 4
-      },
-      "cost": 2
-    },
-    {
-      "id": "cd852c64-36e8-4ff0-a16a-261071e2a603",
-      "type": "healing",
-      "template": "minor_heal",
-      "name": {
-        "en": "Brief Breath",
-        "es": "Amable Despertar"
-      },
-      "description": {
-        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
-        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
-      },
-      "stats": {
-        "healAmount": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "8db18fff-1a5a-47af-bfed-310dbd412cf4",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Severed Brand",
-        "es": "Juramentado Yelmo"
-      },
-      "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 1,
-        "atkModifier": -1,
-        "defModifier": 0,
-        "durability": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "f227077a-629d-427c-9eea-2cb8ee50de37",
-      "type": "hero",
-      "template": "fragile_support",
-      "name": {
-        "en": "Crimson Blade",
-        "es": "Ceniza Vanguardia"
-      },
-      "description": {
-        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
-      },
-      "stats": {
-        "atk": 2,
-        "def": 11,
-        "hp": 4
-      },
-      "cost": 2
-    },
-    {
-      "id": "e94b91b5-e649-4bae-b642-6fee6b6f0068",
-      "type": "healing",
-      "template": "minor_heal",
-      "name": {
-        "en": "Fresh Breath",
-        "es": "Silente Descanso"
-      },
-      "description": {
-        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
-        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
-      },
-      "stats": {
-        "healAmount": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "637f58e6-7d29-4464-bd68-903d2dd7c728",
-      "type": "reactive",
-      "template": "survival_trick",
-      "name": {
-        "en": "Guarded Hold",
-        "es": "Rapido Giro"
-      },
-      "description": {
-        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
-        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
-      },
-      "effect": "prevent_death",
-      "stats": {
-        "damageReduction": null
-      },
-      "cost": 3
-    },
-    {
-      "id": "76faadbe-e501-45b4-8c42-37e2ba66eb7c",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Gleaming Rig",
-        "es": "Reluciente Marca"
-      },
-      "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 1,
-        "atkModifier": -1,
-        "defModifier": 0,
-        "durability": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "f90a2fb4-e296-4774-baa4-34cfb8421baa",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Keening Helm",
-        "es": "Gastado Marca"
-      },
-      "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 2,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "c5809caf-0e5d-44b0-80ee-d788bef1b4e8",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "Sable Outrider",
-        "es": "Vigilante Cazador"
-      },
-      "description": {
-        "en": "A veteran of street wars, they carry scars instead of titles.\nThey move with a patience that hides sudden violence.\nFew remember their name; fewer forget their presence.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 1,
-        "def": 15,
-        "hp": 10
-      },
-      "cost": 4
-    },
-    {
-      "id": "f68eb2e8-209e-42d1-953b-4610493673e5",
-      "type": "hero",
-      "template": "skirmisher",
-      "name": {
-        "en": "Brave Spear",
-        "es": "Sombrio Cazador"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
-      },
-      "stats": {
-        "atk": 2,
-        "def": 12,
-        "hp": 5
-      },
-      "cost": 2
-    },
-    {
-      "id": "3bb3fc61-1fa4-4d1e-8b1a-7c93199fb493",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "Narrow Fade",
-        "es": "Ultimo Paso"
-      },
-      "description": {
-        "en": "No one sees it coming, not even allies.\nA small defiance that shifts the moment.\nIt leaves no trace but the outcome.",
-        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "eb61f000-807f-445b-b2cc-e9ce022f2f02",
-      "type": "hero",
-      "template": "skirmisher",
-      "name": {
-        "en": "Iron Shield",
-        "es": "Salvaje Explorador"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 12,
-        "hp": 6
-      },
-      "cost": 2
-    },
-    {
-      "id": "30af8dcb-4385-4603-b848-7709df6dcecf",
-      "type": "hero",
-      "template": "balanced_fighter",
-      "name": {
-        "en": "Ashen Vanguard",
-        "es": "Hierro Filo"
-      },
-      "description": {
-        "en": "A veteran of street wars, they carry scars instead of titles.\nThey move with a patience that hides sudden violence.\nFew remember their name; fewer forget their presence.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 12,
-        "hp": 8
-      },
-      "cost": 3
-    },
-    {
-      "id": "33365754-7fec-499e-8df7-c87facaea400",
+      "id": "4021a9e8-9d93-4061-b458-e7bbd7522f7c",
       "type": "hero",
       "template": "glass_cannon",
       "name": {
-        "en": "Brave Spear 2",
-        "es": "Sable Vanguardia"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
-      },
-      "stats": {
-        "atk": 4,
-        "def": 11,
-        "hp": 5
-      },
-      "cost": 3
-    },
-    {
-      "id": "24d886aa-1947-4b15-bb1f-962a1b2ec9c7",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Gleaming Glaive",
-        "es": "Verdadero Armadura"
-      },
-      "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 1,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "3a964833-8c57-4310-aaca-c4bd0385e1f9",
-      "type": "healing",
-      "template": "minor_heal",
-      "name": {
-        "en": "Brief Rest",
-        "es": "Segundo Balsamo"
-      },
-      "description": {
-        "en": "Old remedies kept in tin tins and soft pockets.\nThey carry the smell of pine and iron.\nA pause, a breath, and the road continues.",
-        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
-      },
-      "stats": {
-        "healAmount": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "09598687-4f98-409d-be84-a3b4d7e3685a",
-      "type": "hero",
-      "template": "balanced_fighter",
-      "name": {
-        "en": "Stone Outrider",
-        "es": "Hierro Cazador"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 11,
-        "hp": 7
-      },
-      "cost": 3
-    },
-    {
-      "id": "1eeda35d-3566-49dd-89bf-72fb79714a66",
-      "type": "hero",
-      "template": "glass_cannon",
-      "name": {
-        "en": "Wild Spear",
-        "es": "Sable Vanguardia 2"
-      },
-      "description": {
-        "en": "Raised in border hamlets, they learned to read danger in silence.\nTheir oath was written in ash and kept close to the heart.\nThey fight as if the ground itself depends on it.",
-        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atk": 4,
@@ -437,237 +97,33 @@
       "cost": 3
     },
     {
-      "id": "79622c41-1a04-4c17-96a0-7f0a331cb43b",
-      "type": "hero",
-      "template": "glass_cannon",
+      "id": "3385b609-07a1-4605-bef0-fcea66dd76a6",
+      "type": "counterattack",
+      "template": "quick_riposte",
       "name": {
-        "en": "Ashen Hunter",
-        "es": "Silente Filo"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
+        "en": "",
+        "es": ""
       },
       "stats": {
-        "atk": 3,
-        "def": 10,
-        "hp": 5
-      },
-      "cost": 3
-    },
-    {
-      "id": "ef35437f-b907-45ab-b3ee-0f6ba52104f3",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "Second Renew",
-        "es": "Breve Remiendo"
-      },
-      "description": {
-        "en": "A small mercy passed between strangers.\nIt reminds the wounded they are not alone.\nThen the fight resumes.",
-        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
-      },
-      "stats": {
-        "healAmount": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "e345e15c-7d31-4b90-bfb5-c7e5c5483eda",
-      "type": "hero",
-      "template": "balanced_fighter",
-      "name": {
-        "en": "Vigilant Vanguard",
-        "es": "Ceniza Vanguardia 2"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 11,
-        "hp": 6
-      },
-      "cost": 3
-    },
-    {
-      "id": "7a50f05d-8efe-4187-b172-d7f69bbf5e33",
-      "type": "hero",
-      "template": "fragile_support",
-      "name": {
-        "en": "Grim Spear",
-        "es": "Silente Mariscal"
-      },
-      "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Criado en aldeas de frontera, aprendio a leer el peligro en silencio.\nSu juramento fue escrito en ceniza y guardado en el pecho.\nPelea como si la tierra misma dependiera de ello."
-      },
-      "stats": {
-        "atk": 1,
-        "def": 10,
-        "hp": 5
-      },
-      "cost": 2
-    },
-    {
-      "id": "711f72cc-cdef-40d5-994d-d567f9b7bd0c",
-      "type": "hero",
-      "template": "skirmisher",
-      "name": {
-        "en": "Ashen Vanguard 2",
-        "es": "Sable Mariscal"
-      },
-      "description": {
-        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
-        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 11,
-        "hp": 5
-      },
-      "cost": 2
-    },
-    {
-      "id": "229d7d08-ea04-4020-bb50-2bb3f1e4263a",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "Quiet Refresh",
-        "es": "Nuevo Llama"
-      },
-      "description": {
-        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
-        "es": "Remedios viejos guardados en latas y bolsillos suaves.\nLlevan olor a pino y hierro.\nUna pausa, un respiro, y el camino sigue."
-      },
-      "stats": {
-        "healAmount": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "5402eb14-9d78-4828-a492-16dbad59000a",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Honed Brand",
-        "es": "Juramentado Banda"
-      },
-      "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 2,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "f0b81c16-62c1-4caf-aef8-b9e082a81997",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "Reflex Stay",
-        "es": "Oculto Desvanecer"
-      },
-      "description": {
-        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
-        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 2
+        "counterDamage": 1
       },
       "cost": 1
     },
     {
-      "id": "adcbef0f-749a-4e18-beff-13c8d336c280",
-      "type": "hero",
-      "template": "fragile_support",
-      "name": {
-        "en": "Brave Marshal",
-        "es": "Ceniza Jinete"
-      },
-      "description": {
-        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
-        "es": "Guardián de santuarios perdidos, responde solo a campanas antiguas.\nPolvo e incienso se quedan en su armadura.\nProtege lo que muchos ya no ven."
-      },
-      "stats": {
-        "atk": 1,
-        "def": 10,
-        "hp": 4
-      },
-      "cost": 2
-    },
-    {
-      "id": "8499e8cc-5d11-4472-81d0-415614bb3aff",
-      "type": "reactive",
-      "template": "survival_trick",
-      "name": {
-        "en": "Timely Fade",
-        "es": "Ultimo Respuesta"
-      },
-      "description": {
-        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
-        "es": "Un habito nacido de sustos y calles vacias.\nCompra un respiro cuando no deberia haberlo.\nLuego se gasta, sin ceremonia."
-      },
-      "effect": "prevent_death",
-      "stats": {
-        "damageReduction": null
-      },
-      "cost": 3
-    },
-    {
-      "id": "aaf9854a-cc7f-441e-88a0-86cba7bfa97f",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "New Rest",
-        "es": "Silente Pulso"
-      },
-      "description": {
-        "en": "A quiet ritual of cloth, water, and steady hands.\nIt does not erase pain, only keeps it from taking more.\nFor one more step, it is enough.",
-        "es": "Un ritual callado de tela, agua y manos firmes.\nNo borra el dolor, solo evita que tome mas.\nPara un paso mas, alcanza."
-      },
-      "stats": {
-        "healAmount": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "f381ed1d-b7b0-4775-8119-3bf90e38e265",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "Guarded Shift",
-        "es": "Contra Vuelta"
-      },
-      "description": {
-        "en": "No one sees it coming, not even allies.\nA small defiance that shifts the moment.\nIt leaves no trace but the outcome.",
-        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "636de757-e6a1-41b5-b993-c3f5f30415fe",
+      "id": "3c367356-5b3d-4e32-a1f9-9323b402cd5e",
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "Last Hold",
-        "es": "Guardado Respuesta"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
-        "es": "Un rito susurrado aprendido en callejones y torres.\nConvierte el panico en un gesto claro.\nSe va tan rapido como llega."
+        "en": "",
+        "es": ""
       },
       "effect": "cancel_critical",
       "stats": {
@@ -676,58 +132,242 @@
       "cost": 2
     },
     {
-      "id": "1b9f83ba-8ea4-49e6-a20a-7d6338c337e0",
+      "id": "7d5b3707-736a-48dc-9c16-7641866ffb87",
+      "type": "hero",
+      "template": "balanced_fighter",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 12,
+        "hp": 7
+      },
+      "cost": 3
+    },
+    {
+      "id": "8f28531e-ac97-47dd-9a08-533e589895d0",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "Gleaming Plate",
-        "es": "Verdadero Arnes"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atkBonus": 2,
         "defBonus": 0,
         "atkModifier": 0,
+        "defModifier": 0,
+        "durability": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "d121652c-9938-401d-9981-ceee9ab19f3a",
+      "type": "hero",
+      "template": "glass_cannon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 3,
+        "def": 10,
+        "hp": 4
+      },
+      "cost": 3
+    },
+    {
+      "id": "d3164052-eb89-45ae-b435-d0c82ec468c6",
+      "type": "reactive",
+      "template": "critical_control",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "cancel_critical",
+      "stats": {
+        "damageReduction": null
+      },
+      "cost": 2
+    },
+    {
+      "id": "7f3631cc-b3a3-4bf5-af75-5571a99b5278",
+      "type": "reactive",
+      "template": "survival_trick",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "prevent_death",
+      "stats": {
+        "damageReduction": null
+      },
+      "cost": 3
+    },
+    {
+      "id": "7da010d8-a3d9-4fcc-854e-ef109f47c049",
+      "type": "item",
+      "template": "offensive_weapon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 1,
+        "defBonus": 0,
+        "atkModifier": 0,
         "defModifier": -1,
+        "durability": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "76827476-bf1c-418e-a051-3666cb3882c9",
+      "type": "healing",
+      "template": "minor_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "e8ff3861-8622-4736-beb3-26d9cc468366",
+      "type": "hero",
+      "template": "glass_cannon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 4,
+        "def": 11,
+        "hp": 5
+      },
+      "cost": 3
+    },
+    {
+      "id": "0f2fd6be-eeaa-442c-aa02-ff29674f1287",
+      "type": "item",
+      "template": "defensive_gear",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 0,
+        "defBonus": 1,
+        "atkModifier": -1,
+        "defModifier": 0,
         "durability": 2
       },
       "cost": 2
     },
     {
-      "id": "b8d79c12-379c-48ae-a1bc-bc7b238a8506",
-      "type": "item",
-      "template": "high_risk_high_reward",
+      "id": "98f8ac78-bf39-4e55-893a-f86ac67da952",
+      "type": "reactive",
+      "template": "critical_control",
       "name": {
-        "en": "Worn Helm",
-        "es": "Implacable Glaive"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
+        "en": "",
+        "es": ""
       },
+      "effect": "cancel_critical",
       "stats": {
-        "atkBonus": 2,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -2,
-        "durability": 1
+        "damageReduction": null
       },
-      "cost": 3
+      "cost": 2
     },
     {
-      "id": "c63a85c3-50b1-4d89-9404-d80194963d61",
+      "id": "bf8b630a-a1b7-4763-8526-e8bca4b12045",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "6c0a3040-83ee-4cc1-ac56-287bb65f5e7b",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "8f61e6d5-213d-4462-819e-e8f7c0ddf6a0",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "Severed Brand 2",
-        "es": "Agudo Coraza"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Built for a single campaign, it outlived the war.\nScratches mark the promises it kept.\nIt was meant to end a feud, not a life.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atkBonus": 3,
@@ -739,34 +379,349 @@
       "cost": 3
     },
     {
-      "id": "97bee0f9-7e91-4f25-8070-59d50efc04cc",
-      "type": "reactive",
-      "template": "survival_trick",
+      "id": "4dfc3f94-30a0-4fb1-834a-1d5572acce7b",
+      "type": "counterattack",
+      "template": "quick_riposte",
       "name": {
-        "en": "Counter Shift",
-        "es": "Instantaneo Respuesta"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A whispered rite taught in alleys and watchtowers.\nIt turns panic into a single clear move.\nGone as quickly as it appears.",
-        "es": "Nadie lo ve venir, ni siquiera los aliados.\nUna pequena desobediencia que cambia el momento.\nNo deja huella salvo el resultado."
+        "en": "",
+        "es": ""
       },
-      "effect": "prevent_death",
       "stats": {
-        "damageReduction": null
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "47c933dd-56b0-47dd-9018-e6460a282d50",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "e0355c1a-aef0-42cc-8e6b-3c23ee082c59",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 1,
+        "def": 15,
+        "hp": 8
+      },
+      "cost": 4
+    },
+    {
+      "id": "367e88ff-4976-4404-9251-d646b403206f",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "4b10ab41-b1e5-422f-a849-b4c21a087e54",
+      "type": "item",
+      "template": "high_risk_high_reward",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 2,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -2,
+        "durability": 1
       },
       "cost": 3
     },
     {
-      "id": "d20a07cf-1b22-4789-b546-a66a34ce51c6",
+      "id": "a56d84cb-9968-47a0-9274-771be6984a8d",
+      "type": "item",
+      "template": "high_risk_high_reward",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 3,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -2,
+        "durability": 1
+      },
+      "cost": 3
+    },
+    {
+      "id": "c93d952a-dd86-4cad-a1e9-37eaeda18037",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "095e5c86-7ae1-4c19-af97-a1c37748dbec",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 13,
+        "hp": 9
+      },
+      "cost": 4
+    },
+    {
+      "id": "c7d909c6-f9e0-4c37-bf8a-a36dd2cfdabc",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 15,
+        "hp": 9
+      },
+      "cost": 4
+    },
+    {
+      "id": "e79f935c-9f84-4c7f-ba01-433deae094cf",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "7650d5ad-916e-4374-8ce8-310996c8f5c3",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "af8e29c2-628c-4427-b4ca-debec1bfbebc",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "a8d465eb-23ed-44f9-9d6f-44788ebc2c2a",
+      "type": "counterattack",
+      "template": "guarded_strike",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "f9e2b030-f41f-4c67-b3f7-1dc18aa95ebf",
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "Grim Vanguard",
-        "es": "Hierro Guardian"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 10,
+        "hp": 4
+      },
+      "cost": 2
+    },
+    {
+      "id": "24144f40-0b11-44f2-a62a-8f141e064bec",
+      "type": "hero",
+      "template": "balanced_fighter",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 12,
+        "hp": 6
+      },
+      "cost": 3
+    },
+    {
+      "id": "3c915c37-8285-47a1-80cb-bfbed11228ad",
+      "type": "hero",
+      "template": "balanced_fighter",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 13,
+        "hp": 7
+      },
+      "cost": 3
+    },
+    {
+      "id": "9306cd17-b807-4ae8-bced-bcfed0caaea6",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "66ae237a-2cdd-4b28-9dbe-9505971fe562",
+      "type": "item",
+      "template": "defensive_gear",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 0,
+        "defBonus": 1,
+        "atkModifier": 0,
+        "defModifier": 0,
+        "durability": 3
+      },
+      "cost": 2
+    },
+    {
+      "id": "5ad128cb-4541-4f51-8201-034ee2e2a6aa",
+      "type": "hero",
+      "template": "fragile_support",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atk": 1,
@@ -776,175 +731,35 @@
       "cost": 2
     },
     {
-      "id": "5f292592-e2dc-4294-9a88-1144d272b136",
+      "id": "a695ee11-fccc-4ba1-813d-dca7ce46e4fc",
       "type": "hero",
-      "template": "balanced_fighter",
+      "template": "skirmisher",
       "name": {
-        "en": "Iron Rider",
-        "es": "Salvaje Centinela"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "A guardian of lost shrines, they answer only to old bells.\nDust and incense cling to their armor.\nThey protect what most no longer see.",
-        "es": "Cruzó caminos largos escoltando caravanas en inviernos negros.\nCada fogon dio una leccion, cada asalto un juramento.\nSe planta donde otros se apartan."
-      },
-      "stats": {
-        "atk": 3,
-        "def": 13,
-        "hp": 8
-      },
-      "cost": 3
-    },
-    {
-      "id": "de98e61a-0b57-4f3f-9e79-543034f1eab8",
-      "type": "hero",
-      "template": "fragile_support",
-      "name": {
-        "en": "Silent Blade",
-        "es": "Silente Jinete"
-      },
-      "description": {
-        "en": "Raised in border hamlets, they learned to read danger in silence.\nTheir oath was written in ash and kept close to the heart.\nThey fight as if the ground itself depends on it.",
-        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atk": 2,
-        "def": 10,
-        "hp": 5
+        "def": 11,
+        "hp": 6
       },
       "cost": 2
     },
     {
-      "id": "be1303aa-49e2-46fd-b351-516dca33deca",
-      "type": "reactive",
-      "template": "critical_control",
-      "name": {
-        "en": "Narrow Fade 2",
-        "es": "Justo Guardia"
-      },
-      "description": {
-        "en": "A habit learned from close calls and empty streets.\nIt buys a breath when there should be none.\nThen it is spent, without ceremony.",
-        "es": "Un habito nacido de sustos y calles vacias.\nCompra un respiro cuando no deberia haberlo.\nLuego se gasta, sin ceremonia."
-      },
-      "effect": "cancel_critical",
-      "stats": {
-        "damageReduction": null
-      },
-      "cost": 2
-    },
-    {
-      "id": "193712df-9e4c-4cf4-ada7-0e0f9bf5c6eb",
+      "id": "75019106-6945-4215-92d7-5baec308fc17",
       "type": "item",
       "template": "defensive_gear",
       "name": {
-        "en": "Keening Helm 2",
-        "es": "Implacable Banda"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
-        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 2,
-        "atkModifier": -1,
-        "defModifier": 0,
-        "durability": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "1f0afb57-353d-4e3e-aae6-a1ab36786cb9",
-      "type": "item",
-      "template": "offensive_weapon",
-      "name": {
-        "en": "True Aegis",
-        "es": "Reluciente Egida"
-      },
-      "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Hecho para una sola campaña, sobrevivio la guerra.\nLas marcas son promesas que cumplío.\nFue pensado para cerrar una deuda, no una vida."
-      },
-      "stats": {
-        "atkBonus": 1,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -1,
-        "durability": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "63df2187-dac1-4f5d-858f-66602e2a13fd",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "Ashen Sentinel",
-        "es": "Carmesi Guardian"
-      },
-      "description": {
-        "en": "They walked the long roads guarding caravans through black winters.\nEvery campfire left a lesson, every raid a promise.\nThey stand where others step aside.",
-        "es": "Veterano de guerras de calle, lleva cicatrices en lugar de titulos.\nSe mueve con una paciencia que oculta violencia repentina.\nPocos recuerdan su nombre; menos olvidan su presencia."
-      },
-      "stats": {
-        "atk": 2,
-        "def": 14,
-        "hp": 8
-      },
-      "cost": 4
-    },
-    {
-      "id": "36950afd-a279-4cad-b24f-639cf675cbd5",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Severed Harness",
-        "es": "Gastado Arnes"
-      },
-      "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Pasado de veterano en veterano, carga un peso silencioso.\nEl metal zumba cuando la pelea se acerca.\nQuien lo empuña rara vez lo suelta."
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 2,
-        "atkModifier": -1,
-        "defModifier": 0,
-        "durability": 3
-      },
-      "cost": 2
-    },
-    {
-      "id": "84da2866-da80-4ff1-b236-3507e19650cd",
-      "type": "item",
-      "template": "high_risk_high_reward",
-      "name": {
-        "en": "Relentless Harness",
-        "es": "Implacable Marca"
-      },
-      "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
-      },
-      "stats": {
-        "atkBonus": 2,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -1,
-        "durability": 1
-      },
-      "cost": 3
-    },
-    {
-      "id": "52b147bb-3ab8-4bbd-a01b-fed6cecc87a0",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "Stalwart Glaive",
-        "es": "Gastado Talismán"
-      },
-      "description": {
-        "en": "Passed from veteran to veteran, it carries a quiet weight.\nThe metal hums when a fight is close.\nThose who wield it seldom let it go.",
-        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
+        "en": "",
+        "es": ""
       },
       "stats": {
         "atkBonus": 0,
@@ -956,25 +771,192 @@
       "cost": 2
     },
     {
-      "id": "49562ca3-1753-4e3a-b25b-bc02b030dbc2",
+      "id": "de70e98f-d0f1-43bd-8059-f8c6d57a2e5e",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "True Glaive",
-        "es": "Silente Armadura"
+        "en": "",
+        "es": ""
       },
       "description": {
-        "en": "Forged in a foundry that no longer appears on maps.\nIts edge remembers the hands that shaped it.\nIt asks for commitment, not caution.",
-        "es": "Forjado en una fundicion que ya no aparece en los mapas.\nSu filo recuerda las manos que lo formaron.\nExige compromiso, no cautela."
+        "en": "",
+        "es": ""
       },
       "stats": {
-        "atkBonus": 2,
+        "atkBonus": 1,
         "defBonus": 0,
         "atkModifier": 0,
         "defModifier": 0,
         "durability": 1
       },
       "cost": 2
+    },
+    {
+      "id": "34da9100-e9ed-4066-b7e2-096d27c310b0",
+      "type": "item",
+      "template": "offensive_weapon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 2,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -1,
+        "durability": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "b3d67d2f-2a77-4a4b-87e2-dfa706fe05f5",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 1,
+        "def": 13,
+        "hp": 8
+      },
+      "cost": 4
+    },
+    {
+      "id": "08eb4ff5-e235-45b5-8c2e-4f8e9d316305",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "4086f0ca-2437-424d-b42a-976bbda36b87",
+      "type": "item",
+      "template": "defensive_gear",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 0,
+        "defBonus": 2,
+        "atkModifier": -1,
+        "defModifier": 0,
+        "durability": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "fbf52d65-3505-45ff-923a-28cadb4ccb07",
+      "type": "item",
+      "template": "offensive_weapon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 1,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": 0,
+        "durability": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "6132e7aa-09c7-49a6-8247-e42ecf6b449b",
+      "type": "healing",
+      "template": "minor_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "61b695c0-fad9-46f9-8705-ce1cd319dc2e",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "99d214b5-6b6b-48c9-9850-c49070ae268f",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 3
+      },
+      "cost": 2
+    },
+    {
+      "id": "208dea9e-aa3f-42fe-9065-230274c4ec2e",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
     }
   ]
 }

@@ -5,7 +5,8 @@
       'border-amber-400': card.type === 'hero',
       'border-violet-400': card.type === 'item',
       'border-emerald-400': card.type === 'healing',
-      'border-blue-400': card.type === 'reactive'
+      'border-blue-400': card.type === 'reactive',
+      'border-rose-400': card.type === 'counterattack'
     }"
   >
     <!-- Card Name (Top) -->
@@ -49,6 +50,9 @@
         </span>
         <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} {{ t('card.stats.hpShort') }}</span>
         <span v-else-if="card.type === 'reactive'" class="text-xs">{{ formatTemplate(card.effect) }}</span>
+        <span v-else-if="card.type === 'counterattack'" class="text-xs">
+          ⚡ {{ card.stats.counterDamage }} {{ t('card.stats.counterDamage') }}
+        </span>
       </div>
       <!-- Description (Below stats) -->
       <div class="text-[10px] text-gray-500 font-normal italic leading-tight">

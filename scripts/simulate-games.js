@@ -149,7 +149,13 @@ function printSummary({ config, aggregate }) {
     `Combat avg attacks/damage: ${formatNumber(aggregate.combat.avgAttacksPerGame)} / ${formatNumber(aggregate.combat.avgDamagePerGame)}\n`
   )
   process.stdout.write(
+    `Counter avg dmg/uses: ${formatNumber(aggregate.combat.avgCounterDamagePerGame)} / ${formatNumber(aggregate.reactions.avgCounterattacksPerGame)}\n`
+  )
+  process.stdout.write(
     `Crits/Fumbles per 100 attacks: ${formatNumber(aggregate.combat.critsPer100Attacks)} / ${formatNumber(aggregate.combat.fumblesPer100Attacks)}\n`
+  )
+  process.stdout.write(
+    `Attacker deaths by counter: ${aggregate.reactions.attackerDeathsByCounter}\n`
   )
 
   process.stdout.write(

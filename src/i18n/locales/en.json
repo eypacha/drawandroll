@@ -75,7 +75,8 @@
       "hero": "Hero",
       "item": "Item",
       "healing": "Healing",
-      "reactive": "Reactive"
+      "reactive": "Reactive",
+      "counterattack": "Counterattack"
     },
     "effects": {
       "reduce_damage": "Reduce damage",
@@ -91,6 +92,7 @@
       "defenseBonus": "Defense bonus",
       "defensePenalty": "Defense penalty",
       "durability": "Durability",
+      "counterDamage": "Counter damage",
       "hpShort": "HP"
     }
   },

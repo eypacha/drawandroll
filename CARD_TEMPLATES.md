@@ -279,6 +279,40 @@ Never:
 Rol:
 - Salvataje puntual.
 
+---
+
+## 6. Plantillas de CONTRAATAQUE
+
+Las cartas de contraataque:
+- solo se juegan en ventana defensiva
+- tienen daño fijo bajo (`counterDamage`)
+- consumen recursos
+- se destruyen al usarse
+
+### 6.1 Counterattack Template: **Quick Riposte**
+
+Rol:
+- respuesta barata de daño mínimo.
+
+Rangos:
+- `counterDamage`: 1
+- Costo: 1
+
+Never:
+- `counterDamage` > 1
+
+### 6.2 Counterattack Template: **Guarded Strike**
+
+Rol:
+- respuesta media con daño bajo.
+
+Rangos:
+- `counterDamage`: 1–2
+- Costo: 2
+
+Never:
+- `counterDamage` > 2
+
 Rangos:
 - Curar: 2–3 HP
 - Costo: 2 recursos

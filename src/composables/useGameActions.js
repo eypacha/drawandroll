@@ -233,22 +233,36 @@ export function useGameActions() {
     return active
   }
 
+  function hasPlayableReactionCard(playerId) {
+    const hand = players.players[playerId]?.hand || []
+    const resources = Number(players.players[playerId]?.resources || 0)
+    return hand.some((card) => (
+      (card?.type === 'reactive' || card?.type === 'counterattack') &&
+      resources >= Number(card?.cost || 0)
+    ))
+  }
+
   async function waitForReactionChoice(combatId) {
+    const actions = []
     while (true) {
       const active = getActiveCombatOrNull()
       if (!active || active.combatId !== combatId || combat.rollStep !== 'reaction_pending') {
-        return null
+        return actions
+      }
+      if (!hasPlayableReactionCard(active.defenderPlayerId)) {
+        return actions
       }
       const response = combat.consumeReactionResponse(combatId)
       if (response !== undefined) {
-        return response?.cardId || null
+        if (response?.pass) return actions
+        if (response?.cardId) actions.push({ cardId: response.cardId })
       }
       await sleep(60)
     }
   }
 
   async function resolveCombatAfterReaction(combatId) {
-    const selectedReactiveCardId = await waitForReactionChoice(combatId)
+    const selectedReactionActions = await waitForReactionChoice(combatId)
     const active = getActiveCombatOrNull()
     if (!active || active.combatId !== combatId) return false
 
@@ -262,7 +276,9 @@ export function useGameActions() {
       attackerRoll: active.attackerRoll,
       defenderRoll: active.defenderRoll,
       criticalBonus: COMBAT_CRITICAL_BONUS,
-      reactiveCardId: selectedReactiveCardId
+      reactionActions: selectedReactionActions,
+      rollCounterAttack: randomD20,
+      rollCounterDefense: randomD20
     })
 
     if (!resolved) {
@@ -525,14 +541,17 @@ export function useGameActions() {
 
     if (cardId) {
       const card = players.players[myPlayerId.value].hand.find((entry) => entry.id === cardId)
-      if (!card || card.type !== 'reactive') return false
+      if (!card || (card.type !== 'reactive' && card.type !== 'counterattack')) return false
       const cost = Number(card.cost || 0)
       if (players.players[myPlayerId.value].resources < cost) return false
     }
 
     if (connection.isHost) {
-      const accepted = combat.setReactionResponse(window.combatId, cardId)
-      if (accepted) combat.closeReactionWindow(window.combatId)
+      const accepted = combat.setReactionResponse(window.combatId, {
+        cardId: cardId || null,
+        pass: !cardId
+      })
+      if (accepted && !cardId) combat.closeReactionWindow(window.combatId)
       return accepted
     }
 
@@ -542,10 +561,11 @@ export function useGameActions() {
         combatId: window.combatId,
         defenderPlayerId: myPlayerId.value,
         cardId: cardId || null,
+        pass: !cardId,
         respondedAt: Date.now()
       }
     })
-    if (sent) combat.closeReactionWindow(window.combatId)
+    if (sent && !cardId) combat.closeReactionWindow(window.combatId)
     return sent
   }
 
@@ -556,8 +576,11 @@ export function useGameActions() {
     if (!window?.combatId) return false
     if (payload?.combatId !== window.combatId) return false
     if (payload?.defenderPlayerId !== window.defenderPlayerId) return false
-    const accepted = combat.setReactionResponse(window.combatId, payload?.cardId || null)
-    if (accepted) combat.closeReactionWindow(window.combatId)
+    const accepted = combat.setReactionResponse(window.combatId, {
+      cardId: payload?.cardId || null,
+      pass: Boolean(payload?.pass)
+    })
+    if (accepted && payload?.pass) combat.closeReactionWindow(window.combatId)
     return accepted
   }
 

@@ -20,7 +20,9 @@ import {
   reactiveTemplates,
   reactiveTemplateIds,
   healingTemplates,
-  healingTemplateIds
+  healingTemplateIds,
+  counterattackTemplates,
+  counterattackTemplateIds
 } from './templates/index.js';
 
 // =============================================================================
@@ -31,18 +33,20 @@ const BATCH_SIZE = 50;
 
 // Distribution percentages (must sum to 1.0)
 const DISTRIBUTION = {
-  hero: 0.40,      // ~40% = 20 cards
+  hero: 0.25,      // ~25% = 12-13 cards
   item: 0.30,      // ~30% = 15 cards
   reactive: 0.15,  // ~15% = 7-8 cards
-  healing: 0.15    // ~15% = 7-8 cards
+  healing: 0.15,   // ~15% = 7-8 cards
+  counterattack: 0.15 // ~15% = 7-8 cards
 };
 
 // Minimum cards per type (validation)
 const MIN_CARDS = {
   hero: 10,
   item: 10,
-  reactive: 8,
-  healing: 5
+  reactive: 6,
+  healing: 5,
+  counterattack: 5
 };
 
 // Output directory (relative to project root)
@@ -178,6 +182,21 @@ function generateHealingCard(template) {
   };
 }
 
+function generateCounterattackCard(template) {
+  const stats = generateStats(template.ranges);
+  return {
+    id: randomUUID(),
+    type: 'counterattack',
+    template: template.id,
+    name: { en: '', es: '' },
+    description: { en: '', es: '' },
+    stats: {
+      counterDamage: stats.counterDamage
+    },
+    cost: template.baseCost
+  };
+}
+
 // =============================================================================
 // BATCH GENERATION
 // =============================================================================
@@ -187,7 +206,8 @@ function calculateDistribution(batchSize) {
     hero: Math.round(batchSize * DISTRIBUTION.hero),
     item: Math.round(batchSize * DISTRIBUTION.item),
     reactive: Math.round(batchSize * DISTRIBUTION.reactive),
-    healing: Math.round(batchSize * DISTRIBUTION.healing)
+    healing: Math.round(batchSize * DISTRIBUTION.healing),
+    counterattack: Math.round(batchSize * DISTRIBUTION.counterattack)
   };
   
   // Adjust to match exact batch size
@@ -210,7 +230,8 @@ function generateBatch() {
     hero: new Set(),
     item: new Set(),
     reactive: new Set(),
-    healing: new Set()
+    healing: new Set(),
+    counterattack: new Set()
   };
   const distribution = calculateDistribution(BATCH_SIZE);
   
@@ -218,7 +239,8 @@ function generateBatch() {
     hero: () => generateHeroCard(heroTemplates[randomPick(heroTemplateIds)]),
     item: () => generateItemCard(itemTemplates[randomPick(itemTemplateIds)]),
     reactive: () => generateReactiveCard(reactiveTemplates[randomPick(reactiveTemplateIds)]),
-    healing: () => generateHealingCard(healingTemplates[randomPick(healingTemplateIds)])
+    healing: () => generateHealingCard(healingTemplates[randomPick(healingTemplateIds)]),
+    counterattack: () => generateCounterattackCard(counterattackTemplates[randomPick(counterattackTemplateIds)])
   };
   
   // Calculate max unique cards per type
@@ -226,7 +248,8 @@ function generateBatch() {
     hero: maxUniqueCards(heroTemplates),
     item: maxUniqueCards(itemTemplates),
     reactive: maxUniqueCards(reactiveTemplates),
-    healing: maxUniqueCards(healingTemplates)
+    healing: maxUniqueCards(healingTemplates),
+    counterattack: maxUniqueCards(counterattackTemplates)
   };
   
   // Generate cards for each type
@@ -278,7 +301,8 @@ function generateBatch() {
         hero: cards.filter(c => c.type === 'hero').length,
         item: cards.filter(c => c.type === 'item').length,
         reactive: cards.filter(c => c.type === 'reactive').length,
-        healing: cards.filter(c => c.type === 'healing').length
+        healing: cards.filter(c => c.type === 'healing').length,
+        counterattack: cards.filter(c => c.type === 'counterattack').length
       }
     },
     cards
@@ -360,6 +384,7 @@ function main() {
   console.log(`   - Items:    ${batch.summary.by_type.item}`);
   console.log(`   - Reactive: ${batch.summary.by_type.reactive}`);
   console.log(`   - Healing:  ${batch.summary.by_type.healing}`);
+  console.log(`   - Counter:  ${batch.summary.by_type.counterattack}`);
   console.log(`   - Total:    ${batch.summary.total}`);
   console.log('');
   console.log(`   Output: ${filepath}`);

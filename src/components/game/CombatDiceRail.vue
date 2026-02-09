@@ -19,7 +19,7 @@
       <section class="p-2">
         <button
           type="button"
-          class="h-20x` w-full border text-2xl font-black transition-colors"
+          class="h-20 w-full border text-2xl font-black transition-colors"
           :class="ownDieClass"
           :disabled="!canClickOwnDie"
           @click="onClickOwnDie"
@@ -32,7 +32,7 @@
       </section>
 
       <section class="rounded-md p-2 text-xs text-gray-700">
-        <div class="font-semibold">{{ damageFormulaLabel }}</div>
+        <div v-if="damageFormulaLabel" class="font-semibold">{{ damageFormulaLabel }}</div>
         <div class="mt-2 text-[11px] text-gray-600">
           {{ statusLabel }}
         </div>
@@ -42,8 +42,8 @@
         <div v-if="showFumble" class="mt-2 inline-block bg-gray-200 px-2 py-0.5 text-[11px] font-semibold text-gray-700">
           {{ t('combat.fumble') }}
         </div>
-        <div v-if="showReactiveUsed" class="mt-2 text-[11px] text-blue-700">
-          {{ t('combat.reactiveUsed') }}: {{ reactiveEffectLabel }}
+        <div v-if="lastReactionLabel" class="mt-2 text-[11px] text-blue-700">
+          {{ lastReactionLabel }}
         </div>
         <div v-if="isMyReactionWindow" class="mt-2 flex justify-end">
           <button
@@ -155,21 +155,30 @@ const damageModifier = computed(() => {
 })
 const damageFormulaLabel = computed(() => {
   if (!Number.isFinite(baseDamageDisplay.value) || !Number.isFinite(finalDamageDisplay.value) || damageModifier.value === null) {
-    return `${t('combat.damage')}: ? + ? = ?`
+    return ''
   }
   return `${t('combat.damage')}: ${baseDamageDisplay.value} + ${damageModifier.value} = ${finalDamageDisplay.value}`
 })
 
 const showCritical = computed(() => Boolean(active.value?.isCritical))
 const showFumble = computed(() => Boolean(active.value?.isFumble))
-const showReactiveUsed = computed(() => Boolean(active.value?.reactive?.effect))
+const lastReaction = computed(() => {
+  const reactions = active.value?.reactions
+  if (!Array.isArray(reactions) || reactions.length === 0) return null
+  return reactions[reactions.length - 1]
+})
 
-const reactiveEffectLabel = computed(() => {
-  const effect = active.value?.reactive?.effect
+const lastReactionLabel = computed(() => {
+  const reaction = lastReaction.value
+  if (!reaction) return ''
+  if (reaction.type === 'counterattack') {
+    return `${t('card.types.counterattack')}: ${reaction.counterDamage} + ${reaction.counterAttackRoll} - ${reaction.counterDefenseRoll} = ${reaction.counterFinal}`
+  }
+  const effect = reaction.effect
   if (!effect) return ''
   const key = `card.effects.${effect}`
   const translated = t(key)
-  return translated === key ? effect : translated
+  return `${t('combat.reactiveUsed')}: ${translated === key ? effect : translated}`
 })
 
 const statusLabel = computed(() => {

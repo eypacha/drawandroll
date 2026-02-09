@@ -248,7 +248,9 @@ export const usePlayersStore = defineStore('players', () => {
       damage = 0,
       defenderHpAfter = null,
       defenderDefeated = false,
-      reactive = null
+      reactions = [],
+      attackerHpAfter = null,
+      attackerDefeated = false
     } = payload || {}
 
     const attackerHero = ensureHeroState(getHeroAt(attackerPlayerId, attackerSlot))
@@ -259,15 +261,37 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderPlayer = players.value[defenderPlayerId]
     if (!defenderPlayer) return false
 
-    if (reactive?.cardId) {
-      removeCardFromHand(defenderPlayerId, reactive.cardId)
-    }
-    if (typeof reactive?.resourcesAfter === 'number') {
-      defenderPlayer.resources = Math.max(0, reactive.resourcesAfter)
+    if (Array.isArray(reactions)) {
+      for (const reaction of reactions) {
+        if (!reaction?.cardId) continue
+        removeCardFromHand(defenderPlayerId, reaction.cardId)
+      }
+      const lastReaction = reactions[reactions.length - 1]
+      if (typeof lastReaction?.resourcesAfter === 'number') {
+        defenderPlayer.resources = Math.max(0, lastReaction.resourcesAfter)
+      }
     }
 
     const defenderHero = ensureHeroState(getHeroAt(defenderPlayerId, defenderSlot))
     if (!defenderHero) return false
+
+    const attackerPlayer = players.value[attackerPlayerId]
+    if (attackerPlayer) {
+      const attackerHero = ensureHeroState(getHeroAt(attackerPlayerId, attackerSlot))
+      if (attackerHero) {
+        if (attackerDefeated) {
+          attackerPlayer.heroes[attackerSlot] = null
+          attackerPlayer.heroesLost += 1
+        } else if (typeof attackerHpAfter === 'number') {
+          const attackerMaxHp = getHeroMaxHp(attackerHero)
+          attackerHero.currentHp = Math.max(0, Math.min(attackerHpAfter, attackerMaxHp))
+          if (attackerHero.currentHp <= 0) {
+            attackerPlayer.heroes[attackerSlot] = null
+            attackerPlayer.heroesLost += 1
+          }
+        }
+      }
+    }
 
     if (defenderDefeated) {
       defenderPlayer.heroes[defenderSlot] = null
@@ -329,7 +353,8 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderPlayer = players.value[defenderPlayerId]
     if (!defenderPlayer) return []
     return defenderPlayer.hand.filter((card) => (
-      card?.type === 'reactive' && defenderPlayer.resources >= Number(card?.cost || 0)
+      (card?.type === 'reactive' || card?.type === 'counterattack') &&
+      defenderPlayer.resources >= Number(card?.cost || 0)
     ))
   }
 
@@ -341,7 +366,9 @@ export const usePlayersStore = defineStore('players', () => {
     attackerRoll,
     defenderRoll,
     criticalBonus = 2,
-    reactiveCardId = null
+    reactionActions = [],
+    rollCounterAttack = null,
+    rollCounterDefense = null
   }) {
     const attackerHero = ensureHeroState(getHeroAt(attackerPlayerId, attackerSlot))
     const defenderHero = ensureHeroState(getHeroAt(defenderPlayerId, defenderSlot))
@@ -363,35 +390,94 @@ export const usePlayersStore = defineStore('players', () => {
     }
 
     const defenderHpBefore = defenderStats.hp
-    let reactivePlay = null
-    if (reactiveCardId) {
-      const reactiveCard = players.value[defenderPlayerId].hand.find((card) => (
-        card?.id === reactiveCardId && card?.type === 'reactive'
-      ))
-      const hasResources = players.value[defenderPlayerId].resources >= Number(reactiveCard?.cost || 0)
-      if (reactiveCard && hasResources) {
-        const appliedReactive = applyReactiveEffect({
-          card: reactiveCard,
-          damage,
-          isCritical,
-          criticalBonus,
-          defenderHpBefore
-        })
-        damage = appliedReactive.damage
-        isCritical = appliedReactive.isCritical
-        removeCardFromHand(defenderPlayerId, reactiveCard.id)
-        players.value[defenderPlayerId].resources = Math.max(
-          0,
-          players.value[defenderPlayerId].resources - Number(reactiveCard.cost || 0)
-        )
-        reactivePlay = {
-          card: reactiveCard,
-          ...appliedReactive
+    const reactions = []
+    let counterDamageTotal = 0
+    let counterattackUsed = false
+    const safeCounterAttackRoll = typeof rollCounterAttack === 'function'
+      ? rollCounterAttack
+      : () => Math.floor(Math.random() * 20) + 1
+    const safeCounterDefenseRoll = typeof rollCounterDefense === 'function'
+      ? rollCounterDefense
+      : () => Math.floor(Math.random() * 20) + 1
+
+    const defenderPlayer = players.value[defenderPlayerId]
+    if (Array.isArray(reactionActions) && defenderPlayer) {
+      for (const action of reactionActions) {
+        const reactionCardId = action?.cardId
+        if (!reactionCardId) continue
+        const reactionCard = defenderPlayer.hand.find((card) => card?.id === reactionCardId)
+        if (!reactionCard) continue
+
+        const reactionType = reactionCard.type
+        if (reactionType !== 'reactive' && reactionType !== 'counterattack') continue
+        const cost = Number(reactionCard.cost || 0)
+        if (defenderPlayer.resources < cost) continue
+
+        if (reactionType === 'reactive') {
+          const damageBeforeReactive = damage
+          const appliedReactive = applyReactiveEffect({
+            card: reactionCard,
+            damage,
+            isCritical,
+            criticalBonus,
+            defenderHpBefore
+          })
+          damage = appliedReactive.damage
+          isCritical = appliedReactive.isCritical
+          removeCardFromHand(defenderPlayerId, reactionCard.id)
+          defenderPlayer.resources = Math.max(0, defenderPlayer.resources - cost)
+          reactions.push({
+            type: 'reactive',
+            cardId: reactionCard.id,
+            effect: reactionCard.effect,
+            cost,
+            resourcesAfter: defenderPlayer.resources,
+            damageReduction: Math.max(0, damageBeforeReactive - damage),
+            criticalCanceled: Boolean(appliedReactive.criticalCanceled),
+            preventedDeath: Boolean(appliedReactive.preventedDeath)
+          })
+          continue
         }
+
+        if (counterattackUsed) continue
+        const counterDamage = Math.max(0, Number(reactionCard?.stats?.counterDamage || 0))
+        const counterAttackRoll = safeCounterAttackRoll()
+        const counterDefenseRoll = safeCounterDefenseRoll()
+        const isCounterFumble = counterAttackRoll === 1
+        const isCounterCritical = counterAttackRoll === 20
+        let counterFinal = Math.max(
+          0,
+          (counterDamage + counterAttackRoll) - (attackerStats.def + counterDefenseRoll)
+        )
+        if (isCounterFumble) {
+          counterFinal = 0
+        } else if (isCounterCritical) {
+          counterFinal += criticalBonus
+        }
+        counterDamageTotal += counterFinal
+        counterattackUsed = true
+        removeCardFromHand(defenderPlayerId, reactionCard.id)
+        defenderPlayer.resources = Math.max(0, defenderPlayer.resources - cost)
+        reactions.push({
+          type: 'counterattack',
+          cardId: reactionCard.id,
+          cost,
+          resourcesAfter: defenderPlayer.resources,
+          counterDamage,
+          counterAttackRoll,
+          counterDefenseRoll,
+          counterFinal,
+          isCounterCritical,
+          isCounterFumble
+        })
       }
     }
+
     const defenderHpAfter = Math.max(0, defenderHpBefore - damage)
     const defenderDefeated = defenderHpAfter <= 0
+    const attackerHpBefore = attackerStats.hp
+    const attackerHpAfter = Math.max(0, attackerHpBefore - counterDamageTotal)
+    const attackerDefeated = attackerHpAfter <= 0
 
     const result = {
       attackerPlayerId,
@@ -403,22 +489,16 @@ export const usePlayersStore = defineStore('players', () => {
       attackerTotal: attackerStats.atk + safeAttackerRoll,
       defenderTotal: defenderStats.def + safeDefenderRoll,
       damage,
+      counterDamageTotal,
       isCritical,
       isFumble,
+      attackerHpBefore,
+      attackerHpAfter,
+      attackerDefeated,
       defenderHpBefore,
       defenderHpAfter,
       defenderDefeated,
-      reactive: reactivePlay
-        ? {
-            cardId: reactivePlay.card.id,
-            effect: reactivePlay.card.effect,
-            cost: Number(reactivePlay.card.cost || 0),
-            resourcesAfter: players.value[defenderPlayerId].resources,
-            damageReduction: Math.max(0, defenderHpBefore - defenderHpAfter),
-            criticalCanceled: Boolean(reactivePlay.criticalCanceled),
-            preventedDeath: Boolean(reactivePlay.preventedDeath)
-          }
-        : null
+      reactions
     }
 
     applyCombatResult(result)
