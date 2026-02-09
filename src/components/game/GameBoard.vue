@@ -5,7 +5,7 @@
       <DeckPile />
     </div>
     <GameTable />
-    <CombatOverlay />
+    <CombatDiceRail />
     <PlayerHand />
     <TurnStatus />
     <ResourceDisplayPlayer />
@@ -17,7 +17,7 @@
 import OpponentHand from './OpponentHand.vue'
 import DeckPile from './DeckPile.vue'
 import GameTable from './GameTable.vue'
-import CombatOverlay from './CombatOverlay.vue'
+import CombatDiceRail from './CombatDiceRail.vue'
 import PlayerHand from './PlayerHand.vue'
 import TurnStatus from './TurnStatus.vue'
 import ResourceDisplayPlayer from './ResourceDisplayPlayer.vue'

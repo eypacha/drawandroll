@@ -222,6 +222,20 @@ export function useGameSession() {
       return true
     }
 
+    if (data.type === 'combat_roll_click') {
+      return gameActions.handleCombatRollClick(data.payload || {})
+    }
+
+    if (data.type === 'combat_roll_step_result') {
+      gameActions.receiveCombatRollStepResult(data.payload || {})
+      return true
+    }
+
+    if (data.type === 'combat_roll_step_start') {
+      gameActions.receiveCombatRollStepStart(data.payload || {})
+      return true
+    }
+
     if (data.type === 'combat_roll_result') {
       gameActions.receiveCombatRollResult(data.payload || {})
       return true

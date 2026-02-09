@@ -2,8 +2,8 @@ import { computed } from 'vue'
 import { useCombatStore, useConnectionStore, useDeckStore, useGameStore, usePlayersStore } from '@/stores'
 import { sendMessage } from '@/services/peerService'
 
-const COMBAT_ROLLING_MS = 1200
 const COMBAT_CRITICAL_BONUS = 2
+const COMBAT_ROLL_ANIMATION_MS = 1000
 
 export function useGameActions() {
   const connection = useConnectionStore()
@@ -182,6 +182,7 @@ export function useGameActions() {
       type: 'hover_card',
       payload: { playerId: myPlayerId.value, cardId }
     })
+    return true
   }
 
   function clearHoveredCard(expectedCardId = null) {
@@ -208,6 +209,14 @@ export function useGameActions() {
     return playerId === 'player_a' ? 'player_b' : 'player_a'
   }
 
+  function randomD20() {
+    return Math.floor(Math.random() * 20) + 1
+  }
+
+  async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
   function canRunCombat(attackerPlayerId, attackerSlot, defenderSlot) {
     if (combat.isRolling) return false
     if (game.turnPhase !== 'combat') return false
@@ -218,17 +227,16 @@ export function useGameActions() {
     return Boolean(defenderHero)
   }
 
-  function randomD20() {
-    return Math.floor(Math.random() * 20) + 1
-  }
-
-  async function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+  function getActiveCombatOrNull() {
+    const active = combat.activeRoll
+    if (!active?.combatId) return null
+    return active
   }
 
   async function waitForReactionChoice(combatId) {
     while (true) {
-      if (!combat.activeRoll || combat.activeRoll.combatId !== combatId) {
+      const active = getActiveCombatOrNull()
+      if (!active || active.combatId !== combatId || combat.rollStep !== 'reaction_pending') {
         return null
       }
       const response = combat.consumeReactionResponse(combatId)
@@ -239,86 +247,20 @@ export function useGameActions() {
     }
   }
 
-  async function runCombatAsHost({ attackerPlayerId, attackerSlot, defenderSlot }) {
-    if (!connection.isHost) return false
-
-    const safeAttackerSlot = toValidSlotIndex(attackerSlot)
-    const safeDefenderSlot = toValidSlotIndex(defenderSlot)
-    if (safeAttackerSlot === null || safeDefenderSlot === null) return false
-    if (!canRunCombat(attackerPlayerId, safeAttackerSlot, safeDefenderSlot)) return false
-
-    const defenderPlayerId = getOpponentPlayerId(attackerPlayerId)
-    const combatId = `combat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    const rollStartPayload = {
-      combatId,
-      attackerPlayerId,
-      attackerSlot: safeAttackerSlot,
-      defenderPlayerId,
-      defenderSlot: safeDefenderSlot,
-      rollingMs: COMBAT_ROLLING_MS,
-      startedAt: Date.now()
-    }
-
-    combat.startRoll(rollStartPayload)
-    sendMessage({
-      type: 'combat_roll_start',
-      payload: rollStartPayload
-    })
-
-    await sleep(COMBAT_ROLLING_MS)
-
-    if (combat.activeRoll?.combatId !== combatId) {
-      return false
-    }
-    if (game.turnPhase !== 'combat' || game.currentTurn !== attackerPlayerId) {
-      combat.clearRoll(combatId)
-      return false
-    }
-
-    const attackerRoll = randomD20()
-    const defenderRoll = randomD20()
-    const attackerHero = players.players[attackerPlayerId].heroes[safeAttackerSlot]
-    const defenderHero = players.players[defenderPlayerId].heroes[safeDefenderSlot]
-    const attackerStats = players.getHeroCombatStats(attackerHero)
-    const defenderStats = players.getHeroCombatStats(defenderHero)
-    const isFumble = attackerRoll === 1
-    const isCritical = attackerRoll === 20
-    let baseDamage = Math.max(0, attackerStats.atk + attackerRoll - (defenderStats.def + defenderRoll))
-    if (isFumble) {
-      baseDamage = 0
-    } else if (isCritical) {
-      baseDamage += COMBAT_CRITICAL_BONUS
-    }
-
-    const reactionPayload = {
-      combatId,
-      attackerPlayerId,
-      attackerSlot: safeAttackerSlot,
-      defenderPlayerId,
-      defenderSlot: safeDefenderSlot,
-      attackerRoll,
-      defenderRoll,
-      baseDamage,
-      isCritical,
-      isFumble,
-      startedAt: Date.now()
-    }
-    combat.openReactionWindow(reactionPayload)
-    sendMessage({
-      type: 'combat_reaction_window_start',
-      payload: reactionPayload
-    })
-
+  async function resolveCombatAfterReaction(combatId) {
     const selectedReactiveCardId = await waitForReactionChoice(combatId)
+    const active = getActiveCombatOrNull()
+    if (!active || active.combatId !== combatId) return false
+
     combat.closeReactionWindow(combatId)
 
     const resolved = players.resolveCombatAsHost({
-      attackerPlayerId,
-      attackerSlot: safeAttackerSlot,
-      defenderPlayerId,
-      defenderSlot: safeDefenderSlot,
-      attackerRoll,
-      defenderRoll,
+      attackerPlayerId: active.attackerPlayerId,
+      attackerSlot: active.attackerSlot,
+      defenderPlayerId: active.defenderPlayerId,
+      defenderSlot: active.defenderSlot,
+      attackerRoll: active.attackerRoll,
+      defenderRoll: active.defenderRoll,
       criticalBonus: COMBAT_CRITICAL_BONUS,
       reactiveCardId: selectedReactiveCardId
     })
@@ -330,10 +272,11 @@ export function useGameActions() {
 
     const resultPayload = {
       combatId,
-      attackerPlayerId,
-      attackerSlot: safeAttackerSlot,
-      defenderPlayerId,
-      defenderSlot: safeDefenderSlot,
+      attackerPlayerId: active.attackerPlayerId,
+      attackerSlot: active.attackerSlot,
+      defenderPlayerId: active.defenderPlayerId,
+      defenderSlot: active.defenderSlot,
+      baseDamage: active.baseDamage,
       ...resolved
     }
 
@@ -342,7 +285,39 @@ export function useGameActions() {
       type: 'combat_roll_result',
       payload: resultPayload
     })
+    return true
+  }
 
+  async function runCombatAsHost({ attackerPlayerId, attackerSlot, defenderSlot }) {
+    if (!connection.isHost) return false
+    const safeAttackerSlot = toValidSlotIndex(attackerSlot)
+    const safeDefenderSlot = toValidSlotIndex(defenderSlot)
+    if (safeAttackerSlot === null || safeDefenderSlot === null) return false
+    if (!canRunCombat(attackerPlayerId, safeAttackerSlot, safeDefenderSlot)) return false
+
+    const defenderPlayerId = getOpponentPlayerId(attackerPlayerId)
+    const attackerHero = players.players[attackerPlayerId].heroes[safeAttackerSlot]
+    const defenderHero = players.players[defenderPlayerId].heroes[safeDefenderSlot]
+    const attackerStats = players.getHeroCombatStats(attackerHero)
+    const defenderStats = players.getHeroCombatStats(defenderHero)
+
+    const combatId = `combat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const rollStartPayload = {
+      combatId,
+      attackerPlayerId,
+      attackerSlot: safeAttackerSlot,
+      defenderPlayerId,
+      defenderSlot: safeDefenderSlot,
+      attackerStat: attackerStats.atk,
+      defenderStat: defenderStats.def,
+      startedAt: Date.now()
+    }
+
+    combat.startCombatContext(rollStartPayload)
+    sendMessage({
+      type: 'combat_roll_start',
+      payload: rollStartPayload
+    })
     return true
   }
 
@@ -350,7 +325,6 @@ export function useGameActions() {
     const safeAttackerSlot = toValidSlotIndex(attackerSlot)
     const safeDefenderSlot = toValidSlotIndex(defenderSlot)
     if (safeAttackerSlot === null || safeDefenderSlot === null) return false
-
     const attackerPlayerId = myPlayerId.value
     if (!canRunCombat(attackerPlayerId, safeAttackerSlot, safeDefenderSlot)) return false
 
@@ -386,8 +360,157 @@ export function useGameActions() {
     return true
   }
 
+  function requestCombatRollClick(step) {
+    const active = getActiveCombatOrNull()
+    if (!active) return false
+    if (step !== 'attacker' && step !== 'defender') return false
+
+    const payload = {
+      combatId: active.combatId,
+      step,
+      byPlayerId: myPlayerId.value,
+      clickedAt: Date.now()
+    }
+
+    if (connection.isHost) {
+      return handleCombatRollClick(payload)
+    }
+
+    return sendMessage({
+      type: 'combat_roll_click',
+      payload
+    })
+  }
+
+  async function processCombatRollClick(payload = {}) {
+    if (!connection.isHost) return false
+    const active = getActiveCombatOrNull()
+    if (!active) return false
+    const combatId = payload?.combatId
+    const step = payload?.step
+    const byPlayerId = payload?.byPlayerId
+    if (combatId !== active.combatId) return false
+    if (step !== 'attacker' && step !== 'defender') return false
+    if (game.turnPhase !== 'combat' || game.currentTurn !== active.attackerPlayerId) return false
+
+    const attackerHero = players.players[active.attackerPlayerId]?.heroes?.[active.attackerSlot]
+    const defenderHero = players.players[active.defenderPlayerId]?.heroes?.[active.defenderSlot]
+    if (!attackerHero || !defenderHero) {
+      combat.clearRoll(active.combatId)
+      return false
+    }
+
+    if (step === 'attacker') {
+      if (combat.rollStep !== 'attacker_pending') return false
+      if (byPlayerId !== active.attackerPlayerId) return false
+      if (active.rollingAttacker) return false
+      const rollStartPayload = {
+        combatId: active.combatId,
+        step: 'attacker',
+        startedAt: Date.now()
+      }
+      combat.markRollStepStart(rollStartPayload)
+      sendMessage({ type: 'combat_roll_step_start', payload: rollStartPayload })
+      await sleep(COMBAT_ROLL_ANIMATION_MS)
+
+      const refreshed = getActiveCombatOrNull()
+      if (!refreshed || refreshed.combatId !== active.combatId) return false
+      if (combat.rollStep !== 'attacker_pending') return false
+      if (!refreshed.rollingAttacker) return false
+
+      const roll = randomD20()
+      const stepPayload = {
+        combatId: refreshed.combatId,
+        step: 'attacker',
+        roll,
+        attackerTotal: (Number(refreshed.attackerStat) || 0) + roll
+      }
+      if (!combat.setRollStepResult(stepPayload)) return false
+      sendMessage({ type: 'combat_roll_step_result', payload: stepPayload })
+      return true
+    }
+
+    if (combat.rollStep !== 'defender_pending') return false
+    if (byPlayerId !== active.defenderPlayerId) return false
+    if (active.rollingDefender) return false
+    const rollStartPayload = {
+      combatId: active.combatId,
+      step: 'defender',
+      startedAt: Date.now()
+    }
+    combat.markRollStepStart(rollStartPayload)
+    sendMessage({ type: 'combat_roll_step_start', payload: rollStartPayload })
+    await sleep(COMBAT_ROLL_ANIMATION_MS)
+
+    const refreshed = getActiveCombatOrNull()
+    if (!refreshed || refreshed.combatId !== active.combatId) return false
+    if (combat.rollStep !== 'defender_pending') return false
+    if (!refreshed.rollingDefender) return false
+
+    const roll = randomD20()
+    const attackerRoll = Number(refreshed.attackerRoll) || 0
+    const attackerTotal = Number(refreshed.attackerTotal) || ((Number(refreshed.attackerStat) || 0) + attackerRoll)
+    const defenderTotal = (Number(refreshed.defenderStat) || 0) + roll
+    const isFumble = attackerRoll === 1
+    const isCritical = attackerRoll === 20
+    let baseDamage = Math.max(0, attackerTotal - defenderTotal)
+    if (isFumble) {
+      baseDamage = 0
+    } else if (isCritical) {
+      baseDamage += COMBAT_CRITICAL_BONUS
+    }
+
+    const stepPayload = {
+      combatId: refreshed.combatId,
+      step: 'defender',
+      roll,
+      defenderTotal,
+      baseDamage,
+      isCritical,
+      isFumble
+    }
+    if (!combat.setRollStepResult(stepPayload)) return false
+    sendMessage({ type: 'combat_roll_step_result', payload: stepPayload })
+
+    const updated = getActiveCombatOrNull()
+    if (!updated || updated.combatId !== refreshed.combatId) return false
+    const reactionPayload = {
+      combatId: updated.combatId,
+      attackerPlayerId: updated.attackerPlayerId,
+      defenderPlayerId: updated.defenderPlayerId,
+      attackerRoll: updated.attackerRoll,
+      defenderRoll: updated.defenderRoll,
+      baseDamage: updated.baseDamage,
+      isCritical: updated.isCritical,
+      isFumble: updated.isFumble,
+      startedAt: Date.now()
+    }
+    combat.openReactionWindow(reactionPayload)
+    sendMessage({
+      type: 'combat_reaction_window_start',
+      payload: reactionPayload
+    })
+
+    void resolveCombatAfterReaction(updated.combatId)
+    return true
+  }
+
+  function handleCombatRollClick(payload = {}) {
+    if (!connection.isHost) return false
+    void processCombatRollClick(payload)
+    return true
+  }
+
   function receiveCombatRollStart(payload = {}) {
-    combat.startRoll(payload)
+    combat.startCombatContext(payload)
+  }
+
+  function receiveCombatRollStepResult(payload = {}) {
+    combat.setRollStepResult(payload)
+  }
+
+  function receiveCombatRollStepStart(payload = {}) {
+    combat.markRollStepStart(payload)
   }
 
   function receiveCombatReactionWindowStart(payload = {}) {
@@ -397,6 +520,7 @@ export function useGameActions() {
   function submitCombatReaction(cardId = null) {
     const window = combat.reactionWindow
     if (!window?.combatId) return false
+    if (combat.rollStep !== 'reaction_pending') return false
     if (window.defenderPlayerId !== myPlayerId.value) return false
 
     if (cardId) {
@@ -408,9 +532,7 @@ export function useGameActions() {
 
     if (connection.isHost) {
       const accepted = combat.setReactionResponse(window.combatId, cardId)
-      if (accepted) {
-        combat.closeReactionWindow(window.combatId)
-      }
+      if (accepted) combat.closeReactionWindow(window.combatId)
       return accepted
     }
 
@@ -423,19 +545,20 @@ export function useGameActions() {
         respondedAt: Date.now()
       }
     })
-    if (sent) {
-      combat.closeReactionWindow(window.combatId)
-    }
+    if (sent) combat.closeReactionWindow(window.combatId)
     return sent
   }
 
   function handleCombatReactionResponse(payload = {}) {
     if (!connection.isHost) return false
+    if (combat.rollStep !== 'reaction_pending') return false
     const window = combat.reactionWindow
     if (!window?.combatId) return false
     if (payload?.combatId !== window.combatId) return false
     if (payload?.defenderPlayerId !== window.defenderPlayerId) return false
-    return combat.setReactionResponse(window.combatId, payload?.cardId || null)
+    const accepted = combat.setReactionResponse(window.combatId, payload?.cardId || null)
+    if (accepted) combat.closeReactionWindow(window.combatId)
+    return accepted
   }
 
   function receiveCombatRollResult(payload = {}) {
@@ -451,13 +574,17 @@ export function useGameActions() {
     setHoveredCard,
     clearHoveredCard,
     attackHero,
+    requestCombatRollClick,
+    submitCombatReaction,
     handleAdvancePhaseRequest,
     handleDiscardRequest,
     handleCombatRequest,
-    receiveCombatRollStart,
-    receiveCombatReactionWindowStart,
-    submitCombatReaction,
+    handleCombatRollClick,
     handleCombatReactionResponse,
+    receiveCombatRollStart,
+    receiveCombatRollStepStart,
+    receiveCombatRollStepResult,
+    receiveCombatReactionWindowStart,
     receiveCombatRollResult
   }
 }
