@@ -48,7 +48,9 @@
     "total": "Total",
     "damage": "Daño",
     "critical": "Crítico",
-    "fumble": "Pifia"
+    "fumble": "Pifia",
+    "reactionHint": "Ventana defensiva: juega una reactiva desde tu mano o pasa.",
+    "passReaction": "Pasar reacción"
   },
   "card": {
     "imageAlt": "Imagen de carta",

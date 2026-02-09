@@ -7,9 +7,12 @@ import { defineStore } from 'pinia'
  */
 export const useCombatStore = defineStore('combat', () => {
   const activeRoll = ref(null)
+  const reactionWindow = ref(null)
+  const reactionResponses = ref({})
 
   const isActive = computed(() => activeRoll.value !== null)
   const isRolling = computed(() => Boolean(activeRoll.value?.isRolling))
+  const isReactionOpen = computed(() => Boolean(reactionWindow.value))
 
   function startRoll(payload = {}) {
     const combatId = payload.combatId || `combat-${Date.now()}`
@@ -57,24 +60,70 @@ export const useCombatStore = defineStore('combat', () => {
       isRolling: false,
       finishedAt: Date.now()
     }
+    reactionWindow.value = null
+    reactionResponses.value = {}
+  }
+
+  function openReactionWindow(payload = {}) {
+    reactionWindow.value = {
+      combatId: payload.combatId || null,
+      attackerPlayerId: payload.attackerPlayerId || null,
+      defenderPlayerId: payload.defenderPlayerId || null,
+      attackerRoll: Number(payload.attackerRoll) || 0,
+      defenderRoll: Number(payload.defenderRoll) || 0,
+      baseDamage: Number(payload.baseDamage) || 0,
+      isCritical: Boolean(payload.isCritical),
+      isFumble: Boolean(payload.isFumble),
+      startedAt: Number(payload.startedAt) || Date.now()
+    }
+  }
+
+  function closeReactionWindow(expectedCombatId = null) {
+    if (!reactionWindow.value) return
+    if (expectedCombatId && reactionWindow.value.combatId !== expectedCombatId) return
+    reactionWindow.value = null
+  }
+
+  function setReactionResponse(combatId, cardId = null) {
+    if (!combatId) return false
+    reactionResponses.value[combatId] = { cardId: cardId || null, receivedAt: Date.now() }
+    return true
+  }
+
+  function consumeReactionResponse(combatId) {
+    if (!combatId) return undefined
+    if (!(combatId in reactionResponses.value)) return undefined
+    const response = reactionResponses.value[combatId]
+    delete reactionResponses.value[combatId]
+    return response
   }
 
   function clearRoll(expectedCombatId = null) {
     if (!activeRoll.value) return
     if (expectedCombatId && activeRoll.value.combatId !== expectedCombatId) return
     activeRoll.value = null
+    reactionWindow.value = null
+    reactionResponses.value = {}
   }
 
   function $reset() {
     activeRoll.value = null
+    reactionWindow.value = null
+    reactionResponses.value = {}
   }
 
   return {
     activeRoll,
+    reactionWindow,
     isActive,
     isRolling,
+    isReactionOpen,
     startRoll,
     finishRoll,
+    openReactionWindow,
+    closeReactionWindow,
+    setReactionResponse,
+    consumeReactionResponse,
     clearRoll,
     $reset
   }

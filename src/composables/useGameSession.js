@@ -227,6 +227,15 @@ export function useGameSession() {
       return true
     }
 
+    if (data.type === 'combat_reaction_window_start') {
+      gameActions.receiveCombatReactionWindowStart(data.payload || {})
+      return true
+    }
+
+    if (data.type === 'combat_reaction_response') {
+      return gameActions.handleCombatReactionResponse(data.payload || {})
+    }
+
     if (data.type === 'advance_phase_request') {
       return gameActions.handleAdvancePhaseRequest(data.payload || {})
     }

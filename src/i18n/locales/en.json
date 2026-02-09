@@ -48,7 +48,9 @@
     "total": "Total",
     "damage": "Damage",
     "critical": "Critical",
-    "fumble": "Fumble"
+    "fumble": "Fumble",
+    "reactionHint": "Defensive window: play a reactive from your hand or pass.",
+    "passReaction": "Pass reaction"
   },
   "card": {
     "imageAlt": "Card image",

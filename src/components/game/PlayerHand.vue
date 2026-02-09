@@ -9,7 +9,8 @@
           'is-draggable': canDragCard(card),
           'is-dragging': draggedCardId === card.id,
           'is-discard-selectable': canSelectForDiscard,
-          'is-discard-selected': isSelectedForDiscard(card.id)
+          'is-discard-selected': isSelectedForDiscard(card.id),
+          'is-reactive-selectable': canSelectReactive(card)
         }"
         :style="getCardStyle(index)"
         :draggable="canDragCard(card)"
@@ -27,26 +28,37 @@
 
 <script setup>
 import { computed, onUnmounted, watch } from 'vue'
-import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
+import { usePlayersStore, useConnectionStore, useGameStore, useCombatStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
 
 const connection = useConnectionStore()
 const players = usePlayersStore()
 const game = useGameStore()
+const combat = useCombatStore()
 const gameActions = useGameActions()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canAct = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
 const canSelectForDiscard = computed(() => game.turnPhase === 'discard' && game.currentTurn === myPlayerId.value)
+const isReactionDefender = computed(() => combat.reactionWindow?.defenderPlayerId === myPlayerId.value)
+const canReactNow = computed(() => combat.isReactionOpen && isReactionDefender.value)
 const selectedDiscardIds = computed(() => players.players[myPlayerId.value].discardSelectionIds || [])
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
+const myResources = computed(() => players.players[myPlayerId.value].resources)
 let dragPreviewEl = null
 
 function canDragCard(card) {
+  if (canReactNow.value) return false
   if (!canAct.value) return false
   return card.type === 'hero' || card.type === 'item'
+}
+
+function canSelectReactive(card) {
+  if (!canReactNow.value) return false
+  if (card?.type !== 'reactive') return false
+  return myResources.value >= Number(card.cost || 0)
 }
 
 function isSelectedForDiscard(cardId) {
@@ -148,6 +160,10 @@ function onHoverEnd(card) {
 }
 
 function onCardClick(card) {
+  if (canSelectReactive(card)) {
+    gameActions.submitCombatReaction(card.id)
+    return
+  }
   if (!canSelectForDiscard.value) return
   players.toggleDiscardSelection(myPlayerId.value, card.id)
 }
@@ -219,6 +235,10 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
+.card-wrapper.is-reactive-selectable {
+  cursor: pointer;
+}
+
 .card-wrapper.is-discard-selected {
   transform:
     translateY(-6px)
@@ -254,5 +274,11 @@ onUnmounted(() => {
   box-shadow:
     0 0 0 3px rgba(220, 38, 38, 0.45),
     0 18px 40px -12px rgba(220, 38, 38, 0.5);
+}
+
+.card-wrapper.is-reactive-selectable :deep(.hand-card) {
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.45),
+    0 18px 40px -12px rgba(37, 99, 235, 0.45);
 }
 </style>

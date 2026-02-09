@@ -8,9 +8,9 @@ No existen interpretaciones alternativas ni ventanas implícitas.
 ## 1. Principios del combate
 
 - El combate es **determinista + azar controlado**.
-- El evento central del combate es una **tirada de 1d20**.
-- **Solo el atacante tira dados**.
-- El defensor **nunca tira dados**.
+- El evento central del combate son **dos tiradas de 1d20** (atacante y defensor).
+- El atacante tira **1d20**.
+- El defensor tira **1d20**.
 - El combate se resuelve ataque por ataque, nunca en bloque.
 
 ---
@@ -43,7 +43,8 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 ### 2️⃣ Tirada
 - El atacante tira **1d20**.
-- El resultado es **visible para ambos jugadores**.
+- El defensor tira **1d20**.
+- Ambos resultados son **visibles para ambos jugadores**.
 - No se pueden jugar cartas en este paso.
 
 ---
@@ -91,10 +92,9 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 ## 4. Impacto y daño
 
-- Un ataque impacta si:
-  - `d20 + ATK ≥ DEF`
-- El daño infligido es:
-  - definido por la plantilla del héroe o arma
+- El daño base se calcula como:
+  - `max(0, (ATK + d20 atacante) - (DEF + d20 defensor))`
+- El ataque impacta si el daño final es mayor que 0.
 - El daño:
   - reduce HP
   - **persiste entre turnos**

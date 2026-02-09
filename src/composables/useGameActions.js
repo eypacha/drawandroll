@@ -226,6 +226,19 @@ export function useGameActions() {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
+  async function waitForReactionChoice(combatId) {
+    while (true) {
+      if (!combat.activeRoll || combat.activeRoll.combatId !== combatId) {
+        return null
+      }
+      const response = combat.consumeReactionResponse(combatId)
+      if (response !== undefined) {
+        return response?.cardId || null
+      }
+      await sleep(60)
+    }
+  }
+
   async function runCombatAsHost({ attackerPlayerId, attackerSlot, defenderSlot }) {
     if (!connection.isHost) return false
 
@@ -264,6 +277,41 @@ export function useGameActions() {
 
     const attackerRoll = randomD20()
     const defenderRoll = randomD20()
+    const attackerHero = players.players[attackerPlayerId].heroes[safeAttackerSlot]
+    const defenderHero = players.players[defenderPlayerId].heroes[safeDefenderSlot]
+    const attackerStats = players.getHeroCombatStats(attackerHero)
+    const defenderStats = players.getHeroCombatStats(defenderHero)
+    const isFumble = attackerRoll === 1
+    const isCritical = attackerRoll === 20
+    let baseDamage = Math.max(0, attackerStats.atk + attackerRoll - (defenderStats.def + defenderRoll))
+    if (isFumble) {
+      baseDamage = 0
+    } else if (isCritical) {
+      baseDamage += COMBAT_CRITICAL_BONUS
+    }
+
+    const reactionPayload = {
+      combatId,
+      attackerPlayerId,
+      attackerSlot: safeAttackerSlot,
+      defenderPlayerId,
+      defenderSlot: safeDefenderSlot,
+      attackerRoll,
+      defenderRoll,
+      baseDamage,
+      isCritical,
+      isFumble,
+      startedAt: Date.now()
+    }
+    combat.openReactionWindow(reactionPayload)
+    sendMessage({
+      type: 'combat_reaction_window_start',
+      payload: reactionPayload
+    })
+
+    const selectedReactiveCardId = await waitForReactionChoice(combatId)
+    combat.closeReactionWindow(combatId)
+
     const resolved = players.resolveCombatAsHost({
       attackerPlayerId,
       attackerSlot: safeAttackerSlot,
@@ -271,7 +319,8 @@ export function useGameActions() {
       defenderSlot: safeDefenderSlot,
       attackerRoll,
       defenderRoll,
-      criticalBonus: COMBAT_CRITICAL_BONUS
+      criticalBonus: COMBAT_CRITICAL_BONUS,
+      reactiveCardId: selectedReactiveCardId
     })
 
     if (!resolved) {
@@ -341,6 +390,54 @@ export function useGameActions() {
     combat.startRoll(payload)
   }
 
+  function receiveCombatReactionWindowStart(payload = {}) {
+    combat.openReactionWindow(payload)
+  }
+
+  function submitCombatReaction(cardId = null) {
+    const window = combat.reactionWindow
+    if (!window?.combatId) return false
+    if (window.defenderPlayerId !== myPlayerId.value) return false
+
+    if (cardId) {
+      const card = players.players[myPlayerId.value].hand.find((entry) => entry.id === cardId)
+      if (!card || card.type !== 'reactive') return false
+      const cost = Number(card.cost || 0)
+      if (players.players[myPlayerId.value].resources < cost) return false
+    }
+
+    if (connection.isHost) {
+      const accepted = combat.setReactionResponse(window.combatId, cardId)
+      if (accepted) {
+        combat.closeReactionWindow(window.combatId)
+      }
+      return accepted
+    }
+
+    const sent = sendMessage({
+      type: 'combat_reaction_response',
+      payload: {
+        combatId: window.combatId,
+        defenderPlayerId: myPlayerId.value,
+        cardId: cardId || null,
+        respondedAt: Date.now()
+      }
+    })
+    if (sent) {
+      combat.closeReactionWindow(window.combatId)
+    }
+    return sent
+  }
+
+  function handleCombatReactionResponse(payload = {}) {
+    if (!connection.isHost) return false
+    const window = combat.reactionWindow
+    if (!window?.combatId) return false
+    if (payload?.combatId !== window.combatId) return false
+    if (payload?.defenderPlayerId !== window.defenderPlayerId) return false
+    return combat.setReactionResponse(window.combatId, payload?.cardId || null)
+  }
+
   function receiveCombatRollResult(payload = {}) {
     players.applyCombatResult(payload)
     combat.finishRoll(payload)
@@ -358,6 +455,9 @@ export function useGameActions() {
     handleDiscardRequest,
     handleCombatRequest,
     receiveCombatRollStart,
+    receiveCombatReactionWindowStart,
+    submitCombatReaction,
+    handleCombatReactionResponse,
     receiveCombatRollResult
   }
 }
