@@ -2,7 +2,7 @@
   <div class="relative min-h-screen w-full flex flex-col items-center justify-center bg-gray-400 font-sans">
     <PreGameScreen v-if="!connection.isConnected" />
     <StartGameScreen 
-      v-else-if="!game.isPlaying" 
+      v-else-if="game.phase === 'setup'" 
       @start-game="initGame" 
     />
     <GameBoard v-else />
@@ -26,9 +26,16 @@
       @restart-game="requestRestartFromPause"
     />
 
+    <EndGameOverlay
+      v-if="game.isEnded"
+      :restart-pending="isRestartRequestPending"
+      :restart-status="restartRequestStatus"
+      @restart-game="requestRestartFromEndgame"
+    />
+
     <div
       v-if="incomingRestartRequest"
-      class="absolute inset-0 z-[220] bg-black/45 flex items-center justify-center p-4"
+      class="absolute inset-0 z-[240] bg-black/45 flex items-center justify-center p-4"
     >
       <div class="w-full max-w-sm rounded-xl border border-gray-200 bg-white shadow-xl p-5">
         <h3 class="text-base font-semibold mb-2">
@@ -66,6 +73,7 @@ import PreGameScreen from '@/components/game/PreGameScreen.vue'
 import StartGameScreen from '@/components/game/StartGameScreen.vue'
 import GameBoard from '@/components/game/GameBoard.vue'
 import PauseScreen from '@/components/game/PauseScreen.vue'
+import EndGameOverlay from '@/components/game/EndGameOverlay.vue'
 import { useGameSession } from '@/composables/useGameSession'
 
 const { t, locale } = useI18n()
@@ -89,5 +97,9 @@ function toggleLanguage() {
 function requestRestartFromPause() {
   requestRestartGame()
   isPauseOpen.value = false
+}
+
+function requestRestartFromEndgame() {
+  requestRestartGame()
 }
 </script>

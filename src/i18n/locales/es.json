@@ -87,6 +87,12 @@
     "keepPlaying": "Seguir jugando",
     "acceptRestart": "Aceptar reinicio"
   },
+  "endgame": {
+    "titleWin": "Ganaste la partida",
+    "titleLose": "Perdiste la partida",
+    "subtitle": "La partida termino porque el jugador activo cerro turno sin heroes en mesa.",
+    "restart": "Reiniciar partida"
+  },
   "footer": {
     "rights": "Todos los derechos reservados."
   },

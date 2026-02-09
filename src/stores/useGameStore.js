@@ -28,6 +28,21 @@ export const useGameStore = defineStore('game', () => {
   const isEnded = computed(() => phase.value === 'ended')
 
   // Actions
+  function createAdvanceResult(type, loser = null) {
+    return {
+      type,
+      turn: turn.value,
+      currentTurn: currentTurn.value,
+      turnPhase: turnPhase.value,
+      winner: winner.value,
+      loser
+    }
+  }
+
+  function getOpponentPlayerId(playerId) {
+    return playerId === 'player_a' ? 'player_b' : 'player_a'
+  }
+
   function startGame(initialTurn = 'player_a', initialTurnPhase = 'recruit') {
     phase.value = 'playing'
     turn.value = 1
@@ -43,41 +58,60 @@ export const useGameStore = defineStore('game', () => {
     players.refreshResources(currentTurn.value)
   }
 
+  function endGame(winnerPlayerId) {
+    if (winnerPlayerId !== 'player_a' && winnerPlayerId !== 'player_b') return null
+    phase.value = 'ended'
+    turnPhase.value = 'end'
+    winner.value = winnerPlayerId
+    return createAdvanceResult('ended')
+  }
+
   function advancePhase() {
-    if (phase.value !== 'playing') return
+    if (phase.value !== 'playing') return null
     if (turnPhase.value === 'draw') {
       turnPhase.value = 'recruit'
-      return
+      return createAdvanceResult('advanced')
     }
     if (turnPhase.value === 'recruit') {
       // Only the very first player of the match skips combat once.
       if (turn.value === 1 && currentTurn.value === firstTurnPlayer.value) {
-        turnPhase.value = 'end'
-        return
+        return endTurn()
       }
       turnPhase.value = 'combat'
       players.resetCombatActions(currentTurn.value)
-      return
+      return createAdvanceResult('advanced')
     }
     if (turnPhase.value === 'combat') {
-      turnPhase.value = 'end'
-      return
+      return endTurn()
     }
     if (turnPhase.value === 'end') {
-      endTurn()
+      return endTurn()
     }
+    return null
   }
 
   function endTurn() {
+    if (phase.value !== 'playing') return null
+    const activePlayer = currentTurn.value
+    const activeHeroes = players.players[activePlayer]?.heroes || []
+    const hasHeroes = activeHeroes.some(Boolean)
+    if (!hasHeroes) {
+      const winnerPlayerId = getOpponentPlayerId(activePlayer)
+      endGame(winnerPlayerId)
+      return createAdvanceResult('ended', activePlayer)
+    }
+
     currentTurn.value = currentTurn.value === 'player_a' ? 'player_b' : 'player_a'
     if (currentTurn.value === 'player_a') {
       turn.value += 1
     }
     turnPhase.value = 'draw'
     players.refreshResources(currentTurn.value)
+    return createAdvanceResult('advanced')
   }
 
   function setTurnState(nextTurn, nextCurrent, nextPhase) {
+    if (phase.value !== 'playing') return
     turn.value = nextTurn
     currentTurn.value = nextCurrent
     turnPhase.value = nextPhase
@@ -118,6 +152,7 @@ export const useGameStore = defineStore('game', () => {
     startGame,
     advancePhase,
     endTurn,
+    endGame,
     setTurnState,
     $reset
   }

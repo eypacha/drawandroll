@@ -98,7 +98,7 @@ export function useGameSession() {
   }
 
   function requestRestartGame() {
-    if (!game.isPlaying || isRestartRequestPending.value || incomingRestartRequest.value) {
+    if (game.phase === 'setup' || isRestartRequestPending.value || incomingRestartRequest.value) {
       return false
     }
 
@@ -168,6 +168,17 @@ export function useGameSession() {
 
     if (data.type === 'combat_roll_result') {
       gameActions.receiveCombatRollResult(data.payload || {})
+      return true
+    }
+
+    if (data.type === 'advance_phase_request') {
+      return gameActions.handleAdvancePhaseRequest(data.payload || {})
+    }
+
+    if (data.type === 'game_end') {
+      const winner = data.payload?.winner
+      if (winner !== 'player_a' && winner !== 'player_b') return false
+      game.endGame(winner)
       return true
     }
 
@@ -268,15 +279,7 @@ export function useGameSession() {
     isDrawing.value = false
 
     if (advancePhaseAfterDraw && generation === drawGeneration.value) {
-      game.advancePhase()
-      sendMessage({
-        type: 'advance_phase',
-        payload: {
-          turn: game.turn,
-          currentTurn: game.currentTurn,
-          turnPhase: game.turnPhase
-        }
-      })
+      gameActions.advancePhase()
     }
 
     return drawnCards

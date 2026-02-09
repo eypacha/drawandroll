@@ -12,19 +12,64 @@ export function useGameActions() {
   const combat = useCombatStore()
   const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 
-  function advancePhase() {
-    game.advancePhase()
+  function syncAdvanceResult(result) {
+    if (!result) return false
+    if (result.type === 'ended') {
+      const loser = result.loser || getOpponentPlayerId(result.winner)
+      sendMessage({
+        type: 'game_end',
+        payload: {
+          winner: result.winner,
+          loser,
+          endedAt: Date.now()
+        }
+      })
+      return true
+    }
+
     sendMessage({
       type: 'advance_phase',
       payload: {
-        turn: game.turn,
-        currentTurn: game.currentTurn,
-        turnPhase: game.turnPhase
+        turn: result.turn,
+        currentTurn: result.currentTurn,
+        turnPhase: result.turnPhase
+      }
+    })
+    return true
+  }
+
+  function advancePhase() {
+    if (!game.isPlaying || combat.isRolling) return false
+
+    if (connection.isHost) {
+      const result = game.advancePhase()
+      return syncAdvanceResult(result)
+    }
+
+    return sendMessage({
+      type: 'advance_phase_request',
+      payload: {
+        playerId: myPlayerId.value,
+        requestedAt: Date.now()
       }
     })
   }
 
+  function handleAdvancePhaseRequest(payload = {}) {
+    if (!connection.isHost) return false
+    if (!game.isPlaying || combat.isRolling) return false
+
+    const requesterId = payload?.playerId
+    if (requesterId !== 'player_a' && requesterId !== 'player_b') return false
+    if (requesterId === myPlayerId.value) return false
+    if (game.currentTurn !== requesterId) return false
+
+    const result = game.advancePhase()
+    return syncAdvanceResult(result)
+  }
+
   function playHeroToSlot(slotIndex, cardId) {
+    if (!game.isPlaying) return null
     const played = players.playHeroFromHand(myPlayerId.value, cardId, slotIndex)
     if (!played) return null
     sendMessage({
@@ -40,6 +85,7 @@ export function useGameActions() {
   }
 
   function playItemToSlot(slotIndex, cardId) {
+    if (!game.isPlaying) return null
     const played = players.playItemFromHand(myPlayerId.value, cardId, slotIndex)
     if (!played) return null
     sendMessage({
@@ -55,6 +101,7 @@ export function useGameActions() {
   }
 
   function setHoveredCard(cardId) {
+    if (!game.isPlaying) return false
     players.setHoveredCard(myPlayerId.value, cardId)
     sendMessage({
       type: 'hover_card',
@@ -63,6 +110,7 @@ export function useGameActions() {
   }
 
   function clearHoveredCard(expectedCardId = null) {
+    if (!game.isPlaying) return false
     if (expectedCardId && players.players[myPlayerId.value].hoveredCardId !== expectedCardId) {
       return false
     }
@@ -230,6 +278,7 @@ export function useGameActions() {
     setHoveredCard,
     clearHoveredCard,
     attackHero,
+    handleAdvancePhaseRequest,
     handleCombatRequest,
     receiveCombatRollStart,
     receiveCombatRollResult

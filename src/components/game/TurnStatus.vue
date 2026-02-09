@@ -1,12 +1,12 @@
 <template>
-  <div class="absolute bottom-0 right-0 py-3 px-4 font-semibold w-42 text-right z-101">
+  <div v-if="game.isPlaying" class="absolute bottom-0 right-0 py-3 px-4 font-semibold w-42 text-right z-101">
     <span v-if="isMyTurn">{{ t('turn.yourTurn') }}</span>
     <span v-else>{{ t('turn.opponentTurn') }}</span>
     <div class="text-xs font-normal opacity-80">
       {{ phaseLabel }}
     </div>
     <button
-      v-if="isMyTurn && advanceLabel"
+      v-if="isMyTurn && game.isPlaying && advanceLabel"
       class="mt-2 px-3 py-1 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-800 transition-colors"
       :disabled="combat.isRolling"
       :class="{ 'opacity-60 cursor-not-allowed': combat.isRolling }"

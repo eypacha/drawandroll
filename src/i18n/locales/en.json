@@ -87,6 +87,12 @@
     "keepPlaying": "Keep playing",
     "acceptRestart": "Accept restart"
   },
+  "endgame": {
+    "titleWin": "You won the game",
+    "titleLose": "You lost the game",
+    "subtitle": "The game ended because the active player finished their turn with no heroes on board.",
+    "restart": "Restart game"
+  },
   "footer": {
     "rights": "All rights reserved."
   },
