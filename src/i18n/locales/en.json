@@ -28,11 +28,13 @@
       "draw": "Draw",
       "recruit": "Recruit",
       "combat": "Combat",
+      "discard": "Discard",
       "end": "End"
     },
     "action": {
       "endTurn": "End turn",
-      "toCombat": "To combat"
+      "toCombat": "To combat",
+      "discard": "Discard"
     }
   },
   "combat": {

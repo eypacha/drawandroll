@@ -28,11 +28,13 @@
       "draw": "Robo",
       "recruit": "Reclutamiento",
       "combat": "Combate",
+      "discard": "Descartar",
       "end": "Fin"
     },
     "action": {
       "endTurn": "Terminar turno",
-      "toCombat": "Ir a combate"
+      "toCombat": "Ir a combate",
+      "discard": "Descartar"
     }
   },
   "combat": {

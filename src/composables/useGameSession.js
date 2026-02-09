@@ -172,6 +172,10 @@ export function useGameSession() {
       return gameActions.handleAdvancePhaseRequest(data.payload || {})
     }
 
+    if (data.type === 'discard_request') {
+      return gameActions.handleDiscardRequest(data.payload || {})
+    }
+
     if (data.type === 'game_end') {
       const winner = data.payload?.winner
       if (winner !== 'player_a' && winner !== 'player_b') return false

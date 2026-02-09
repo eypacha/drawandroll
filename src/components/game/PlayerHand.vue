@@ -7,10 +7,13 @@
         class="card-wrapper"
         :class="{ 
           'is-draggable': canDragCard(card),
-          'is-dragging': draggedCardId === card.id
+          'is-dragging': draggedCardId === card.id,
+          'is-discard-selectable': canSelectForDiscard,
+          'is-discard-selected': isSelectedForDiscard(card.id)
         }"
         :style="getCardStyle(index)"
         :draggable="canDragCard(card)"
+        @click="onCardClick(card)"
         @dragstart="onDragStart($event, card)"
         @dragend="onDragEnd(card)"
         @mouseenter="onHover(card)"
@@ -23,7 +26,7 @@
 </template>
 
 <script setup>
-import { computed, onUnmounted } from 'vue'
+import { computed, onUnmounted, watch } from 'vue'
 import { usePlayersStore, useConnectionStore, useGameStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
@@ -36,12 +39,18 @@ const gameActions = useGameActions()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canAct = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const canSelectForDiscard = computed(() => game.turnPhase === 'discard' && game.currentTurn === myPlayerId.value)
+const selectedDiscardIds = computed(() => players.players[myPlayerId.value].discardSelectionIds || [])
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
 let dragPreviewEl = null
 
 function canDragCard(card) {
   if (!canAct.value) return false
   return card.type === 'hero' || card.type === 'item'
+}
+
+function isSelectedForDiscard(cardId) {
+  return selectedDiscardIds.value.includes(cardId)
 }
 
 function getCardStyle(index) {
@@ -128,16 +137,32 @@ function removeDragPreview() {
 }
 
 function onHover(card) {
+  if (canSelectForDiscard.value) return
   gameActions.setHoveredCard(card.id)
 }
 
 function onHoverEnd(card) {
+  if (canSelectForDiscard.value) return
   if (draggedCardId.value === card.id) return
   gameActions.clearHoveredCard(card.id)
 }
 
+function onCardClick(card) {
+  if (!canSelectForDiscard.value) return
+  players.toggleDiscardSelection(myPlayerId.value, card.id)
+}
+
+watch(
+  () => [game.turnPhase, game.currentTurn],
+  ([nextPhase, nextTurnPlayer]) => {
+    if (nextPhase === 'discard' && nextTurnPlayer === myPlayerId.value) return
+    players.clearDiscardSelection(myPlayerId.value)
+  }
+)
+
 onUnmounted(() => {
   removeDragPreview()
+  players.clearDiscardSelection(myPlayerId.value)
 })
 </script>
 
@@ -190,6 +215,18 @@ onUnmounted(() => {
   cursor: grab;
 }
 
+.card-wrapper.is-discard-selectable {
+  cursor: pointer;
+}
+
+.card-wrapper.is-discard-selected {
+  transform:
+    translateY(-6px)
+    rotate(0deg)
+    scale(1.03);
+  z-index: var(--hover-z-index, 100);
+}
+
 .card-wrapper.is-dragging {
   opacity: 0;
 }
@@ -210,6 +247,12 @@ onUnmounted(() => {
 
 .card-wrapper:hover :deep(.hand-card) {
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 25px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+.card-wrapper.is-discard-selected :deep(.hand-card) {
+  box-shadow:
+    0 0 0 3px rgba(220, 38, 38, 0.45),
+    0 18px 40px -12px rgba(220, 38, 38, 0.5);
 }
 </style>

@@ -38,6 +38,14 @@ export function createGameMessageRouter({ deck, game, players, resetLocalGameSta
       players.addToHand(playerId, [card])
     },
 
+    discard_hand(payload) {
+      const { playerId, cardIds } = payload
+      const discardedCards = players.discardFromHand(playerId, cardIds)
+      for (const card of discardedCards) {
+        deck.discard(card)
+      }
+    },
+
     hover_card(payload) {
       const { playerId, cardId } = payload
       if (cardId) {

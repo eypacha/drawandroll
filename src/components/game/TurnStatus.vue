@@ -8,8 +8,8 @@
     <button
       v-if="isMyTurn && game.isPlaying && advanceLabel"
       class="mt-2 px-3 py-1 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-800 transition-colors"
-      :disabled="combat.isRolling"
-      :class="{ 'opacity-60 cursor-not-allowed': combat.isRolling }"
+      :disabled="isActionDisabled"
+      :class="{ 'opacity-60 cursor-not-allowed': isActionDisabled }"
       @click="advance"
     >
       {{ advanceLabel }}
@@ -20,27 +20,33 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useGameStore, useConnectionStore, useCombatStore } from '@/stores'
+import { useGameStore, useConnectionStore, useCombatStore, usePlayersStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 
 const game = useGameStore()
 const connection = useConnectionStore()
 const combat = useCombatStore()
+const players = usePlayersStore()
 const gameActions = useGameActions()
 const { t } = useI18n()
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const isMyTurn = computed(() => game.currentTurn === myPlayerId.value)
+const myHand = computed(() => players.players[myPlayerId.value].hand)
+const selectedDiscardIds = computed(() => players.players[myPlayerId.value].discardSelectionIds || [])
+const requiredDiscardCount = computed(() => Math.max(0, myHand.value.length - 7))
 const phaseLabel = computed(() => {
   const map = {
     draw: t('turn.phase.draw'),
     recruit: t('turn.phase.recruit'),
     combat: t('turn.phase.combat'),
+    discard: t('turn.phase.discard'),
     end: t('turn.phase.end')
   }
   return map[game.turnPhase] || ''
 })
 
 const advanceLabel = computed(() => {
+  if (game.turnPhase === 'discard') return t('turn.action.discard')
   if (game.turnPhase === 'combat') return t('turn.action.endTurn')
   if (game.turnPhase === 'recruit') {
     const isFirstPlayerOpeningTurn =
@@ -51,9 +57,20 @@ const advanceLabel = computed(() => {
   return ''
 })
 
+const isActionDisabled = computed(() => {
+  if (combat.isRolling) return true
+  if (game.turnPhase !== 'discard') return false
+  if (requiredDiscardCount.value <= 0) return false
+  return selectedDiscardIds.value.length !== requiredDiscardCount.value
+})
+
 function advance() {
   if (!isMyTurn.value) return
-  if (combat.isRolling) return
+  if (isActionDisabled.value) return
+  if (game.turnPhase === 'discard') {
+    gameActions.discardSelectedHand()
+    return
+  }
   gameActions.advancePhase()
 }
 </script>

@@ -20,7 +20,7 @@ export const useGameStore = defineStore('game', () => {
   })
   const currentTurn = ref('player_a') // 'player_a' | 'player_b'
   const firstTurnPlayer = ref('player_a') // player who starts the match
-  const turnPhase = ref('draw') // 'draw' | 'recruit' | 'combat' | 'end'
+  const turnPhase = ref('draw') // 'draw' | 'recruit' | 'combat' | 'discard' | 'end'
   const winner = ref(null) // null | 'player_a' | 'player_b'
 
   // Getters
@@ -41,6 +41,19 @@ export const useGameStore = defineStore('game', () => {
 
   function getOpponentPlayerId(playerId) {
     return playerId === 'player_a' ? 'player_b' : 'player_a'
+  }
+
+  function getRequiredDiscardCount(playerId) {
+    const handSize = players.players[playerId]?.hand?.length || 0
+    return Math.max(0, handSize - 7)
+  }
+
+  function advanceToTurnEnd(playerId) {
+    if (getRequiredDiscardCount(playerId) > 0) {
+      turnPhase.value = 'discard'
+      return createAdvanceResult('advanced')
+    }
+    return endTurn()
   }
 
   function startGame(initialTurn = 'player_a', initialTurnPhase = 'recruit') {
@@ -75,13 +88,17 @@ export const useGameStore = defineStore('game', () => {
     if (turnPhase.value === 'recruit') {
       // Only the very first player of the match skips combat once.
       if (turn.value === 1 && currentTurn.value === firstTurnPlayer.value) {
-        return endTurn()
+        return advanceToTurnEnd(currentTurn.value)
       }
       turnPhase.value = 'combat'
       players.resetCombatActions(currentTurn.value)
       return createAdvanceResult('advanced')
     }
     if (turnPhase.value === 'combat') {
+      return advanceToTurnEnd(currentTurn.value)
+    }
+    if (turnPhase.value === 'discard') {
+      if (getRequiredDiscardCount(currentTurn.value) > 0) return null
       return endTurn()
     }
     if (turnPhase.value === 'end') {
@@ -150,6 +167,7 @@ export const useGameStore = defineStore('game', () => {
     isEnded,
     // Actions
     startGame,
+    getRequiredDiscardCount,
     advancePhase,
     endTurn,
     endGame,

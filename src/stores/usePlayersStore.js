@@ -14,7 +14,8 @@ export const usePlayersStore = defineStore('players', () => {
     maxResources: 5,
     heroesLost: 0,
     draggedCardId: null,
-    hoveredCardId: null
+    hoveredCardId: null,
+    discardSelectionIds: []
   })
 
   // State
@@ -111,6 +112,12 @@ export const usePlayersStore = defineStore('players', () => {
     players.value[playerId].hand.push(...cards)
   }
 
+  function removeDiscardSelectionCard(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player) return
+    player.discardSelectionIds = player.discardSelectionIds.filter((id) => id !== cardId)
+  }
+
   function playHeroFromHand(playerId, cardId, slotIndex = null) {
     const player = players.value[playerId]
     const heroCount = player.heroes.filter(Boolean).length
@@ -129,6 +136,7 @@ export const usePlayersStore = defineStore('players', () => {
     }
     player.resources -= cost
     player.hand.splice(index, 1)
+    removeDiscardSelectionCard(playerId, card.id)
     player.heroes[slotIndex] = createHeroInstance(card)
     return { card, cost, slotIndex }
   }
@@ -138,6 +146,7 @@ export const usePlayersStore = defineStore('players', () => {
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
+      removeDiscardSelectionCard(playerId, card.id)
     }
     const heroCount = player.heroes.filter(Boolean).length
     if (heroCount >= 3) return false
@@ -169,6 +178,7 @@ export const usePlayersStore = defineStore('players', () => {
     const maxHpBefore = getHeroMaxHp(hero)
     player.resources -= cost
     player.hand.splice(index, 1)
+    removeDiscardSelectionCard(playerId, card.id)
     hero.items.push(createItemInstance(card))
     const maxHpAfter = getHeroMaxHp(hero)
     if (maxHpAfter > maxHpBefore) {
@@ -186,6 +196,7 @@ export const usePlayersStore = defineStore('players', () => {
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
+      removeDiscardSelectionCard(playerId, card.id)
     }
     const maxHpBefore = getHeroMaxHp(hero)
     if (typeof cost === 'number') {
@@ -327,6 +338,42 @@ export const usePlayersStore = defineStore('players', () => {
     players.value[playerId].hoveredCardId = null
   }
 
+  function toggleDiscardSelection(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player || !cardId) return false
+    if (!player.hand.some((card) => card.id === cardId)) return false
+    if (player.discardSelectionIds.includes(cardId)) {
+      player.discardSelectionIds = player.discardSelectionIds.filter((id) => id !== cardId)
+      return true
+    }
+    player.discardSelectionIds = [...player.discardSelectionIds, cardId]
+    return true
+  }
+
+  function clearDiscardSelection(playerId) {
+    const player = players.value[playerId]
+    if (!player) return
+    player.discardSelectionIds = []
+  }
+
+  function discardFromHand(playerId, cardIds) {
+    const player = players.value[playerId]
+    if (!player || !Array.isArray(cardIds) || cardIds.length === 0) return []
+    const uniqueIds = [...new Set(cardIds)].filter(Boolean)
+    const handById = new Map(player.hand.map((card) => [card.id, card]))
+    const discardedCards = []
+    for (const cardId of uniqueIds) {
+      const card = handById.get(cardId)
+      if (!card) return []
+      discardedCards.push(card)
+    }
+    if (discardedCards.length !== uniqueIds.length) return []
+    const selectedSet = new Set(uniqueIds)
+    player.hand = player.hand.filter((card) => !selectedSet.has(card.id))
+    player.discardSelectionIds = player.discardSelectionIds.filter((id) => !selectedSet.has(id))
+    return discardedCards
+  }
+
   function refreshResources(playerId) {
     players.value[playerId].resources = players.value[playerId].maxResources
   }
@@ -359,6 +406,9 @@ export const usePlayersStore = defineStore('players', () => {
     clearDraggedCard,
     setHoveredCard,
     clearHoveredCard,
+    toggleDiscardSelection,
+    clearDiscardSelection,
+    discardFromHand,
     refreshResources,
     $reset
   }

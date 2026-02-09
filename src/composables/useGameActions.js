@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { useCombatStore, useConnectionStore, useGameStore, usePlayersStore } from '@/stores'
+import { useCombatStore, useConnectionStore, useDeckStore, useGameStore, usePlayersStore } from '@/stores'
 import { sendMessage } from '@/services/peerService'
 
 const COMBAT_ROLLING_MS = 1200
@@ -9,6 +9,7 @@ export function useGameActions() {
   const connection = useConnectionStore()
   const game = useGameStore()
   const players = usePlayersStore()
+  const deck = useDeckStore()
   const combat = useCombatStore()
   const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 
@@ -66,6 +67,71 @@ export function useGameActions() {
 
     const result = game.advancePhase()
     return syncAdvanceResult(result)
+  }
+
+  function applyDiscardAndAdvance(playerId, cardIds) {
+    const requiredDiscardCount = game.getRequiredDiscardCount(playerId)
+    if (requiredDiscardCount <= 0) return false
+    if (!Array.isArray(cardIds)) return false
+    const uniqueCardIds = [...new Set(cardIds)].filter(Boolean)
+    if (uniqueCardIds.length !== requiredDiscardCount) return false
+
+    const handIds = new Set(players.players[playerId].hand.map((card) => card.id))
+    if (uniqueCardIds.some((cardId) => !handIds.has(cardId))) return false
+
+    const discardedCards = players.discardFromHand(playerId, uniqueCardIds)
+    if (discardedCards.length !== requiredDiscardCount) return false
+    for (const card of discardedCards) {
+      deck.discard(card)
+    }
+
+    sendMessage({
+      type: 'discard_hand',
+      payload: {
+        playerId,
+        cardIds: uniqueCardIds
+      }
+    })
+
+    const result = game.endTurn()
+    return syncAdvanceResult(result)
+  }
+
+  function discardSelectedHand() {
+    if (!game.isPlaying || combat.isRolling) return false
+    if (game.turnPhase !== 'discard') return false
+    if (game.currentTurn !== myPlayerId.value) return false
+
+    const requiredDiscardCount = game.getRequiredDiscardCount(myPlayerId.value)
+    if (requiredDiscardCount <= 0) return false
+    const selectedCardIds = players.players[myPlayerId.value].discardSelectionIds || []
+    if (selectedCardIds.length !== requiredDiscardCount) return false
+
+    if (connection.isHost) {
+      return applyDiscardAndAdvance(myPlayerId.value, selectedCardIds)
+    }
+
+    return sendMessage({
+      type: 'discard_request',
+      payload: {
+        playerId: myPlayerId.value,
+        cardIds: selectedCardIds,
+        requestedAt: Date.now()
+      }
+    })
+  }
+
+  function handleDiscardRequest(payload = {}) {
+    if (!connection.isHost) return false
+    if (!game.isPlaying || combat.isRolling) return false
+    if (game.turnPhase !== 'discard') return false
+
+    const requesterId = payload?.playerId
+    if (requesterId !== 'player_a' && requesterId !== 'player_b') return false
+    if (requesterId === myPlayerId.value) return false
+    if (game.currentTurn !== requesterId) return false
+
+    return applyDiscardAndAdvance(requesterId, payload?.cardIds || [])
   }
 
   function playHeroToSlot(slotIndex, cardId) {
@@ -273,12 +339,14 @@ export function useGameActions() {
 
   return {
     advancePhase,
+    discardSelectedHand,
     playHeroToSlot,
     playItemToSlot,
     setHoveredCard,
     clearHoveredCard,
     attackHero,
     handleAdvancePhaseRequest,
+    handleDiscardRequest,
     handleCombatRequest,
     receiveCombatRollStart,
     receiveCombatRollResult
