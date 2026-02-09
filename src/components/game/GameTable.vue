@@ -30,8 +30,7 @@
           :key="slot.key"
           class="table-slot"
           :class="{
-            'slot-drop-valid': isDropCandidate(slot.index),
-            'slot-drag-active': isDropCandidate(slot.index) && activeDropSlot === slot.index,
+            'slot-drop-valid': isActiveDropSlot(slot.index),
             'slot-attack-selectable': canSelectAttacker(slot.index),
             'slot-attack-selected': selectedAttackerSlot === slot.index
           }"
@@ -179,6 +178,10 @@ function isDropCandidate(slotIndex) {
   return canDropOnSlot(slotIndex, draggedCardId.value)
 }
 
+function isActiveDropSlot(slotIndex) {
+  return activeDropSlot.value === slotIndex && isDropCandidate(slotIndex)
+}
+
 function onSlotDragOver(slotIndex, event) {
   const cardId = getDraggedCardId(event)
   if (!cardId || !canDropOnSlot(slotIndex, cardId)) {
@@ -297,10 +300,6 @@ function getHeroDisplay(hero) {
   box-shadow: 0 0 0 3px var(--slot-highlight-soft, rgba(245, 158, 11, 0.35));
   background: rgba(255, 255, 255, 0.35);
   cursor: pointer;
-}
-
-.table-slot.slot-drag-active {
-  transform: translateY(-2px);
 }
 
 .table-slot.slot-attack-selectable {

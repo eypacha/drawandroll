@@ -19,6 +19,7 @@ export const useGameStore = defineStore('game', () => {
     player_b: MAX_RESOURCES
   })
   const currentTurn = ref('player_a') // 'player_a' | 'player_b'
+  const firstTurnPlayer = ref('player_a') // player who starts the match
   const turnPhase = ref('draw') // 'draw' | 'recruit' | 'combat' | 'end'
   const winner = ref(null) // null | 'player_a' | 'player_b'
 
@@ -35,6 +36,7 @@ export const useGameStore = defineStore('game', () => {
       player_b: MAX_RESOURCES
     }
     currentTurn.value = initialTurn
+    firstTurnPlayer.value = initialTurn
     // First player skips draw phase on turn 1
     turnPhase.value = initialTurnPhase
     winner.value = null
@@ -48,7 +50,8 @@ export const useGameStore = defineStore('game', () => {
       return
     }
     if (turnPhase.value === 'recruit') {
-      if (turn.value === 1) {
+      // Only the very first player of the match skips combat once.
+      if (turn.value === 1 && currentTurn.value === firstTurnPlayer.value) {
         turnPhase.value = 'end'
         return
       }
@@ -94,6 +97,7 @@ export const useGameStore = defineStore('game', () => {
       player_b: MAX_RESOURCES
     }
     currentTurn.value = 'player_a'
+    firstTurnPlayer.value = 'player_a'
     turnPhase.value = 'draw'
     winner.value = null
   }
@@ -104,6 +108,7 @@ export const useGameStore = defineStore('game', () => {
     resources,
     turn,
     currentTurn,
+    firstTurnPlayer,
     turnPhase,
     winner,
     // Getters
