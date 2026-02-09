@@ -61,8 +61,7 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 ### 4️⃣ Ventana de reacción defensiva
 - **Solo el defensor** puede reaccionar.
-- Puede jugar **múltiples cartas** (reactive/counterattack/healing) mientras tenga recursos.
-- Límite: **máximo 1 counterattack por ataque**.
+- Puede jugar **máximo 1 carta defensiva total** por ataque (`reactive`, `counterattack` o `healing`).
 - La tirada **ya es conocida**.
 - Si el defensor no reacciona en este momento:
   - pierde la oportunidad
@@ -128,7 +127,7 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 
 - Solo pueden jugarse en la **ventana de reacción**.
 - Solo el defensor puede jugarlas.
-- Se pueden encadenar varias cartas por ataque, limitadas por recursos.
+- Se puede jugar una sola carta defensiva por ataque.
 - Ejemplos válidos de efectos:
   - reducir daño
   - cancelar crítico

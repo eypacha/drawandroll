@@ -478,33 +478,32 @@ function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) 
   if (!defender) return context
 
   const nextContext = { ...context, reactions: [] }
-  while (true) {
-    const bestChoice = chooseDefenderReactionCard(state, defenderPlayerId, nextContext, rng)
-    if (!bestChoice) break
-    const card = bestChoice.candidate.card
-    const cost = Number(card?.cost || 0)
-    if (defender.resources < cost) break
+  const bestChoice = chooseDefenderReactionCard(state, defenderPlayerId, nextContext, rng)
+  if (!bestChoice) return nextContext
 
-    nextContext.damage = bestChoice.applied.nextDamage
-    nextContext.isCritical = bestChoice.applied.nextIsCritical
-    nextContext.counterDamage = bestChoice.applied.counterDamage
-    nextContext.counterCriticalCount = bestChoice.applied.counterCriticalCount
-    nextContext.counterFumbleCount = bestChoice.applied.counterFumbleCount
-    nextContext.counterattackUsed = Boolean(bestChoice.applied.counterattackUsed || nextContext.counterattackUsed)
-    defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
-    defender.resources = Math.max(0, defender.resources - cost)
-    nextContext.reactions.push({
-      type: card.type,
-      cardId: card.id,
-      effect: card.effect || null,
-      cost,
-      resourcesAfter: defender.resources,
-      counterDamageAdded: bestChoice.applied.counterDamageAdded
-    })
-    if (card.type === 'counterattack') {
-      stats.counterattacksUsed += 1
-      stats.counterattackDamageDealt += bestChoice.applied.counterDamageAdded
-    }
+  const card = bestChoice.candidate.card
+  const cost = Number(card?.cost || 0)
+  if (defender.resources < cost) return nextContext
+
+  nextContext.damage = bestChoice.applied.nextDamage
+  nextContext.isCritical = bestChoice.applied.nextIsCritical
+  nextContext.counterDamage = bestChoice.applied.counterDamage
+  nextContext.counterCriticalCount = bestChoice.applied.counterCriticalCount
+  nextContext.counterFumbleCount = bestChoice.applied.counterFumbleCount
+  nextContext.counterattackUsed = Boolean(bestChoice.applied.counterattackUsed || nextContext.counterattackUsed)
+  defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
+  defender.resources = Math.max(0, defender.resources - cost)
+  nextContext.reactions.push({
+    type: card.type,
+    cardId: card.id,
+    effect: card.effect || null,
+    cost,
+    resourcesAfter: defender.resources,
+    counterDamageAdded: bestChoice.applied.counterDamageAdded
+  })
+  if (card.type === 'counterattack') {
+    stats.counterattacksUsed += 1
+    stats.counterattackDamageDealt += bestChoice.applied.counterDamageAdded
   }
 
   return nextContext

@@ -149,8 +149,7 @@ Un turno se resuelve siempre en este orden:
 ## 10. Reacciones defensivas (reactive + counterattack)
 
 - Solo el **defensor** puede usar cartas reactivas.
-- En la ventana defensiva se pueden jugar **múltiples cartas** mientras haya recursos.
-- Máximo **1 counterattack por ataque**.
+- En la ventana defensiva se puede jugar **máximo 1 carta total** por ataque.
 - No existen reacciones del atacante dentro de esa ventana.
 - Las cartas reactivas:
   - se destruyen al usarse

@@ -243,19 +243,18 @@ export function useGameActions() {
   }
 
   async function waitForReactionChoice(combatId) {
-    const actions = []
     while (true) {
       const active = getActiveCombatOrNull()
       if (!active || active.combatId !== combatId || combat.rollStep !== 'reaction_pending') {
-        return actions
+        return []
       }
       if (!hasPlayableReactionCard(active.defenderPlayerId)) {
-        return actions
+        return []
       }
       const response = combat.consumeReactionResponse(combatId)
       if (response !== undefined) {
-        if (response?.pass) return actions
-        if (response?.cardId) actions.push({ cardId: response.cardId })
+        if (response?.pass) return []
+        if (response?.cardId) return [{ cardId: response.cardId }]
       }
       await sleep(60)
     }
@@ -551,7 +550,7 @@ export function useGameActions() {
         cardId: cardId || null,
         pass: !cardId
       })
-      if (accepted && !cardId) combat.closeReactionWindow(window.combatId)
+      if (accepted) combat.closeReactionWindow(window.combatId)
       return accepted
     }
 
@@ -565,7 +564,7 @@ export function useGameActions() {
         respondedAt: Date.now()
       }
     })
-    if (sent && !cardId) combat.closeReactionWindow(window.combatId)
+    if (sent) combat.closeReactionWindow(window.combatId)
     return sent
   }
 
@@ -580,7 +579,7 @@ export function useGameActions() {
       cardId: payload?.cardId || null,
       pass: Boolean(payload?.pass)
     })
-    if (accepted && payload?.pass) combat.closeReactionWindow(window.combatId)
+    if (accepted) combat.closeReactionWindow(window.combatId)
     return accepted
   }
 

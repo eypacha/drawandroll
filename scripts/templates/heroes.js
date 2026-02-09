@@ -10,7 +10,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 2, max: 3 },
-      def: { min: 11, max: 13 },
+      def: { min: 9, max: 11 },
       hp: { min: 6, max: 8 }
     },
     baseCost: 3
@@ -21,7 +21,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 3, max: 4 },
-      def: { min: 10, max: 11 },
+      def: { min: 8, max: 9 },
       hp: { min: 4, max: 5 }
     },
     baseCost: 3
@@ -32,7 +32,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 1, max: 2 },
-      def: { min: 13, max: 15 },
+      def: { min: 11, max: 13 },
       hp: { min: 8, max: 10 }
     },
     baseCost: 4
@@ -43,7 +43,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 2, max: 3 },
-      def: { min: 11, max: 12 },
+      def: { min: 9, max: 10 },
       hp: { min: 5, max: 6 }
     },
     baseCost: 2
@@ -54,7 +54,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 1, max: 2 },
-      def: { min: 10, max: 11 },
+      def: { min: 8, max: 9 },
       hp: { min: 4, max: 5 }
     },
     baseCost: 2

@@ -392,6 +392,7 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderHpBefore = defenderStats.hp
     const reactions = []
     let counterDamageTotal = 0
+    let reactionUsed = false
     let counterattackUsed = false
     const safeCounterAttackRoll = typeof rollCounterAttack === 'function'
       ? rollCounterAttack
@@ -403,6 +404,7 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderPlayer = players.value[defenderPlayerId]
     if (Array.isArray(reactionActions) && defenderPlayer) {
       for (const action of reactionActions) {
+        if (reactionUsed) break
         const reactionCardId = action?.cardId
         if (!reactionCardId) continue
         const reactionCard = defenderPlayer.hand.find((card) => card?.id === reactionCardId)
@@ -436,6 +438,7 @@ export const usePlayersStore = defineStore('players', () => {
             criticalCanceled: Boolean(appliedReactive.criticalCanceled),
             preventedDeath: Boolean(appliedReactive.preventedDeath)
           })
+          reactionUsed = true
           continue
         }
 
@@ -470,6 +473,7 @@ export const usePlayersStore = defineStore('players', () => {
           isCounterCritical,
           isCounterFumble
         })
+        reactionUsed = true
       }
     }
 

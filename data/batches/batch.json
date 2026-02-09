@@ -1,6 +1,6 @@
 {
-  "batch_id": "3ca88ad1-fbca-412f-9f53-c040e6f419f1",
-  "created_at": "2026-02-09T18:37:39.596Z",
+  "batch_id": "778974b8-8606-4cf8-ae16-8cb9ba7f44da",
+  "created_at": "2026-02-09T18:48:18.185Z",
   "config": {
     "batch_size": 50,
     "distribution": {
@@ -23,7 +23,152 @@
   },
   "cards": [
     {
-      "id": "5517a3e1-d27d-49ce-b887-bea7064c7fa8",
+      "id": "b7bac2e4-677e-4957-8f8b-3edec32725cf",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "96d8af96-e20e-491a-bba4-44630c63af91",
+      "type": "hero",
+      "template": "fragile_support",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 8,
+        "hp": 4
+      },
+      "cost": 2
+    },
+    {
+      "id": "8f268e0c-29f8-421e-92c1-7ddd65527d9d",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 13,
+        "hp": 10
+      },
+      "cost": 4
+    },
+    {
+      "id": "3f2eb52d-dbb5-4e8e-8673-76671b164aff",
+      "type": "reactive",
+      "template": "critical_control",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "cancel_critical",
+      "stats": {
+        "damageReduction": null
+      },
+      "cost": 2
+    },
+    {
+      "id": "ca8fc344-83d2-4ea5-8247-9bd88863aa79",
+      "type": "counterattack",
+      "template": "quick_riposte",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 1
+    },
+    {
+      "id": "f5a79100-b08d-478d-b357-f1423db263f0",
+      "type": "counterattack",
+      "template": "guarded_strike",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "8fede063-3edd-474e-bc02-684658b1417b",
+      "type": "item",
+      "template": "defensive_gear",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 0,
+        "defBonus": 2,
+        "atkModifier": 0,
+        "defModifier": 0,
+        "durability": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "f5df22da-597f-4f95-a7f0-5e001e7ab6b8",
+      "type": "healing",
+      "template": "emergency_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "e24775ac-6e79-40d4-9bef-0690fa87cb5e",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
@@ -44,7 +189,24 @@
       "cost": 2
     },
     {
-      "id": "0489f774-e82e-434d-8047-2bb30360a976",
+      "id": "f08dcbf3-ec01-444d-9aef-bafa5baf07d1",
+      "type": "healing",
+      "template": "minor_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "51db231b-fb96-4902-ac6b-191d11393f7e",
       "type": "healing",
       "template": "emergency_heal",
       "name": {
@@ -61,7 +223,28 @@
       "cost": 2
     },
     {
-      "id": "0cfa633a-7673-434f-b4c4-0e04ad2086e1",
+      "id": "2a3baca3-71d3-4aa9-afc5-06085b999a1f",
+      "type": "item",
+      "template": "offensive_weapon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 1,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": 0,
+        "durability": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "42971045-d476-439d-a208-8d718cc09725",
       "type": "healing",
       "template": "emergency_heal",
       "name": {
@@ -73,31 +256,12 @@
         "es": ""
       },
       "stats": {
-        "healAmount": 2
+        "healAmount": 3
       },
       "cost": 2
     },
     {
-      "id": "4021a9e8-9d93-4061-b458-e7bbd7522f7c",
-      "type": "hero",
-      "template": "glass_cannon",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 4,
-        "def": 11,
-        "hp": 4
-      },
-      "cost": 3
-    },
-    {
-      "id": "3385b609-07a1-4605-bef0-fcea66dd76a6",
+      "id": "30c294d6-2f97-450a-948f-e1f288918c4a",
       "type": "counterattack",
       "template": "quick_riposte",
       "name": {
@@ -114,102 +278,7 @@
       "cost": 1
     },
     {
-      "id": "3c367356-5b3d-4e32-a1f9-9323b402cd5e",
-      "type": "reactive",
-      "template": "critical_control",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "cancel_critical",
-      "stats": {
-        "damageReduction": null
-      },
-      "cost": 2
-    },
-    {
-      "id": "7d5b3707-736a-48dc-9c16-7641866ffb87",
-      "type": "hero",
-      "template": "balanced_fighter",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 2,
-        "def": 12,
-        "hp": 7
-      },
-      "cost": 3
-    },
-    {
-      "id": "8f28531e-ac97-47dd-9a08-533e589895d0",
-      "type": "item",
-      "template": "offensive_weapon",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 2,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 1
-      },
-      "cost": 2
-    },
-    {
-      "id": "d121652c-9938-401d-9981-ceee9ab19f3a",
-      "type": "hero",
-      "template": "glass_cannon",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 3,
-        "def": 10,
-        "hp": 4
-      },
-      "cost": 3
-    },
-    {
-      "id": "d3164052-eb89-45ae-b435-d0c82ec468c6",
-      "type": "reactive",
-      "template": "critical_control",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "cancel_critical",
-      "stats": {
-        "damageReduction": null
-      },
-      "cost": 2
-    },
-    {
-      "id": "7f3631cc-b3a3-4bf5-af75-5571a99b5278",
+      "id": "e76922ad-8423-4951-bd7f-5458cb436a3b",
       "type": "reactive",
       "template": "survival_trick",
       "name": {
@@ -227,28 +296,7 @@
       "cost": 3
     },
     {
-      "id": "7da010d8-a3d9-4fcc-854e-ef109f47c049",
-      "type": "item",
-      "template": "offensive_weapon",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 1,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -1,
-        "durability": 1
-      },
-      "cost": 2
-    },
-    {
-      "id": "76827476-bf1c-418e-a051-3666cb3882c9",
+      "id": "d9ea8c9c-108a-4683-9ab2-8bf637466a31",
       "type": "healing",
       "template": "minor_heal",
       "name": {
@@ -265,7 +313,7 @@
       "cost": 1
     },
     {
-      "id": "e8ff3861-8622-4736-beb3-26d9cc468366",
+      "id": "7ce064d1-63ae-491a-b24b-c1f0c35a3c94",
       "type": "hero",
       "template": "glass_cannon",
       "name": {
@@ -278,15 +326,15 @@
       },
       "stats": {
         "atk": 4,
-        "def": 11,
+        "def": 8,
         "hp": 5
       },
       "cost": 3
     },
     {
-      "id": "0f2fd6be-eeaa-442c-aa02-ff29674f1287",
-      "type": "item",
-      "template": "defensive_gear",
+      "id": "f98b0405-bf90-4a2f-85fa-b1aefd1bd584",
+      "type": "healing",
+      "template": "minor_heal",
       "name": {
         "en": "",
         "es": ""
@@ -296,16 +344,31 @@
         "es": ""
       },
       "stats": {
-        "atkBonus": 0,
-        "defBonus": 1,
-        "atkModifier": -1,
-        "defModifier": 0,
-        "durability": 2
+        "healAmount": 1
       },
-      "cost": 2
+      "cost": 1
     },
     {
-      "id": "98f8ac78-bf39-4e55-893a-f86ac67da952",
+      "id": "a652a003-9f6e-49ef-b6bc-fbdacaabfcd2",
+      "type": "hero",
+      "template": "glass_cannon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 3,
+        "def": 8,
+        "hp": 5
+      },
+      "cost": 3
+    },
+    {
+      "id": "097b008a-08d4-4026-9b45-edb1aa8dd568",
       "type": "reactive",
       "template": "critical_control",
       "name": {
@@ -323,136 +386,9 @@
       "cost": 2
     },
     {
-      "id": "bf8b630a-a1b7-4763-8526-e8bca4b12045",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "6c0a3040-83ee-4cc1-ac56-287bb65f5e7b",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "healAmount": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "8f61e6d5-213d-4462-819e-e8f7c0ddf6a0",
+      "id": "661c7f2a-2286-46bc-9aed-889c3f07a48c",
       "type": "item",
-      "template": "high_risk_high_reward",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 3,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -1,
-        "durability": 1
-      },
-      "cost": 3
-    },
-    {
-      "id": "4dfc3f94-30a0-4fb1-834a-1d5572acce7b",
-      "type": "counterattack",
-      "template": "quick_riposte",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "counterDamage": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "47c933dd-56b0-47dd-9018-e6460a282d50",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "healAmount": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "e0355c1a-aef0-42cc-8e6b-3c23ee082c59",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 1,
-        "def": 15,
-        "hp": 8
-      },
-      "cost": 4
-    },
-    {
-      "id": "367e88ff-4976-4404-9251-d646b403206f",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 2
-      },
-      "cost": 1
-    },
-    {
-      "id": "4b10ab41-b1e5-422f-a849-b4c21a087e54",
-      "type": "item",
-      "template": "high_risk_high_reward",
+      "template": "offensive_weapon",
       "name": {
         "en": "",
         "es": ""
@@ -465,161 +401,15 @@
         "atkBonus": 2,
         "defBonus": 0,
         "atkModifier": 0,
-        "defModifier": -2,
+        "defModifier": -1,
         "durability": 1
-      },
-      "cost": 3
-    },
-    {
-      "id": "a56d84cb-9968-47a0-9274-771be6984a8d",
-      "type": "item",
-      "template": "high_risk_high_reward",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 3,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": -2,
-        "durability": 1
-      },
-      "cost": 3
-    },
-    {
-      "id": "c93d952a-dd86-4cad-a1e9-37eaeda18037",
-      "type": "counterattack",
-      "template": "quick_riposte",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "counterDamage": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "095e5c86-7ae1-4c19-af97-a1c37748dbec",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 2,
-        "def": 13,
-        "hp": 9
-      },
-      "cost": 4
-    },
-    {
-      "id": "c7d909c6-f9e0-4c37-bf8a-a36dd2cfdabc",
-      "type": "hero",
-      "template": "tank",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 2,
-        "def": 15,
-        "hp": 9
-      },
-      "cost": 4
-    },
-    {
-      "id": "e79f935c-9f84-4c7f-ba01-433deae094cf",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "7650d5ad-916e-4374-8ce8-310996c8f5c3",
-      "type": "reactive",
-      "template": "damage_mitigation",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "effect": "reduce_damage",
-      "stats": {
-        "damageReduction": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "af8e29c2-628c-4427-b4ca-debec1bfbebc",
-      "type": "counterattack",
-      "template": "quick_riposte",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "counterDamage": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "a8d465eb-23ed-44f9-9d6f-44788ebc2c2a",
-      "type": "counterattack",
-      "template": "guarded_strike",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "counterDamage": 1
       },
       "cost": 2
     },
     {
-      "id": "f9e2b030-f41f-4c67-b3f7-1dc18aa95ebf",
+      "id": "f1abe35c-dcd1-4ea1-b8bb-b259c9346b25",
       "type": "hero",
-      "template": "fragile_support",
+      "template": "skirmisher",
       "name": {
         "en": "",
         "es": ""
@@ -631,14 +421,14 @@
       "stats": {
         "atk": 2,
         "def": 10,
-        "hp": 4
+        "hp": 6
       },
       "cost": 2
     },
     {
-      "id": "24144f40-0b11-44f2-a62a-8f141e064bec",
+      "id": "cfc127e2-c5ac-4348-9edc-20fe24f1aeb9",
       "type": "hero",
-      "template": "balanced_fighter",
+      "template": "skirmisher",
       "name": {
         "en": "",
         "es": ""
@@ -648,14 +438,14 @@
         "es": ""
       },
       "stats": {
-        "atk": 2,
-        "def": 12,
-        "hp": 6
+        "atk": 3,
+        "def": 10,
+        "hp": 5
       },
-      "cost": 3
+      "cost": 2
     },
     {
-      "id": "3c915c37-8285-47a1-80cb-bfbed11228ad",
+      "id": "e9f6765d-a962-4f05-9a77-ac8fa1a77fbe",
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
@@ -668,15 +458,15 @@
       },
       "stats": {
         "atk": 2,
-        "def": 13,
+        "def": 9,
         "hp": 7
       },
       "cost": 3
     },
     {
-      "id": "9306cd17-b807-4ae8-bced-bcfed0caaea6",
-      "type": "healing",
-      "template": "emergency_heal",
+      "id": "b859ac24-03cc-4610-9f26-299fc823d95f",
+      "type": "counterattack",
+      "template": "quick_riposte",
       "name": {
         "en": "",
         "es": ""
@@ -686,12 +476,12 @@
         "es": ""
       },
       "stats": {
-        "healAmount": 2
+        "counterDamage": 1
       },
-      "cost": 2
+      "cost": 1
     },
     {
-      "id": "66ae237a-2cdd-4b28-9dbe-9505971fe562",
+      "id": "33b12434-397f-4be3-b2b1-6159bb5e2120",
       "type": "item",
       "template": "defensive_gear",
       "name": {
@@ -712,9 +502,9 @@
       "cost": 2
     },
     {
-      "id": "5ad128cb-4541-4f51-8201-034ee2e2a6aa",
-      "type": "hero",
-      "template": "fragile_support",
+      "id": "d7935cf5-3b59-412b-9aea-346ad8bf9b69",
+      "type": "counterattack",
+      "template": "quick_riposte",
       "name": {
         "en": "",
         "es": ""
@@ -724,75 +514,12 @@
         "es": ""
       },
       "stats": {
-        "atk": 1,
-        "def": 11,
-        "hp": 5
+        "counterDamage": 1
       },
-      "cost": 2
+      "cost": 1
     },
     {
-      "id": "a695ee11-fccc-4ba1-813d-dca7ce46e4fc",
-      "type": "hero",
-      "template": "skirmisher",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atk": 2,
-        "def": 11,
-        "hp": 6
-      },
-      "cost": 2
-    },
-    {
-      "id": "75019106-6945-4215-92d7-5baec308fc17",
-      "type": "item",
-      "template": "defensive_gear",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 0,
-        "defBonus": 1,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 2
-      },
-      "cost": 2
-    },
-    {
-      "id": "de70e98f-d0f1-43bd-8059-f8c6d57a2e5e",
-      "type": "item",
-      "template": "offensive_weapon",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "atkBonus": 1,
-        "defBonus": 0,
-        "atkModifier": 0,
-        "defModifier": 0,
-        "durability": 1
-      },
-      "cost": 2
-    },
-    {
-      "id": "34da9100-e9ed-4066-b7e2-096d27c310b0",
+      "id": "36a418ea-18e5-4639-b037-06f2c756f9e6",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
@@ -807,13 +534,13 @@
         "atkBonus": 2,
         "defBonus": 0,
         "atkModifier": 0,
-        "defModifier": -1,
-        "durability": 2
+        "defModifier": 0,
+        "durability": 1
       },
       "cost": 2
     },
     {
-      "id": "b3d67d2f-2a77-4a4b-87e2-dfa706fe05f5",
+      "id": "d2f84bbc-a068-43dd-a4e6-24c477bff15c",
       "type": "hero",
       "template": "tank",
       "name": {
@@ -832,9 +559,9 @@
       "cost": 4
     },
     {
-      "id": "08eb4ff5-e235-45b5-8c2e-4f8e9d316305",
-      "type": "counterattack",
-      "template": "quick_riposte",
+      "id": "7f6e4073-a52d-42ed-a7d3-ab78b08f3df1",
+      "type": "item",
+      "template": "high_risk_high_reward",
       "name": {
         "en": "",
         "es": ""
@@ -844,12 +571,144 @@
         "es": ""
       },
       "stats": {
-        "counterDamage": 1
+        "atkBonus": 3,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -2,
+        "durability": 1
+      },
+      "cost": 3
+    },
+    {
+      "id": "68d2c6a8-3536-4e77-816c-69a39c3cee5b",
+      "type": "reactive",
+      "template": "survival_trick",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "prevent_death",
+      "stats": {
+        "damageReduction": null
+      },
+      "cost": 3
+    },
+    {
+      "id": "19b8d0f5-6eaf-4bba-9883-470331ad1962",
+      "type": "reactive",
+      "template": "survival_trick",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "prevent_death",
+      "stats": {
+        "damageReduction": null
+      },
+      "cost": 3
+    },
+    {
+      "id": "436ebb2f-c165-4c75-8718-5360793ba4b1",
+      "type": "hero",
+      "template": "fragile_support",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 2,
+        "def": 9,
+        "hp": 5
+      },
+      "cost": 2
+    },
+    {
+      "id": "05b86779-cb1e-465b-9c04-368571f0908a",
+      "type": "hero",
+      "template": "balanced_fighter",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 3,
+        "def": 10,
+        "hp": 6
+      },
+      "cost": 3
+    },
+    {
+      "id": "604e197a-8215-4773-bea4-b3d902df6816",
+      "type": "hero",
+      "template": "balanced_fighter",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 3,
+        "def": 10,
+        "hp": 7
+      },
+      "cost": 3
+    },
+    {
+      "id": "be2dc884-0255-41be-bc4c-edfbc9655423",
+      "type": "healing",
+      "template": "minor_heal",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "healAmount": 2
       },
       "cost": 1
     },
     {
-      "id": "4086f0ca-2437-424d-b42a-976bbda36b87",
+      "id": "71112b5a-443e-4544-ac1f-aae402c1348b",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "997353b3-1153-4d5a-ae8a-b20810aaf852",
       "type": "item",
       "template": "defensive_gear",
       "name": {
@@ -870,7 +729,160 @@
       "cost": 2
     },
     {
-      "id": "fbf52d65-3505-45ff-923a-28cadb4ccb07",
+      "id": "8b661bd3-e42c-46f8-8e2b-6a78c417e82c",
+      "type": "item",
+      "template": "high_risk_high_reward",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 2,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -1,
+        "durability": 1
+      },
+      "cost": 3
+    },
+    {
+      "id": "2ca05b17-7bf4-424e-9222-4477d9b6b735",
+      "type": "item",
+      "template": "defensive_gear",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 0,
+        "defBonus": 1,
+        "atkModifier": -1,
+        "defModifier": 0,
+        "durability": 2
+      },
+      "cost": 2
+    },
+    {
+      "id": "81d0dde2-f1f2-4472-9a6b-bb7a1fa32855",
+      "type": "counterattack",
+      "template": "guarded_strike",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "960a983e-27a0-4354-967c-87bd35150b26",
+      "type": "item",
+      "template": "high_risk_high_reward",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atkBonus": 2,
+        "defBonus": 0,
+        "atkModifier": 0,
+        "defModifier": -2,
+        "durability": 1
+      },
+      "cost": 3
+    },
+    {
+      "id": "e67dd3a5-6ff1-4d6a-afd4-53dee26511ef",
+      "type": "reactive",
+      "template": "damage_mitigation",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "effect": "reduce_damage",
+      "stats": {
+        "damageReduction": 2
+      },
+      "cost": 1
+    },
+    {
+      "id": "43f1a0cf-164c-4d2f-983f-5c15c8499954",
+      "type": "counterattack",
+      "template": "guarded_strike",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "counterDamage": 1
+      },
+      "cost": 2
+    },
+    {
+      "id": "3bd3cdb6-0bd3-495a-9806-6b8d4e18cd19",
+      "type": "hero",
+      "template": "glass_cannon",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 3,
+        "def": 9,
+        "hp": 4
+      },
+      "cost": 3
+    },
+    {
+      "id": "8d1a8903-6931-4a53-9ff1-6905330f83b9",
+      "type": "hero",
+      "template": "tank",
+      "name": {
+        "en": "",
+        "es": ""
+      },
+      "description": {
+        "en": "",
+        "es": ""
+      },
+      "stats": {
+        "atk": 1,
+        "def": 13,
+        "hp": 10
+      },
+      "cost": 4
+    },
+    {
+      "id": "3bf28a5d-26c0-488f-a93a-da500db9600c",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
@@ -882,16 +894,16 @@
         "es": ""
       },
       "stats": {
-        "atkBonus": 1,
+        "atkBonus": 2,
         "defBonus": 0,
         "atkModifier": 0,
-        "defModifier": 0,
+        "defModifier": -1,
         "durability": 2
       },
       "cost": 2
     },
     {
-      "id": "6132e7aa-09c7-49a6-8247-e42ecf6b449b",
+      "id": "a6789d45-3e37-4b5e-bf00-314b8ac4cfd6",
       "type": "healing",
       "template": "minor_heal",
       "name": {
@@ -903,14 +915,14 @@
         "es": ""
       },
       "stats": {
-        "healAmount": 2
+        "healAmount": 1
       },
       "cost": 1
     },
     {
-      "id": "61b695c0-fad9-46f9-8705-ce1cd319dc2e",
-      "type": "counterattack",
-      "template": "quick_riposte",
+      "id": "fe3b4108-9919-49ea-af4c-3ee19885b67f",
+      "type": "item",
+      "template": "defensive_gear",
       "name": {
         "en": "",
         "es": ""
@@ -920,31 +932,18 @@
         "es": ""
       },
       "stats": {
-        "counterDamage": 1
-      },
-      "cost": 1
-    },
-    {
-      "id": "99d214b5-6b6b-48c9-9850-c49070ae268f",
-      "type": "healing",
-      "template": "emergency_heal",
-      "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
-        "en": "",
-        "es": ""
-      },
-      "stats": {
-        "healAmount": 3
+        "atkBonus": 0,
+        "defBonus": 1,
+        "atkModifier": -1,
+        "defModifier": 0,
+        "durability": 3
       },
       "cost": 2
     },
     {
-      "id": "208dea9e-aa3f-42fe-9065-230274c4ec2e",
-      "type": "counterattack",
-      "template": "quick_riposte",
+      "id": "be6738da-7073-4374-804a-bf4ac6d4c462",
+      "type": "reactive",
+      "template": "damage_mitigation",
       "name": {
         "en": "",
         "es": ""
@@ -953,8 +952,9 @@
         "en": "",
         "es": ""
       },
+      "effect": "reduce_damage",
       "stats": {
-        "counterDamage": 1
+        "damageReduction": 2
       },
       "cost": 1
     }
