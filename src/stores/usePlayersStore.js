@@ -406,6 +406,40 @@ export const usePlayersStore = defineStore('players', () => {
     return discardedCards
   }
 
+  function applyEndTurnDurability(playerId) {
+    const player = players.value[playerId]
+    if (!player) return false
+
+    for (const hero of player.heroes) {
+      const readyHero = ensureHeroState(hero)
+      if (!readyHero) continue
+
+      const nextItems = []
+      for (const item of readyHero.items || []) {
+        const baseDurability = Number(item?.stats?.durability)
+        if (!Number.isFinite(baseDurability) || baseDurability <= 0) {
+          nextItems.push(item)
+          continue
+        }
+
+        const currentDurability = Number.isFinite(Number(item.currentDurability))
+          ? Number(item.currentDurability)
+          : baseDurability
+        const nextDurability = Math.max(0, currentDurability - 1)
+        if (nextDurability > 0) {
+          item.currentDurability = nextDurability
+          nextItems.push(item)
+        }
+      }
+
+      readyHero.items = nextItems
+      const maxHp = getHeroMaxHp(readyHero)
+      readyHero.currentHp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
+    }
+
+    return true
+  }
+
   function refreshResources(playerId) {
     players.value[playerId].resources = players.value[playerId].maxResources
   }
@@ -445,6 +479,7 @@ export const usePlayersStore = defineStore('players', () => {
     toggleDiscardSelection,
     clearDiscardSelection,
     discardFromHand,
+    applyEndTurnDurability,
     refreshResources,
     $reset
   }

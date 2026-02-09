@@ -317,12 +317,48 @@ function discardFromHand(state, playerId, cardIds, stats) {
   return discardedCards
 }
 
+function applyEndTurnDurability(state, playerId) {
+  const player = state.players[playerId]
+  if (!player) return false
+
+  for (const hero of player.heroes) {
+    const readyHero = ensureHeroState(hero)
+    if (!readyHero) continue
+
+    const nextItems = []
+    for (const item of readyHero.items || []) {
+      const baseDurability = Number(item?.stats?.durability)
+      if (!Number.isFinite(baseDurability) || baseDurability <= 0) {
+        nextItems.push(item)
+        continue
+      }
+
+      const currentDurability = Number.isFinite(Number(item.currentDurability))
+        ? Number(item.currentDurability)
+        : baseDurability
+      const nextDurability = Math.max(0, currentDurability - 1)
+
+      if (nextDurability > 0) {
+        item.currentDurability = nextDurability
+        nextItems.push(item)
+      }
+    }
+
+    readyHero.items = nextItems
+    const maxHp = getHeroMaxHp(readyHero)
+    readyHero.currentHp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
+  }
+
+  return true
+}
+
 function getRequiredDiscardCount(state, playerId) {
   return Math.max(0, state.players[playerId].hand.length - 7)
 }
 
 function finishTurn(state) {
   const activePlayer = state.game.currentTurn
+  applyEndTurnDurability(state, activePlayer)
   const hasHeroes = state.players[activePlayer].heroes.some(Boolean)
 
   if (!hasHeroes) {

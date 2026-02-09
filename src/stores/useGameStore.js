@@ -35,7 +35,8 @@ export const useGameStore = defineStore('game', () => {
       currentTurn: currentTurn.value,
       turnPhase: turnPhase.value,
       winner: winner.value,
-      loser
+      loser,
+      maintenancePlayerId: null
     }
   }
 
@@ -110,12 +111,15 @@ export const useGameStore = defineStore('game', () => {
   function endTurn() {
     if (phase.value !== 'playing') return null
     const activePlayer = currentTurn.value
+    players.applyEndTurnDurability(activePlayer)
     const activeHeroes = players.players[activePlayer]?.heroes || []
     const hasHeroes = activeHeroes.some(Boolean)
     if (!hasHeroes) {
       const winnerPlayerId = getOpponentPlayerId(activePlayer)
       endGame(winnerPlayerId)
-      return createAdvanceResult('ended', activePlayer)
+      const endedResult = createAdvanceResult('ended', activePlayer)
+      endedResult.maintenancePlayerId = activePlayer
+      return endedResult
     }
 
     currentTurn.value = currentTurn.value === 'player_a' ? 'player_b' : 'player_a'
@@ -124,7 +128,9 @@ export const useGameStore = defineStore('game', () => {
     }
     turnPhase.value = 'draw'
     players.refreshResources(currentTurn.value)
-    return createAdvanceResult('advanced')
+    const advancedResult = createAdvanceResult('advanced')
+    advancedResult.maintenancePlayerId = activePlayer
+    return advancedResult
   }
 
   function setTurnState(nextTurn, nextCurrent, nextPhase) {
