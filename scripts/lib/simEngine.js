@@ -260,7 +260,7 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
 
   let damage = Math.max(0, attackerStats.atk + attackerRoll - (defenderStats.def + defenderRoll))
   const isFumble = attackerRoll === 1
-  const isCritical = attackerRoll === 20
+  let isCritical = attackerRoll === 20
   if (isFumble) {
     damage = 0
   } else if (isCritical) {
@@ -268,6 +268,16 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   }
 
   const defenderHpBefore = defenderStats.hp
+  const reactivePlay = chooseDefenderReactive(state, defenderPlayerId, {
+    damage,
+    isCritical,
+    criticalBonus: COMBAT_CRITICAL_BONUS,
+    defenderHpBefore
+  })
+  if (reactivePlay) {
+    damage = reactivePlay.damage
+    isCritical = reactivePlay.isCritical
+  }
   const defenderHpAfter = Math.max(0, defenderHpBefore - damage)
   const defenderDefeated = defenderHpAfter <= 0
 
@@ -295,6 +305,91 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
 
   applyCombatResult(state, result, stats)
   return result
+}
+
+function applyReactiveEffect(card, { damage, isCritical, criticalBonus, defenderHpBefore }) {
+  const effect = card?.effect
+  const next = {
+    damage,
+    isCritical
+  }
+
+  if (effect === 'reduce_damage') {
+    const reduction = Math.max(0, Number(card?.stats?.damageReduction) || 0)
+    if (reduction <= 0 || next.damage <= 0) return null
+    next.damage = Math.max(0, next.damage - reduction)
+    return next
+  }
+
+  if (effect === 'cancel_critical') {
+    if (!next.isCritical || criticalBonus <= 0 || next.damage <= 0) return null
+    next.damage = Math.max(0, next.damage - criticalBonus)
+    next.isCritical = false
+    return next
+  }
+
+  if (effect === 'prevent_death') {
+    if (next.damage < defenderHpBefore) return null
+    next.damage = Math.max(0, defenderHpBefore - 1)
+    return next
+  }
+
+  return null
+}
+
+function chooseDefenderReactive(state, defenderPlayerId, context) {
+  const defender = state.players[defenderPlayerId]
+  if (!defender) return null
+
+  const candidates = defender.hand
+    .map((card, handIndex) => ({ card, handIndex }))
+    .filter(({ card }) => card?.type === 'reactive')
+    .filter(({ card }) => defender.resources >= Number(card?.cost || 0))
+
+  if (candidates.length === 0) return null
+
+  let bestChoice = null
+  for (const candidate of candidates) {
+    const applied = applyReactiveEffect(candidate.card, context)
+    if (!applied) continue
+
+    const nextHp = Math.max(0, context.defenderHpBefore - applied.damage)
+    const score = {
+      survives: nextHp > 0 ? 1 : 0,
+      damageSaved: Math.max(0, context.damage - applied.damage),
+      remainingHp: nextHp,
+      handIndex: -candidate.handIndex
+    }
+
+    if (!bestChoice) {
+      bestChoice = { candidate, applied, score }
+      continue
+    }
+
+    const prevScore = bestChoice.score
+    if (score.survives !== prevScore.survives) {
+      if (score.survives > prevScore.survives) bestChoice = { candidate, applied, score }
+      continue
+    }
+    if (score.damageSaved !== prevScore.damageSaved) {
+      if (score.damageSaved > prevScore.damageSaved) bestChoice = { candidate, applied, score }
+      continue
+    }
+    if (score.remainingHp !== prevScore.remainingHp) {
+      if (score.remainingHp > prevScore.remainingHp) bestChoice = { candidate, applied, score }
+      continue
+    }
+    if (score.handIndex > prevScore.handIndex) {
+      bestChoice = { candidate, applied, score }
+    }
+  }
+
+  if (!bestChoice) return null
+
+  const card = bestChoice.candidate.card
+  defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
+  defender.resources = Math.max(0, defender.resources - Number(card?.cost || 0))
+  return bestChoice.applied
 }
 
 function discardFromHand(state, playerId, cardIds, stats) {
