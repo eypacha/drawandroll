@@ -60,6 +60,7 @@
     "reactionHint": "Ventana defensiva: juega una reactiva desde tu mano o pasa.",
     "passReaction": "Pasar reacción",
     "reactiveUsed": "Reactiva usada",
+    "healingUsed": "Curación usada",
     "statusIdle": "Selecciona atacante y objetivo.",
     "statusRollAttacker": "Tira el dado atacante.",
     "statusWaitAttacker": "Esperando tirada del atacante.",

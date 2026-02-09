@@ -171,6 +171,9 @@ const lastReaction = computed(() => {
 const lastReactionLabel = computed(() => {
   const reaction = lastReaction.value
   if (!reaction) return ''
+  if (reaction.type === 'healing') {
+    return `${t('combat.healingUsed')}: +${reaction.appliedHeal} (slot ${Number(reaction.targetSlot) + 1})`
+  }
   if (reaction.type === 'counterattack') {
     return `${t('card.types.counterattack')}: ${reaction.counterDamage} + ${reaction.counterAttackRoll} - ${reaction.counterDefenseRoll} = ${reaction.counterFinal}`
   }

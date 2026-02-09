@@ -82,7 +82,12 @@ const opponentHeroes = computed(() => players.players[opponentPlayerId.value].he
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const canRecruit = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
 const canCombat = computed(() => game.turnPhase === 'combat' && game.currentTurn === myPlayerId.value)
+const canReactionHeal = computed(() => (
+  combat.rollStep === 'reaction_pending' &&
+  combat.reactionWindow?.defenderPlayerId === myPlayerId.value
+))
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
+const pendingHealingCardId = computed(() => players.players[myPlayerId.value].pendingHealingCardId)
 const activeDropSlot = ref(null)
 const selectedAttackerSlot = ref(null)
 
@@ -125,6 +130,24 @@ function getCardFromHand(cardId) {
   return myHand.value.find((card) => card.id === cardId) || null
 }
 
+function getPendingHealingCard() {
+  if (!pendingHealingCardId.value) return null
+  const card = getCardFromHand(pendingHealingCardId.value)
+  if (!card || card.type !== 'healing') return null
+  return card
+}
+
+function canApplyHealingOnSlot(slotIndex) {
+  const card = getPendingHealingCard()
+  if (!card) return false
+  const canUseInRecruit = canRecruit.value
+  const canUseInReaction = canReactionHeal.value
+  if (!canUseInRecruit && !canUseInReaction) return false
+  const resources = Number(players.players[myPlayerId.value].resources || 0)
+  if (resources < Number(card.cost || 0)) return false
+  return players.getHealingTargets(myPlayerId.value).includes(slotIndex)
+}
+
 function getDraggedCardId(event) {
   const customId = event.dataTransfer?.getData('application/x-card-id')
   if (customId) return customId
@@ -157,6 +180,12 @@ function canDropOnSlot(slotIndex, cardId) {
 }
 
 function getSlotStyle(slotIndex) {
+  if (canApplyHealingOnSlot(slotIndex)) {
+    return {
+      '--slot-highlight': 'rgba(16, 185, 129, 0.9)',
+      '--slot-highlight-soft': 'rgba(16, 185, 129, 0.35)'
+    }
+  }
   const card = getCardFromHand(draggedCardId.value)
   if (!card || !canDropOnSlot(slotIndex, draggedCardId.value)) {
     return {}
@@ -179,6 +208,7 @@ function isDropCandidate(slotIndex) {
 }
 
 function isActiveDropSlot(slotIndex) {
+  if (canApplyHealingOnSlot(slotIndex)) return true
   return activeDropSlot.value === slotIndex && isDropCandidate(slotIndex)
 }
 
@@ -244,6 +274,20 @@ function isAttackTarget(slotIndex) {
 }
 
 function onMySlotClick(slotIndex) {
+  if (canApplyHealingOnSlot(slotIndex)) {
+    const cardId = pendingHealingCardId.value
+    if (!cardId) return
+    let played = null
+    if (canReactionHeal.value) {
+      played = gameActions.submitCombatReaction(cardId, slotIndex)
+    } else if (canRecruit.value) {
+      played = gameActions.playHealingToSlot(slotIndex, cardId)
+    }
+    if (played) {
+      players.clearPendingHealingCard(myPlayerId.value)
+    }
+    return
+  }
   if (!canCombat.value) return
   if (!canSelectAttacker(slotIndex)) return
   if (selectedAttackerSlot.value === slotIndex) {

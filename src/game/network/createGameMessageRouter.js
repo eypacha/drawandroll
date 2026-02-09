@@ -22,6 +22,11 @@ export function createGameMessageRouter({ deck, game, players, resetLocalGameSta
       players.addItemFromRemote(playerId, card, cost, slotIndex)
     },
 
+    play_healing(payload) {
+      const { playerId, card, cost, targetSlot, appliedHeal, hpBefore, hpAfter } = payload
+      players.addHealingFromRemote(playerId, card, cost, targetSlot, appliedHeal, hpBefore, hpAfter)
+    },
+
     advance_phase(payload) {
       const { turn, currentTurn, turnPhase } = payload
       game.setTurnState(turn, currentTurn, turnPhase)

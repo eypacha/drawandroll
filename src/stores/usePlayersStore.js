@@ -16,7 +16,8 @@ export const usePlayersStore = defineStore('players', () => {
     draggedCardId: null,
     hoveredCardId: null,
     discardSelectionIds: [],
-    mulliganRevealCards: []
+    mulliganRevealCards: [],
+    pendingHealingCardId: null
   })
 
   // State
@@ -108,6 +109,53 @@ export const usePlayersStore = defineStore('players', () => {
     return player.heroes[slotIndex] || null
   }
 
+  function toValidSlotIndex(slotIndex) {
+    const parsed = Number(slotIndex)
+    if (!Number.isInteger(parsed)) return null
+    if (parsed < 0 || parsed > 2) return null
+    return parsed
+  }
+
+  function canHealTarget(playerId, slotIndex) {
+    const safeSlotIndex = toValidSlotIndex(slotIndex)
+    if (safeSlotIndex === null) return false
+    const hero = ensureHeroState(getHeroAt(playerId, safeSlotIndex))
+    if (!hero) return false
+    if (hero.currentHp <= 0) return false
+    const maxHp = getHeroMaxHp(hero)
+    return hero.currentHp < maxHp
+  }
+
+  function getHealingTargets(playerId) {
+    const player = players.value[playerId]
+    if (!player) return []
+    const targets = []
+    for (let slotIndex = 0; slotIndex < player.heroes.length; slotIndex += 1) {
+      if (canHealTarget(playerId, slotIndex)) targets.push(slotIndex)
+    }
+    return targets
+  }
+
+  function healHeroAtSlot(playerId, slotIndex, healAmount) {
+    const safeSlotIndex = toValidSlotIndex(slotIndex)
+    if (safeSlotIndex === null) return null
+    const hero = ensureHeroState(getHeroAt(playerId, safeSlotIndex))
+    if (!hero || hero.currentHp <= 0) return null
+    const maxHp = getHeroMaxHp(hero)
+    const amount = Math.max(0, Number(healAmount) || 0)
+    const hpBefore = hero.currentHp
+    const hpAfter = Math.max(0, Math.min(maxHp, hpBefore + amount))
+    const appliedHeal = Math.max(0, hpAfter - hpBefore)
+    if (appliedHeal <= 0) return null
+    hero.currentHp = hpAfter
+    return {
+      slotIndex: safeSlotIndex,
+      hpBefore,
+      hpAfter,
+      appliedHeal
+    }
+  }
+
   // Actions
   function addToHand(playerId, cards) {
     players.value[playerId].hand.push(...cards)
@@ -120,6 +168,9 @@ export const usePlayersStore = defineStore('players', () => {
     if (index === -1) return null
     const [removed] = player.hand.splice(index, 1)
     removeDiscardSelectionCard(playerId, cardId)
+    if (player.pendingHealingCardId === cardId) {
+      player.pendingHealingCardId = null
+    }
     return removed || null
   }
 
@@ -222,6 +273,78 @@ export const usePlayersStore = defineStore('players', () => {
     return true
   }
 
+  function playHealingFromHand(playerId, cardId, targetSlot) {
+    const player = players.value[playerId]
+    if (!player) return null
+    const safeTargetSlot = toValidSlotIndex(targetSlot)
+    if (safeTargetSlot === null) return null
+
+    const handIndex = player.hand.findIndex((card) => card.id === cardId)
+    if (handIndex === -1) return null
+    const card = player.hand[handIndex]
+    if (card?.type !== 'healing') return null
+
+    const cost = Number(card.cost || 0)
+    if (player.resources < cost) return null
+    if (!canHealTarget(playerId, safeTargetSlot)) return null
+
+    const healAmount = Math.max(0, Number(card?.stats?.healAmount || 0))
+    const healResult = healHeroAtSlot(playerId, safeTargetSlot, healAmount)
+    if (!healResult || healResult.appliedHeal <= 0) return null
+
+    player.resources = Math.max(0, player.resources - cost)
+    player.hand.splice(handIndex, 1)
+    removeDiscardSelectionCard(playerId, card.id)
+    if (player.pendingHealingCardId === card.id) {
+      player.pendingHealingCardId = null
+    }
+
+    return {
+      card,
+      cost,
+      targetSlot: safeTargetSlot,
+      healAmount,
+      ...healResult
+    }
+  }
+
+  function addHealingFromRemote(playerId, card, cost, targetSlot, appliedHeal, hpBefore, hpAfter) {
+    const player = players.value[playerId]
+    if (!player) return false
+    const safeTargetSlot = toValidSlotIndex(targetSlot)
+    if (safeTargetSlot === null) return false
+
+    const handIndex = player.hand.findIndex((entry) => entry.id === card?.id)
+    if (handIndex !== -1) {
+      player.hand.splice(handIndex, 1)
+      removeDiscardSelectionCard(playerId, card.id)
+      if (player.pendingHealingCardId === card.id) {
+        player.pendingHealingCardId = null
+      }
+    }
+
+    const hero = ensureHeroState(player.heroes[safeTargetSlot])
+    if (!hero || hero.currentHp <= 0) return false
+
+    if (typeof cost === 'number') {
+      player.resources = Math.max(0, player.resources - cost)
+    }
+
+    const maxHp = getHeroMaxHp(hero)
+    if (typeof hpBefore === 'number') {
+      hero.currentHp = Math.max(0, Math.min(hpBefore, maxHp))
+    }
+
+    if (typeof hpAfter === 'number') {
+      hero.currentHp = Math.max(0, Math.min(hpAfter, maxHp))
+      return true
+    }
+
+    const healAmount = Math.max(0, Number(appliedHeal) || 0)
+    hero.currentHp = Math.max(0, Math.min(hero.currentHp + healAmount, maxHp))
+    return true
+  }
+
   function canHeroAttack(playerId, slotIndex) {
     const hero = ensureHeroState(getHeroAt(playerId, slotIndex))
     if (!hero) return false
@@ -265,6 +388,23 @@ export const usePlayersStore = defineStore('players', () => {
       for (const reaction of reactions) {
         if (!reaction?.cardId) continue
         removeCardFromHand(defenderPlayerId, reaction.cardId)
+        if (reaction.type === 'healing') {
+          const targetSlot = toValidSlotIndex(reaction.targetSlot)
+          if (targetSlot !== null) {
+            const hero = ensureHeroState(getHeroAt(defenderPlayerId, targetSlot))
+            if (hero && hero.currentHp > 0) {
+              const maxHp = getHeroMaxHp(hero)
+              if (typeof reaction.hpBefore === 'number') {
+                hero.currentHp = Math.max(0, Math.min(reaction.hpBefore, maxHp))
+              }
+              if (typeof reaction.hpAfter === 'number') {
+                hero.currentHp = Math.max(0, Math.min(reaction.hpAfter, maxHp))
+              } else if (typeof reaction.appliedHeal === 'number') {
+                hero.currentHp = Math.max(0, Math.min(hero.currentHp + reaction.appliedHeal, maxHp))
+              }
+            }
+          }
+        }
       }
       const lastReaction = reactions[reactions.length - 1]
       if (typeof lastReaction?.resourcesAfter === 'number') {
@@ -353,7 +493,11 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderPlayer = players.value[defenderPlayerId]
     if (!defenderPlayer) return []
     return defenderPlayer.hand.filter((card) => (
-      (card?.type === 'reactive' || card?.type === 'counterattack') &&
+      (
+        card?.type === 'reactive' ||
+        card?.type === 'counterattack' ||
+        (card?.type === 'healing' && getHealingTargets(defenderPlayerId).length > 0)
+      ) &&
       defenderPlayer.resources >= Number(card?.cost || 0)
     ))
   }
@@ -411,7 +555,7 @@ export const usePlayersStore = defineStore('players', () => {
         if (!reactionCard) continue
 
         const reactionType = reactionCard.type
-        if (reactionType !== 'reactive' && reactionType !== 'counterattack') continue
+        if (reactionType !== 'reactive' && reactionType !== 'counterattack' && reactionType !== 'healing') continue
         const cost = Number(reactionCard.cost || 0)
         if (defenderPlayer.resources < cost) continue
 
@@ -437,6 +581,29 @@ export const usePlayersStore = defineStore('players', () => {
             damageReduction: Math.max(0, damageBeforeReactive - damage),
             criticalCanceled: Boolean(appliedReactive.criticalCanceled),
             preventedDeath: Boolean(appliedReactive.preventedDeath)
+          })
+          reactionUsed = true
+          continue
+        }
+
+        if (reactionType === 'healing') {
+          const targetSlot = toValidSlotIndex(action?.targetSlot)
+          if (targetSlot === null) continue
+          const healAmount = Math.max(0, Number(reactionCard?.stats?.healAmount || 0))
+          const healResult = healHeroAtSlot(defenderPlayerId, targetSlot, healAmount)
+          if (!healResult || healResult.appliedHeal <= 0) continue
+          removeCardFromHand(defenderPlayerId, reactionCard.id)
+          defenderPlayer.resources = Math.max(0, defenderPlayer.resources - cost)
+          reactions.push({
+            type: 'healing',
+            cardId: reactionCard.id,
+            cost,
+            resourcesAfter: defenderPlayer.resources,
+            targetSlot,
+            healAmount,
+            appliedHeal: healResult.appliedHeal,
+            hpBefore: healResult.hpBefore,
+            hpAfter: healResult.hpAfter
           })
           reactionUsed = true
           continue
@@ -477,7 +644,11 @@ export const usePlayersStore = defineStore('players', () => {
       }
     }
 
-    const defenderHpAfter = Math.max(0, defenderHpBefore - damage)
+    const defenderHeroAfterReaction = ensureHeroState(getHeroAt(defenderPlayerId, defenderSlot))
+    const defenderEffectiveHpBefore = defenderHeroAfterReaction
+      ? getHeroCombatStats(defenderHeroAfterReaction).hp
+      : defenderHpBefore
+    const defenderHpAfter = Math.max(0, defenderEffectiveHpBefore - damage)
     const defenderDefeated = defenderHpAfter <= 0
     const attackerHpBefore = attackerStats.hp
     const attackerHpAfter = Math.max(0, attackerHpBefore - counterDamageTotal)
@@ -523,6 +694,26 @@ export const usePlayersStore = defineStore('players', () => {
 
   function clearHoveredCard(playerId) {
     players.value[playerId].hoveredCardId = null
+  }
+
+  function setPendingHealingCard(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player) return false
+    if (!cardId) {
+      player.pendingHealingCardId = null
+      return true
+    }
+    const card = player.hand.find((entry) => entry.id === cardId)
+    if (!card || card.type !== 'healing') return false
+    player.pendingHealingCardId = cardId
+    return true
+  }
+
+  function clearPendingHealingCard(playerId) {
+    const player = players.value[playerId]
+    if (!player) return false
+    player.pendingHealingCardId = null
+    return true
   }
 
   function setMulliganReveal(playerId, cards) {
@@ -640,7 +831,10 @@ export const usePlayersStore = defineStore('players', () => {
     addHeroFromRemote,
     playItemFromHand,
     addItemFromRemote,
+    playHealingFromHand,
+    addHealingFromRemote,
     getHeroCombatStats,
+    getHealingTargets,
     canHeroAttack,
     getPlayableReactiveCards,
     resetCombatActions,
@@ -650,6 +844,8 @@ export const usePlayersStore = defineStore('players', () => {
     clearDraggedCard,
     setHoveredCard,
     clearHoveredCard,
+    setPendingHealingCard,
+    clearPendingHealingCard,
     setMulliganReveal,
     removeMulliganRevealCard,
     clearMulliganReveal,

@@ -2,6 +2,7 @@ import { createRng } from './rng.js'
 import {
   pickHeroRecruitPlay,
   pickItemEquipPlay,
+  pickHealingRecruitPlay,
   pickAttacks,
   pickDiscardCardIds
 } from './botBaseline.js'
@@ -183,6 +184,46 @@ function playItemFromHand(state, playerId, cardId, slotIndex, stats) {
   return { card, cost, slotIndex }
 }
 
+function playHealingFromHand(state, playerId, cardId, targetSlot, stats) {
+  const player = state.players[playerId]
+  if (!player) return null
+  if (targetSlot < 0 || targetSlot >= MAX_HERO_SLOTS) return null
+
+  const hero = ensureHeroState(player.heroes[targetSlot])
+  if (!hero || hero.currentHp <= 0) return null
+
+  const handIndex = player.hand.findIndex((card) => card.id === cardId)
+  if (handIndex === -1) return null
+  const card = player.hand[handIndex]
+  if (card.type !== 'healing') return null
+
+  const cost = Number(card.cost || 0)
+  if (player.resources < cost) return null
+
+  const maxHp = getHeroMaxHp(hero)
+  const hpBefore = hero.currentHp
+  const healAmount = Math.max(0, Number(card?.stats?.healAmount || 0))
+  const hpAfter = Math.min(maxHp, hpBefore + healAmount)
+  const appliedHeal = Math.max(0, hpAfter - hpBefore)
+  if (appliedHeal <= 0) return null
+
+  hero.currentHp = hpAfter
+  player.resources -= cost
+  player.hand.splice(handIndex, 1)
+  stats.healingCardsUsed += 1
+  stats.healingTotal += appliedHeal
+
+  return {
+    card,
+    cost,
+    targetSlot,
+    healAmount,
+    appliedHeal,
+    hpBefore,
+    hpAfter
+  }
+}
+
 function canHeroAttack(state, playerId, slotIndex) {
   const player = state.players[playerId]
   if (!player) return false
@@ -289,6 +330,7 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
     damage,
     isCritical,
     criticalBonus: COMBAT_CRITICAL_BONUS,
+    defenderSlot,
     defenderHpBefore,
     attackerDef: attackerStats.def,
     counterDamage: 0,
@@ -298,9 +340,10 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   }, rng, stats)
   damage = reactionContext.damage
   isCritical = reactionContext.isCritical
+  const defenderEffectiveHpBefore = Number(reactionContext.defenderHpBefore || defenderHpBefore)
   const counterDamageTotal = reactionContext.counterDamage
   const reactions = reactionContext.reactions
-  const defenderHpAfter = Math.max(0, defenderHpBefore - damage)
+  const defenderHpAfter = Math.max(0, defenderEffectiveHpBefore - damage)
   const defenderDefeated = defenderHpAfter <= 0
   const attackerHpBefore = attackerStats.hp
   const attackerHpAfter = Math.max(0, attackerHpBefore - counterDamageTotal)
@@ -369,7 +412,52 @@ function applyReactiveEffect(card, { damage, isCritical, criticalBonus, defender
   return null
 }
 
-function evaluateReactionCandidate(card, context, rng) {
+function pickBestHealingTarget(state, defenderPlayerId, context) {
+  const defender = state.players[defenderPlayerId]
+  if (!defender) return null
+
+  let best = null
+  for (let slotIndex = 0; slotIndex < defender.heroes.length; slotIndex += 1) {
+    const hero = ensureHeroState(defender.heroes[slotIndex])
+    if (!hero || hero.currentHp <= 0) continue
+    const heroStats = getHeroCombatStats(hero)
+    const missingHp = Math.max(0, Number(heroStats.maxHp || 0) - Number(heroStats.hp || 0))
+    if (missingHp <= 0) continue
+    const isDefenderSlot = slotIndex === context.defenderSlot
+    const wouldDieWithoutHealing = isDefenderSlot && context.damage >= heroStats.hp
+    const heroValue = Number(heroStats.atk || 0) + Number(heroStats.def || 0) + (hero.items?.length || 0)
+    const candidate = {
+      slotIndex,
+      missingHp,
+      heroValue,
+      wouldDieWithoutHealing
+    }
+
+    if (!best) {
+      best = candidate
+      continue
+    }
+    if (candidate.wouldDieWithoutHealing !== best.wouldDieWithoutHealing) {
+      if (candidate.wouldDieWithoutHealing) best = candidate
+      continue
+    }
+    if (candidate.heroValue !== best.heroValue) {
+      if (candidate.heroValue > best.heroValue) best = candidate
+      continue
+    }
+    if (candidate.missingHp !== best.missingHp) {
+      if (candidate.missingHp > best.missingHp) best = candidate
+      continue
+    }
+    if (candidate.slotIndex < best.slotIndex) {
+      best = candidate
+    }
+  }
+
+  return best
+}
+
+function evaluateReactionCandidate(state, defenderPlayerId, card, context, rng) {
   if (card?.type === 'reactive') {
     const applied = applyReactiveEffect(card, context)
     if (!applied) return null
@@ -413,6 +501,37 @@ function evaluateReactionCandidate(card, context, rng) {
     }
   }
 
+  if (card?.type === 'healing') {
+    const target = pickBestHealingTarget(state, defenderPlayerId, context)
+    if (!target) return null
+    const healAmount = Math.max(0, Number(card?.stats?.healAmount || 0))
+    const appliedHeal = Math.min(target.missingHp, healAmount)
+    if (appliedHeal <= 0) return null
+
+    const isTargetDefender = target.slotIndex === context.defenderSlot
+    const defenderHpBefore = Number(context.defenderHpBefore || 0)
+    const nextDefenderHpBefore = isTargetDefender ? defenderHpBefore + appliedHeal : defenderHpBefore
+    const nextDamage = context.damage
+    const preventedDeath = isTargetDefender && context.damage >= defenderHpBefore && context.damage < nextDefenderHpBefore
+
+    return {
+      type: 'healing',
+      card,
+      nextDamage,
+      nextIsCritical: context.isCritical,
+      counterDamage: context.counterDamage,
+      counterCriticalCount: context.counterCriticalCount,
+      counterFumbleCount: context.counterFumbleCount,
+      counterattackUsed: context.counterattackUsed,
+      counterDamageAdded: 0,
+      targetSlot: target.slotIndex,
+      healAmount,
+      appliedHeal,
+      preventedDeath,
+      nextDefenderHpBefore
+    }
+  }
+
   return null
 }
 
@@ -422,21 +541,24 @@ function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
 
   const candidates = defender.hand
     .map((card, handIndex) => ({ card, handIndex }))
-    .filter(({ card }) => card?.type === 'reactive' || card?.type === 'counterattack')
+    .filter(({ card }) => card?.type === 'reactive' || card?.type === 'counterattack' || card?.type === 'healing')
     .filter(({ card }) => defender.resources >= Number(card?.cost || 0))
 
   if (candidates.length === 0) return null
 
   let bestChoice = null
   for (const candidate of candidates) {
-    const applied = evaluateReactionCandidate(candidate.card, context, rng)
+    const applied = evaluateReactionCandidate(state, defenderPlayerId, candidate.card, context, rng)
     if (!applied) continue
 
-    const nextHp = Math.max(0, context.defenderHpBefore - applied.nextDamage)
+    const effectiveDefenderHpBefore = Number(applied.nextDefenderHpBefore ?? context.defenderHpBefore)
+    const nextHp = Math.max(0, effectiveDefenderHpBefore - applied.nextDamage)
     const score = {
       survives: nextHp > 0 ? 1 : 0,
       damageSaved: Math.max(0, context.damage - applied.nextDamage),
       counterDamage: Math.max(0, applied.counterDamage - context.counterDamage),
+      healingApplied: Math.max(0, Number(applied.appliedHeal || 0)),
+      preventedDeath: applied.preventedDeath ? 1 : 0,
       remainingHp: nextHp,
       handIndex: -candidate.handIndex
     }
@@ -447,12 +569,20 @@ function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
     }
 
     const prevScore = bestChoice.score
+    if (score.preventedDeath !== prevScore.preventedDeath) {
+      if (score.preventedDeath > prevScore.preventedDeath) bestChoice = { candidate, applied, score }
+      continue
+    }
     if (score.survives !== prevScore.survives) {
       if (score.survives > prevScore.survives) bestChoice = { candidate, applied, score }
       continue
     }
     if (score.damageSaved !== prevScore.damageSaved) {
       if (score.damageSaved > prevScore.damageSaved) bestChoice = { candidate, applied, score }
+      continue
+    }
+    if (score.healingApplied !== prevScore.healingApplied) {
+      if (score.healingApplied > prevScore.healingApplied) bestChoice = { candidate, applied, score }
       continue
     }
     if (score.counterDamage !== prevScore.counterDamage) {
@@ -491,6 +621,9 @@ function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) 
   nextContext.counterCriticalCount = bestChoice.applied.counterCriticalCount
   nextContext.counterFumbleCount = bestChoice.applied.counterFumbleCount
   nextContext.counterattackUsed = Boolean(bestChoice.applied.counterattackUsed || nextContext.counterattackUsed)
+  if (typeof bestChoice.applied.nextDefenderHpBefore === 'number') {
+    nextContext.defenderHpBefore = bestChoice.applied.nextDefenderHpBefore
+  }
   defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
   defender.resources = Math.max(0, defender.resources - cost)
   nextContext.reactions.push({
@@ -499,11 +632,30 @@ function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) 
     effect: card.effect || null,
     cost,
     resourcesAfter: defender.resources,
-    counterDamageAdded: bestChoice.applied.counterDamageAdded
+    counterDamageAdded: bestChoice.applied.counterDamageAdded,
+    targetSlot: Number.isInteger(bestChoice.applied.targetSlot) ? bestChoice.applied.targetSlot : null,
+    healAmount: Number(bestChoice.applied.healAmount || 0),
+    appliedHeal: Number(bestChoice.applied.appliedHeal || 0),
+    preventedDeath: Boolean(bestChoice.applied.preventedDeath)
   })
   if (card.type === 'counterattack') {
     stats.counterattacksUsed += 1
     stats.counterattackDamageDealt += bestChoice.applied.counterDamageAdded
+  }
+  if (card.type === 'healing') {
+    const targetSlot = bestChoice.applied.targetSlot
+    if (Number.isInteger(targetSlot) && targetSlot >= 0 && targetSlot < MAX_HERO_SLOTS) {
+      const hero = ensureHeroState(defender.heroes[targetSlot])
+      if (hero && hero.currentHp > 0) {
+        const maxHp = getHeroMaxHp(hero)
+        hero.currentHp = Math.max(0, Math.min(hero.currentHp + Number(bestChoice.applied.appliedHeal || 0), maxHp))
+      }
+    }
+    stats.healingCardsUsed += 1
+    stats.healingTotal += Number(bestChoice.applied.appliedHeal || 0)
+    if (bestChoice.applied.preventedDeath) {
+      stats.healingPreventedDeaths += 1
+    }
   }
 
   return nextContext
@@ -604,6 +756,13 @@ function runRecruitPhase(state, playerId, stats) {
     const done = playItemFromHand(state, playerId, play.cardId, play.slotIndex, stats)
     if (!done) break
   }
+
+  while (true) {
+    const play = pickHealingRecruitPlay(state, playerId, getHeroCombatStats)
+    if (!play) break
+    const done = playHealingFromHand(state, playerId, play.cardId, play.slotIndex, stats)
+    if (!done) break
+  }
 }
 
 function runCombatPhase(state, playerId, rng, stats) {
@@ -678,6 +837,9 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     counterattacksUsed: 0,
     counterattackDamageDealt: 0,
     attackerDeathsByCounter: 0,
+    healingCardsUsed: 0,
+    healingTotal: 0,
+    healingPreventedDeaths: 0,
     cardsDrawnTotal: 0,
     cardsRecruitedTotal: 0,
     itemsEquippedTotal: 0,
@@ -797,6 +959,9 @@ export function aggregateResults(games) {
   const criticalCount = sum('criticalCount')
   const fumbleCount = sum('fumbleCount')
   const counterattacksUsed = sum('counterattacksUsed')
+  const healingCardsUsed = sum('healingCardsUsed')
+  const healingTotal = sum('healingTotal')
+  const healingPreventedDeaths = sum('healingPreventedDeaths')
 
   return {
     games: gameCount,
@@ -832,7 +997,12 @@ export function aggregateResults(games) {
     reactions: {
       counterattacksUsed,
       avgCounterattacksPerGame: gameCount > 0 ? counterattacksUsed / gameCount : 0,
-      attackerDeathsByCounter: sum('attackerDeathsByCounter')
+      attackerDeathsByCounter: sum('attackerDeathsByCounter'),
+      healingCardsUsed,
+      avgHealingCardsPerGame: gameCount > 0 ? healingCardsUsed / gameCount : 0,
+      healingTotal,
+      avgHealingPerGame: gameCount > 0 ? healingTotal / gameCount : 0,
+      healingPreventedDeaths
     },
     economy: {
       cardsDrawnTotal: sum('cardsDrawnTotal'),

@@ -36,8 +36,8 @@ const DISTRIBUTION = {
   hero: 0.25,      // ~25% = 12-13 cards
   item: 0.30,      // ~30% = 15 cards
   reactive: 0.15,  // ~15% = 7-8 cards
-  healing: 0.15,   // ~15% = 7-8 cards
-  counterattack: 0.15 // ~15% = 7-8 cards
+  healing: 0.10,   // ~10% = 5 cards
+  counterattack: 0.20 // ~20% = 10 cards
 };
 
 // Minimum cards per type (validation)

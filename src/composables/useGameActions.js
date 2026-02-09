@@ -175,6 +175,28 @@ export function useGameActions() {
     return played
   }
 
+  function playHealingToSlot(slotIndex, cardId) {
+    if (!game.isPlaying) return null
+    if (game.turnPhase !== 'recruit') return null
+    if (game.currentTurn !== myPlayerId.value) return null
+    const played = players.playHealingFromHand(myPlayerId.value, cardId, slotIndex)
+    if (!played) return null
+    sendMessage({
+      type: 'play_healing',
+      payload: {
+        playerId: myPlayerId.value,
+        card: played.card,
+        cost: played.cost,
+        targetSlot: played.targetSlot,
+        appliedHeal: played.appliedHeal,
+        hpBefore: played.hpBefore,
+        hpAfter: played.hpAfter,
+        playedAt: Date.now()
+      }
+    })
+    return played
+  }
+
   function setHoveredCard(cardId) {
     if (!game.isPlaying) return false
     players.setHoveredCard(myPlayerId.value, cardId)
@@ -234,12 +256,7 @@ export function useGameActions() {
   }
 
   function hasPlayableReactionCard(playerId) {
-    const hand = players.players[playerId]?.hand || []
-    const resources = Number(players.players[playerId]?.resources || 0)
-    return hand.some((card) => (
-      (card?.type === 'reactive' || card?.type === 'counterattack') &&
-      resources >= Number(card?.cost || 0)
-    ))
+    return players.getPlayableReactiveCards(playerId).length > 0
   }
 
   async function waitForReactionChoice(combatId) {
@@ -254,7 +271,12 @@ export function useGameActions() {
       const response = combat.consumeReactionResponse(combatId)
       if (response !== undefined) {
         if (response?.pass) return []
-        if (response?.cardId) return [{ cardId: response.cardId }]
+        if (response?.cardId) {
+          return [{
+            cardId: response.cardId,
+            targetSlot: Number.isInteger(response?.targetSlot) ? response.targetSlot : null
+          }]
+        }
       }
       await sleep(60)
     }
@@ -532,7 +554,7 @@ export function useGameActions() {
     combat.openReactionWindow(payload)
   }
 
-  function submitCombatReaction(cardId = null) {
+  function submitCombatReaction(cardId = null, targetSlot = null) {
     const window = combat.reactionWindow
     if (!window?.combatId) return false
     if (combat.rollStep !== 'reaction_pending') return false
@@ -540,15 +562,20 @@ export function useGameActions() {
 
     if (cardId) {
       const card = players.players[myPlayerId.value].hand.find((entry) => entry.id === cardId)
-      if (!card || (card.type !== 'reactive' && card.type !== 'counterattack')) return false
+      if (!card || (card.type !== 'reactive' && card.type !== 'counterattack' && card.type !== 'healing')) return false
       const cost = Number(card.cost || 0)
       if (players.players[myPlayerId.value].resources < cost) return false
+      if (card.type === 'healing') {
+        if (!Number.isInteger(targetSlot)) return false
+        if (!players.getHealingTargets(myPlayerId.value).includes(targetSlot)) return false
+      }
     }
 
     if (connection.isHost) {
       const accepted = combat.setReactionResponse(window.combatId, {
         cardId: cardId || null,
-        pass: !cardId
+        pass: !cardId,
+        targetSlot: Number.isInteger(targetSlot) ? targetSlot : null
       })
       if (accepted) combat.closeReactionWindow(window.combatId)
       return accepted
@@ -561,6 +588,7 @@ export function useGameActions() {
         defenderPlayerId: myPlayerId.value,
         cardId: cardId || null,
         pass: !cardId,
+        targetSlot: Number.isInteger(targetSlot) ? targetSlot : null,
         respondedAt: Date.now()
       }
     })
@@ -577,7 +605,8 @@ export function useGameActions() {
     if (payload?.defenderPlayerId !== window.defenderPlayerId) return false
     const accepted = combat.setReactionResponse(window.combatId, {
       cardId: payload?.cardId || null,
-      pass: Boolean(payload?.pass)
+      pass: Boolean(payload?.pass),
+      targetSlot: Number.isInteger(payload?.targetSlot) ? payload.targetSlot : null
     })
     if (accepted) combat.closeReactionWindow(window.combatId)
     return accepted
@@ -593,6 +622,7 @@ export function useGameActions() {
     discardSelectedHand,
     playHeroToSlot,
     playItemToSlot,
+    playHealingToSlot,
     setHoveredCard,
     clearHoveredCard,
     attackHero,

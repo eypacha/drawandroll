@@ -10,7 +10,8 @@
           'is-dragging': draggedCardId === card.id,
           'is-discard-selectable': canSelectForDiscard,
           'is-discard-selected': isSelectedForDiscard(card.id),
-          'is-reactive-selectable': canSelectReactive(card)
+          'is-reactive-selectable': canSelectReactive(card),
+          'is-healing-selected': pendingHealingCardId === card.id
         }"
         :style="getCardStyle(index)"
         :draggable="canDragCard(card)"
@@ -47,6 +48,7 @@ const canReactNow = computed(() => combat.isReactionOpen && isReactionDefender.v
 const selectedDiscardIds = computed(() => players.players[myPlayerId.value].discardSelectionIds || [])
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
 const myResources = computed(() => players.players[myPlayerId.value].resources)
+const pendingHealingCardId = computed(() => players.players[myPlayerId.value].pendingHealingCardId)
 let dragPreviewEl = null
 
 function canDragCard(card) {
@@ -57,8 +59,16 @@ function canDragCard(card) {
 
 function canSelectReactive(card) {
   if (!canReactNow.value) return false
-  if (card?.type !== 'reactive' && card?.type !== 'counterattack') return false
+  if (card?.type !== 'reactive' && card?.type !== 'counterattack' && card?.type !== 'healing') return false
+  if (card?.type === 'healing' && players.getHealingTargets(myPlayerId.value).length === 0) return false
   return myResources.value >= Number(card.cost || 0)
+}
+
+function canArmHealingInRecruit(card) {
+  if (!canAct.value) return false
+  if (card?.type !== 'healing') return false
+  if (myResources.value < Number(card.cost || 0)) return false
+  return players.getHealingTargets(myPlayerId.value).length > 0
 }
 
 function isSelectedForDiscard(cardId) {
@@ -161,10 +171,28 @@ function onHoverEnd(card) {
 
 function onCardClick(card) {
   if (canSelectReactive(card)) {
+    if (card.type === 'healing') {
+      if (pendingHealingCardId.value === card.id) {
+        players.clearPendingHealingCard(myPlayerId.value)
+      } else {
+        players.setPendingHealingCard(myPlayerId.value, card.id)
+      }
+      return
+    }
+    players.clearPendingHealingCard(myPlayerId.value)
     gameActions.submitCombatReaction(card.id)
     return
   }
+  if (canArmHealingInRecruit(card)) {
+    if (pendingHealingCardId.value === card.id) {
+      players.clearPendingHealingCard(myPlayerId.value)
+    } else {
+      players.setPendingHealingCard(myPlayerId.value, card.id)
+    }
+    return
+  }
   if (!canSelectForDiscard.value) return
+  players.clearPendingHealingCard(myPlayerId.value)
   players.toggleDiscardSelection(myPlayerId.value, card.id)
 }
 
@@ -173,12 +201,25 @@ watch(
   ([nextPhase, nextTurnPlayer]) => {
     if (nextPhase === 'discard' && nextTurnPlayer === myPlayerId.value) return
     players.clearDiscardSelection(myPlayerId.value)
+    if (nextPhase !== 'recruit' && !(nextPhase === 'combat' && canReactNow.value)) {
+      players.clearPendingHealingCard(myPlayerId.value)
+    }
+  }
+)
+
+watch(
+  () => [combat.rollStep, combat.reactionWindow?.defenderPlayerId],
+  ([nextStep, nextDefender]) => {
+    if (nextStep === 'reaction_pending' && nextDefender === myPlayerId.value) return
+    if (game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value) return
+    players.clearPendingHealingCard(myPlayerId.value)
   }
 )
 
 onUnmounted(() => {
   removeDragPreview()
   players.clearDiscardSelection(myPlayerId.value)
+  players.clearPendingHealingCard(myPlayerId.value)
 })
 </script>
 
@@ -280,5 +321,11 @@ onUnmounted(() => {
   box-shadow:
     0 0 0 3px rgba(37, 99, 235, 0.45),
     0 18px 40px -12px rgba(37, 99, 235, 0.45);
+}
+
+.card-wrapper.is-healing-selected :deep(.hand-card) {
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.6),
+    0 18px 40px -12px rgba(16, 185, 129, 0.45);
 }
 </style>

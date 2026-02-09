@@ -62,6 +62,50 @@ export function pickItemEquipPlay(state, playerId) {
   return null
 }
 
+export function pickHealingRecruitPlay(state, playerId, getHeroCombatStats) {
+  const player = state.players[playerId]
+  if (!player) return null
+
+  const healingCards = player.hand
+    .map((card, index) => ({ card, index }))
+    .filter(({ card }) => card?.type === 'healing')
+    .filter(({ card }) => player.resources >= Number(card?.cost || 0))
+
+  if (healingCards.length === 0) return null
+
+  const targets = []
+  for (let slotIndex = 0; slotIndex < player.heroes.length; slotIndex += 1) {
+    const hero = player.heroes[slotIndex]
+    if (!hero) continue
+    const stats = getHeroCombatStats(hero)
+    const missingHp = Math.max(0, Number(stats.maxHp || 0) - Number(stats.hp || 0))
+    if (missingHp < 2) continue
+    const itemCount = Array.isArray(hero.items) ? hero.items.length : 0
+    const heroValue = Number(stats.atk || 0) + Number(stats.def || 0) + itemCount
+    targets.push({ slotIndex, missingHp, heroValue })
+  }
+
+  if (targets.length === 0) return null
+
+  targets.sort((a, b) => {
+    if (a.heroValue !== b.heroValue) return b.heroValue - a.heroValue
+    if (a.missingHp !== b.missingHp) return b.missingHp - a.missingHp
+    return a.slotIndex - b.slotIndex
+  })
+
+  healingCards.sort((a, b) => {
+    const costA = Number(a.card?.cost || 0)
+    const costB = Number(b.card?.cost || 0)
+    if (costA !== costB) return costA - costB
+    return a.index - b.index
+  })
+
+  return {
+    cardId: healingCards[0].card.id,
+    slotIndex: targets[0].slotIndex
+  }
+}
+
 export function pickAttacks(state, attackerPlayerId, canHeroAttack) {
   const defenderPlayerId = attackerPlayerId === 'player_a' ? 'player_b' : 'player_a'
   const defenderHeroes = state.players[defenderPlayerId].heroes

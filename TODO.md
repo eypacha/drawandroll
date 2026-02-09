@@ -39,7 +39,7 @@ Actualizado: 2026-02-09
 - [x] Cierre formal de partida (`phase = ended`, `winner`) y bloqueo de acciones.
 
 ### Tipos de carta no jugables aun
-- [ ] Jugar cartas `healing` desde mano.
+- [x] Jugar cartas `healing` desde mano.
 - [x] Jugar cartas `reactive` en ventana defensiva.
 - [x] Jugar cartas `counterattack` en ventana defensiva.
 - [x] Ventana multi-carta del defensor durante combate (seleccion manual y pasar).

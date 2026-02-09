@@ -60,6 +60,7 @@
     "reactionHint": "Defensive window: play a reactive from your hand or pass.",
     "passReaction": "Pass reaction",
     "reactiveUsed": "Reactive used",
+    "healingUsed": "Healing used",
     "statusIdle": "Select attacker and target.",
     "statusRollAttacker": "Roll attacker die.",
     "statusWaitAttacker": "Waiting attacker roll.",

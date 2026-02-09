@@ -153,6 +153,7 @@ export const useCombatStore = defineStore('combat', () => {
     reactionResponses.value[combatId].push({
       cardId: payload?.cardId || null,
       pass: Boolean(payload?.pass),
+      targetSlot: Number.isInteger(payload?.targetSlot) ? payload.targetSlot : null,
       receivedAt: Date.now()
     })
     return true
