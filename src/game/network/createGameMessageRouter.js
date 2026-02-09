@@ -46,6 +46,29 @@ export function createGameMessageRouter({ deck, game, players, resetLocalGameSta
       }
     },
 
+    mulligan_reveal(payload) {
+      const { playerId, cards } = payload
+      players.setMulliganReveal(playerId, cards)
+    },
+
+    mulligan_remove_one(payload) {
+      const { playerId, cardId } = payload
+      players.removeCardFromHand(playerId, cardId)
+      players.removeMulliganRevealCard(playerId, cardId)
+    },
+
+    mulligan_clear(payload) {
+      const { playerId } = payload
+      players.clearMulliganReveal(playerId)
+    },
+
+    mulligan_deck_sync(payload) {
+      const { deckCards } = payload
+      if (Array.isArray(deckCards)) {
+        deck.cards = deckCards
+      }
+    },
+
     hover_card(payload) {
       const { playerId, cardId } = payload
       if (cardId) {

@@ -15,7 +15,8 @@ export const usePlayersStore = defineStore('players', () => {
     heroesLost: 0,
     draggedCardId: null,
     hoveredCardId: null,
-    discardSelectionIds: []
+    discardSelectionIds: [],
+    mulliganRevealCards: []
   })
 
   // State
@@ -110,6 +111,16 @@ export const usePlayersStore = defineStore('players', () => {
   // Actions
   function addToHand(playerId, cards) {
     players.value[playerId].hand.push(...cards)
+  }
+
+  function removeCardFromHand(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player || !cardId) return null
+    const index = player.hand.findIndex((card) => card.id === cardId)
+    if (index === -1) return null
+    const [removed] = player.hand.splice(index, 1)
+    removeDiscardSelectionCard(playerId, cardId)
+    return removed || null
   }
 
   function removeDiscardSelectionCard(playerId, cardId) {
@@ -338,6 +349,27 @@ export const usePlayersStore = defineStore('players', () => {
     players.value[playerId].hoveredCardId = null
   }
 
+  function setMulliganReveal(playerId, cards) {
+    const player = players.value[playerId]
+    if (!player) return false
+    player.mulliganRevealCards = Array.isArray(cards) ? cards.map((card) => ({ ...card })) : []
+    return true
+  }
+
+  function removeMulliganRevealCard(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player) return false
+    player.mulliganRevealCards = player.mulliganRevealCards.filter((card) => card.id !== cardId)
+    return true
+  }
+
+  function clearMulliganReveal(playerId) {
+    const player = players.value[playerId]
+    if (!player) return false
+    player.mulliganRevealCards = []
+    return true
+  }
+
   function toggleDiscardSelection(playerId, cardId) {
     const player = players.value[playerId]
     if (!player || !cardId) return false
@@ -393,6 +425,7 @@ export const usePlayersStore = defineStore('players', () => {
     getRecruitCost,
     // Actions
     addToHand,
+    removeCardFromHand,
     playHeroFromHand,
     addHeroFromRemote,
     playItemFromHand,
@@ -406,6 +439,9 @@ export const usePlayersStore = defineStore('players', () => {
     clearDraggedCard,
     setHoveredCard,
     clearHoveredCard,
+    setMulliganReveal,
+    removeMulliganRevealCard,
+    clearMulliganReveal,
     toggleDiscardSelection,
     clearDiscardSelection,
     discardFromHand,

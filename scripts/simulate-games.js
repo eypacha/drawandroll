@@ -155,6 +155,9 @@ function printSummary({ config, aggregate }) {
   process.stdout.write(
     `Economy draws/recruits/items/discards: ${aggregate.economy.cardsDrawnTotal} / ${aggregate.economy.cardsRecruitedTotal} / ${aggregate.economy.itemsEquippedTotal} / ${aggregate.economy.cardsDiscardedTotal}\n`
   )
+  process.stdout.write(
+    `Mulligans: total=${aggregate.mulligan.total}, games=${aggregate.mulligan.gamesWithMulligan}/${aggregate.games} (${formatNumber(aggregate.mulligan.pctGamesWithMulligan)}%)\n`
+  )
 
   process.stdout.write(`Ended by no heroes: ${aggregate.endedByNoHeroes}\n`)
   process.stdout.write(`Timeout games: ${aggregate.timeouts}\n`)

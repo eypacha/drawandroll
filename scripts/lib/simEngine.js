@@ -114,6 +114,22 @@ function drawCards(state, playerId, count, stats) {
   return drawn
 }
 
+function runOpeningMulliganIfNeeded(state, playerId, rng, stats) {
+  const player = state.players[playerId]
+  const hasHero = player.hand.some((card) => card.type === 'hero')
+  if (hasHero) return false
+
+  const openingHand = [...player.hand]
+  player.hand = []
+  state.deck.cards.push(...openingHand)
+  rng.shuffle(state.deck.cards)
+
+  stats.mulliganCount += 1
+  stats.cardsDiscardedTotal += openingHand.length
+  drawCards(state, playerId, 7, stats)
+  return true
+}
+
 function playHeroFromHand(state, playerId, cardId, slotIndex, stats) {
   const player = state.players[playerId]
   if (!player) return null
@@ -414,6 +430,7 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     cardsRecruitedTotal: 0,
     itemsEquippedTotal: 0,
     cardsDiscardedTotal: 0,
+    mulliganCount: 0,
     finalHeroesPlayerA: 0,
     finalHeroesPlayerB: 0,
     deckRemaining: 0
@@ -421,6 +438,8 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
 
   drawCards(state, state.game.firstTurnPlayer, 7, stats)
   drawCards(state, getOpponentPlayerId(state.game.firstTurnPlayer), 7, stats)
+  runOpeningMulliganIfNeeded(state, state.game.firstTurnPlayer, rng, stats)
+  runOpeningMulliganIfNeeded(state, getOpponentPlayerId(state.game.firstTurnPlayer), rng, stats)
 
   while (state.game.phase === 'playing') {
     if (state.game.turn > maxTurns) {
@@ -560,6 +579,11 @@ export function aggregateResults(games) {
       itemsEquippedTotal: sum('itemsEquippedTotal'),
       cardsDiscardedTotal: sum('cardsDiscardedTotal'),
       avgDiscardsPerGame: gameCount > 0 ? sum('cardsDiscardedTotal') / gameCount : 0
+    },
+    mulligan: {
+      total: sum('mulliganCount'),
+      gamesWithMulligan: games.filter((g) => g.mulliganCount > 0).length,
+      pctGamesWithMulligan: gameCount > 0 ? (games.filter((g) => g.mulliganCount > 0).length / gameCount) * 100 : 0
     },
     endedByNoHeroes: games.filter((g) => g.endedByNoHeroes).length,
     timeouts: games.filter((g) => g.timedOutByMaxTurns).length

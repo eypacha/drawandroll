@@ -13,6 +13,7 @@ import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
 import { useGameActions } from './useGameActions'
 
 const DRAW_DELAY_MS = 350
+const MULLIGAN_REMOVE_DELAY_MS = 220
 
 export function useGameSession() {
   const route = useRoute()
@@ -88,10 +89,68 @@ export function useGameSession() {
           advancePhaseAfterDraw: false,
           delayMs: DRAW_DELAY_MS
         })
+        await runOpeningMulliganIfNeeded(playerId)
       }
     } finally {
       isRestarting.value = false
     }
+  }
+
+  async function runOpeningMulliganIfNeeded(playerId) {
+    const player = players.players[playerId]
+    if (!player) return false
+
+    const hasHeroInOpeningHand = player.hand.some((card) => card.type === 'hero')
+    if (hasHeroInOpeningHand) {
+      players.clearMulliganReveal(playerId)
+      return false
+    }
+
+    const openingHand = player.hand.map((card) => ({ ...card }))
+    players.setMulliganReveal(playerId, openingHand)
+    sendMessage({
+      type: 'mulligan_reveal',
+      payload: { playerId, cards: openingHand }
+    })
+
+    const removedCards = []
+    while (players.players[playerId].hand.length > 0) {
+      const card = players.players[playerId].hand[0]
+      const removed = players.removeCardFromHand(playerId, card.id)
+      if (!removed) break
+      removedCards.push(removed)
+      players.removeMulliganRevealCard(playerId, card.id)
+      sendMessage({
+        type: 'mulligan_remove_one',
+        payload: { playerId, cardId: card.id }
+      })
+      await new Promise((resolve) => setTimeout(resolve, MULLIGAN_REMOVE_DELAY_MS))
+    }
+
+    if (removedCards.length > 0) {
+      deck.cards.push(...removedCards)
+      deck.shuffle()
+      sendMessage({
+        type: 'mulligan_deck_sync',
+        payload: {
+          deckCards: deck.cards
+        }
+      })
+    }
+
+    await drawSequence(7, {
+      playerId,
+      syncEachDraw: true,
+      advancePhaseAfterDraw: false,
+      delayMs: DRAW_DELAY_MS
+    })
+
+    players.clearMulliganReveal(playerId)
+    sendMessage({
+      type: 'mulligan_clear',
+      payload: { playerId }
+    })
+    return true
   }
 
   function requestRestartGame() {
