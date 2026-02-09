@@ -243,6 +243,41 @@ function resetCombatActions(state, playerId) {
   }
 }
 
+function consumeHeroItemDurability(hero) {
+  const readyHero = ensureHeroState(hero)
+  if (!readyHero) return false
+  let didChange = false
+  const nextItems = []
+
+  for (const item of readyHero.items || []) {
+    const baseDurability = Number(item?.stats?.durability)
+    if (!Number.isFinite(baseDurability) || baseDurability <= 0) {
+      nextItems.push(item)
+      continue
+    }
+
+    const currentDurability = Number.isFinite(Number(item.currentDurability))
+      ? Number(item.currentDurability)
+      : baseDurability
+    const nextDurability = Math.max(0, currentDurability - 1)
+
+    if (nextDurability > 0) {
+      item.currentDurability = nextDurability
+      nextItems.push(item)
+    } else {
+      didChange = true
+    }
+    if (nextDurability !== currentDurability) {
+      didChange = true
+    }
+  }
+
+  readyHero.items = nextItems
+  const maxHp = getHeroMaxHp(readyHero)
+  readyHero.currentHp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
+  return didChange
+}
+
 function applyCombatResult(state, result, stats) {
   const {
     attackerPlayerId,
@@ -300,6 +335,11 @@ function applyCombatResult(state, result, stats) {
     if (defenderPlayerId === 'player_a') stats.heroesKilledByPlayerA += 1
     if (defenderPlayerId === 'player_b') stats.heroesKilledByPlayerB += 1
   }
+
+  const attackerAfterCombat = state.players[attackerPlayerId]?.heroes?.[attackerSlot]
+  const defenderAfterCombat = state.players[defenderPlayerId]?.heroes?.[defenderSlot]
+  consumeHeroItemDurability(attackerAfterCombat)
+  consumeHeroItemDurability(defenderAfterCombat)
 
   return true
 }
@@ -681,48 +721,12 @@ function discardFromHand(state, playerId, cardIds, stats) {
   return discardedCards
 }
 
-function applyEndTurnDurability(state, playerId) {
-  const player = state.players[playerId]
-  if (!player) return false
-
-  for (const hero of player.heroes) {
-    const readyHero = ensureHeroState(hero)
-    if (!readyHero) continue
-
-    const nextItems = []
-    for (const item of readyHero.items || []) {
-      const baseDurability = Number(item?.stats?.durability)
-      if (!Number.isFinite(baseDurability) || baseDurability <= 0) {
-        nextItems.push(item)
-        continue
-      }
-
-      const currentDurability = Number.isFinite(Number(item.currentDurability))
-        ? Number(item.currentDurability)
-        : baseDurability
-      const nextDurability = Math.max(0, currentDurability - 1)
-
-      if (nextDurability > 0) {
-        item.currentDurability = nextDurability
-        nextItems.push(item)
-      }
-    }
-
-    readyHero.items = nextItems
-    const maxHp = getHeroMaxHp(readyHero)
-    readyHero.currentHp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
-  }
-
-  return true
-}
-
 function getRequiredDiscardCount(state, playerId) {
   return Math.max(0, state.players[playerId].hand.length - 7)
 }
 
 function finishTurn(state) {
   const activePlayer = state.game.currentTurn
-  applyEndTurnDurability(state, activePlayer)
   const hasHeroes = state.players[activePlayer].heroes.some(Boolean)
 
   if (!hasHeroes) {

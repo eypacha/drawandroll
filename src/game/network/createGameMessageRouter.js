@@ -37,12 +37,6 @@ export function createGameMessageRouter({ deck, game, players, resetLocalGameSta
       game.endGame(winner)
     },
 
-    end_turn_maintenance(payload) {
-      const { playerId, heroes } = payload
-      if (!playerId || !Array.isArray(heroes)) return
-      players.players[playerId].heroes = heroes
-    },
-
     draw_card(payload) {
       const { playerId, card } = payload
       deck.removeCardById(card.id)

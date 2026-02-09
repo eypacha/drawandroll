@@ -15,15 +15,6 @@ export function useGameActions() {
 
   function syncAdvanceResult(result) {
     if (!result) return false
-    if (result.maintenancePlayerId) {
-      sendMessage({
-        type: 'end_turn_maintenance',
-        payload: {
-          playerId: result.maintenancePlayerId,
-          heroes: players.players[result.maintenancePlayerId].heroes
-        }
-      })
-    }
     if (result.type === 'ended') {
       const loser = result.loser || getOpponentPlayerId(result.winner)
       sendMessage({

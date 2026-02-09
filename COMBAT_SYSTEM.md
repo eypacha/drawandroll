@@ -78,14 +78,15 @@ Un ataque **siempre** sigue este orden y no puede alterarse.
 - Si el HP del héroe defensor llega a **0**:
   - el héroe muere
   - sale del juego
-- Luego se resuelven los `counterattack` ya jugados en orden FIFO.
-- Los `counterattack` pueden matar al héroe atacante.
+- Si la reacción fue `counterattack`, se resuelve el daño de contraataque.
+- El `counterattack` puede matar al héroe atacante.
 - No se pueden jugar cartas en este paso.
 
 ---
 
 ### 6️⃣ Cierre del ataque
-- Se descuenta durabilidad de los ítems usados.
+- Se descuenta 1 de durabilidad a los ítems del héroe atacante y del héroe defensor que participaron.
+- Si un ítem llega a durabilidad 0, se destruye inmediatamente.
 - El ataque termina definitivamente.
 - No se pueden aplicar efectos posteriores.
 

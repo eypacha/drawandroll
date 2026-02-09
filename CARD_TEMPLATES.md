@@ -279,6 +279,14 @@ Never:
 Rol:
 - Salvataje puntual.
 
+Rangos:
+- Curar: 2–3 HP
+- Costo: 2 recursos
+
+Never:
+- Curar más de 3 HP
+- Evitar muerte automáticamente
+
 ---
 
 ## 6. Plantillas de CONTRAATAQUE
@@ -313,17 +321,9 @@ Rangos:
 Never:
 - `counterDamage` > 2
 
-Rangos:
-- Curar: 2–3 HP
-- Costo: 2 recursos
-
-Never:
-- Curar más de 3 HP
-- Evitar muerte automáticamente
-
 ---
 
-## 6. Restricciones globales
+## 7. Restricciones globales
 
 - Ninguna plantilla puede:
   - modificar reglas base
@@ -335,7 +335,7 @@ Never:
 
 ---
 
-## 7. Autoridad del documento
+## 8. Autoridad del documento
 
 - Este documento define el espacio de diseño permitido.
 - El generador **debe** respetar estas plantillas.

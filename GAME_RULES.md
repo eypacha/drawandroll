@@ -125,7 +125,7 @@ Un turno se resuelve siempre en este orden:
   - ocupan slots
   - tienen **durabilidad**
 - La durabilidad:
-  - se reduce por uso
+  - se reduce por uso en combate
   - al llegar a 0, el ítem se destruye
 - Ítems más poderosos tienen menos durabilidad.
 - Todos los ítems y modificadores son visibles.
@@ -165,7 +165,7 @@ Un turno se resuelve siempre en este orden:
   - `counterFinal = max(0, (counterDamage + d20Contraataque) - (DEF atacante + d20Contradefensa))`
 - Si el d20 de contraataque es 20 natural, suma bono crítico.
 - Si el d20 de contraataque es 1 natural, el contraataque hace 0 daño.
-- Los contraataques se aplican en orden de juego y pueden matar al atacante.
+- El contraataque puede matar al atacante.
 
 ---
 

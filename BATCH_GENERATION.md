@@ -45,8 +45,8 @@ Distribución recomendada (ajustable en código):
 - **Héroes**: ~25%
 - **Ítems / Armas**: ~30%
 - **Cartas reactivas defensivas**: ~15%
-- **Curación**: ~15%
-- **Contraataques**: ~15%
+- **Curación**: ~10%
+- **Contraataques**: ~20%
 
 La implementación:
 - puede variar levemente estas proporciones
