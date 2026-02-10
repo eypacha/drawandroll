@@ -10,8 +10,7 @@ export const itemTemplates = {
     type: 'item',
     ranges: {
       atkBonus: { min: 1, max: 2 },
-      defModifier: { min: -1, max: 0 },
-      durability: { min: 1, max: 2 }
+      defModifier: { min: -1, max: 0 }
     },
     baseCost: 2
   },
@@ -21,8 +20,7 @@ export const itemTemplates = {
     type: 'item',
     ranges: {
       defBonus: { min: 1, max: 2 },
-      atkModifier: { min: -1, max: 0 },
-      durability: { min: 2, max: 3 }
+      atkModifier: { min: -1, max: 0 }
     },
     baseCost: 2
   },
@@ -32,8 +30,7 @@ export const itemTemplates = {
     type: 'item',
     ranges: {
       atkBonus: { min: 2, max: 3 },
-      defModifier: { min: -2, max: -1 },
-      durability: { min: 1, max: 1 }
+      defModifier: { min: -2, max: -1 }
     },
     baseCost: 3
   }

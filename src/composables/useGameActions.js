@@ -12,6 +12,32 @@ export function useGameActions() {
   const deck = useDeckStore()
   const combat = useCombatStore()
   const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
+  const REACTION_REVEAL_DURATION_MS = 2000
+
+  function applyLocalReactionReveal(playerId, card) {
+    if (!playerId || !card?.id) return false
+    players.hideHandCard(playerId, card.id)
+    combat.showReactionReveal({
+      playerId,
+      card,
+      shownAt: Date.now(),
+      durationMs: REACTION_REVEAL_DURATION_MS
+    })
+    return true
+  }
+
+  function broadcastReactionReveal(playerId, card) {
+    if (!playerId || !card?.id) return false
+    return sendMessage({
+      type: 'reaction_reveal',
+      payload: {
+        playerId,
+        card,
+        shownAt: Date.now(),
+        durationMs: REACTION_REVEAL_DURATION_MS
+      }
+    })
+  }
 
   function syncAdvanceResult(result) {
     if (!result) return false
@@ -569,8 +595,10 @@ export function useGameActions() {
     if (combat.rollStep !== 'reaction_pending') return false
     if (window.defenderPlayerId !== myPlayerId.value) return false
 
+    let selectedCard = null
     if (cardId) {
-      const card = players.players[myPlayerId.value].hand.find((entry) => entry.id === cardId)
+      selectedCard = players.players[myPlayerId.value].hand.find((entry) => entry.id === cardId) || null
+      const card = selectedCard
       if (!card || (card.type !== 'reactive' && card.type !== 'counterattack' && card.type !== 'healing')) return false
       const cost = Number(card.cost || 0)
       if (players.players[myPlayerId.value].resources < cost) return false
@@ -586,7 +614,13 @@ export function useGameActions() {
         pass: !cardId,
         targetSlot: Number.isInteger(targetSlot) ? targetSlot : null
       })
-      if (accepted) combat.closeReactionWindow(window.combatId)
+      if (accepted) {
+        if (selectedCard) {
+          applyLocalReactionReveal(myPlayerId.value, selectedCard)
+          broadcastReactionReveal(myPlayerId.value, selectedCard)
+        }
+        combat.closeReactionWindow(window.combatId)
+      }
       return accepted
     }
 
@@ -601,7 +635,12 @@ export function useGameActions() {
         respondedAt: Date.now()
       }
     })
-    if (sent) combat.closeReactionWindow(window.combatId)
+    if (sent) {
+      if (selectedCard) {
+        applyLocalReactionReveal(myPlayerId.value, selectedCard)
+      }
+      combat.closeReactionWindow(window.combatId)
+    }
     return sent
   }
 
@@ -617,7 +656,18 @@ export function useGameActions() {
       pass: Boolean(payload?.pass),
       targetSlot: Number.isInteger(payload?.targetSlot) ? payload.targetSlot : null
     })
-    if (accepted) combat.closeReactionWindow(window.combatId)
+    if (accepted) {
+      const reactionCardId = payload?.cardId || null
+      if (reactionCardId) {
+        const defenderPlayerId = payload?.defenderPlayerId
+        const reactionCard = players.players[defenderPlayerId]?.hand?.find((entry) => entry.id === reactionCardId) || null
+        if (reactionCard) {
+          applyLocalReactionReveal(defenderPlayerId, reactionCard)
+          broadcastReactionReveal(defenderPlayerId, reactionCard)
+        }
+      }
+      combat.closeReactionWindow(window.combatId)
+    }
     return accepted
   }
 

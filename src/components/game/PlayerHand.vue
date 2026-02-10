@@ -88,7 +88,11 @@ const { t } = useI18n()
 
 const localPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const myPlayerId = computed(() => props.myPlayerId?.value || localPlayerId.value)
-const myHand = computed(() => players.players[myPlayerId.value].hand)
+const myHand = computed(() => {
+  const player = players.players[myPlayerId.value]
+  const hiddenSet = new Set(player.hiddenHandCardIds || [])
+  return player.hand.filter((card) => !hiddenSet.has(card.id))
+})
 const openingFlowActive = computed(() => Boolean(props.openingFlow?.active))
 const isOpeningAcceptedByMe = computed(() => Boolean(props.openingFlow?.acceptedByPlayer?.[myPlayerId.value]))
 const showOpeningButtons = computed(() => openingFlowActive.value && !isOpeningAcceptedByMe.value)

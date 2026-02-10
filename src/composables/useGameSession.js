@@ -224,6 +224,20 @@ export function useGameSession() {
     return true
   }
 
+  function applyReactionReveal(payload = {}) {
+    const playerId = payload?.playerId
+    const card = payload?.card
+    if ((playerId !== 'player_a' && playerId !== 'player_b') || !card?.id) return false
+    players.hideHandCard(playerId, card.id)
+    combat.showReactionReveal({
+      playerId,
+      card,
+      shownAt: Number(payload?.shownAt) || Date.now(),
+      durationMs: Number(payload?.durationMs) || 2000
+    })
+    return true
+  }
+
   async function replaceOpeningHand(playerId, targetSize) {
     const player = players.players[playerId]
     if (!player) return null
@@ -474,6 +488,10 @@ export function useGameSession() {
 
     if (data.type === 'combat_reaction_response') {
       return gameActions.handleCombatReactionResponse(data.payload || {})
+    }
+
+    if (data.type === 'reaction_reveal') {
+      return applyReactionReveal(data.payload || {})
     }
 
     if (data.type === 'advance_phase_request') {

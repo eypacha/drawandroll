@@ -5,6 +5,7 @@
       <DeckPile />
     </div>
     <GameTable />
+    <ReactionRevealCard />
     <CombatDiceRail />
     <PlayerHand
       :opening-flow="openingFlow"
@@ -24,6 +25,7 @@
 import OpponentHand from './OpponentHand.vue'
 import DeckPile from './DeckPile.vue'
 import GameTable from './GameTable.vue'
+import ReactionRevealCard from './ReactionRevealCard.vue'
 import CombatDiceRail from './CombatDiceRail.vue'
 import PlayerHand from './PlayerHand.vue'
 import TurnStatus from './TurnStatus.vue'

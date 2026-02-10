@@ -7,11 +7,14 @@ import { defineStore } from 'pinia'
  * attacker click -> defender click -> defensive reaction -> final resolve.
  */
 export const useCombatStore = defineStore('combat', () => {
+  const REACTION_REVEAL_DURATION_MS = 2000
   const activeRoll = ref(null)
   const rollStep = ref('idle')
   const pendingCombatContext = ref(null)
   const reactionWindow = ref(null)
   const reactionResponses = ref({})
+  const reactionReveal = ref(null)
+  let reactionRevealTimer = null
 
   const isActive = computed(() => rollStep.value !== 'idle')
   const isRolling = computed(() => rollStep.value !== 'idle')
@@ -201,6 +204,31 @@ export const useCombatStore = defineStore('combat', () => {
     return true
   }
 
+  function clearReactionReveal() {
+    if (reactionRevealTimer) {
+      clearTimeout(reactionRevealTimer)
+      reactionRevealTimer = null
+    }
+    reactionReveal.value = null
+  }
+
+  function showReactionReveal(payload = {}) {
+    const card = payload?.card
+    if (!card?.id) return false
+    clearReactionReveal()
+    reactionReveal.value = {
+      playerId: payload?.playerId || null,
+      card: { ...card },
+      shownAt: Number(payload?.shownAt) || Date.now()
+    }
+    const durationMs = Math.max(100, Number(payload?.durationMs) || REACTION_REVEAL_DURATION_MS)
+    reactionRevealTimer = setTimeout(() => {
+      reactionRevealTimer = null
+      reactionReveal.value = null
+    }, durationMs)
+    return true
+  }
+
   function clearRoll(expectedCombatId = null) {
     if (expectedCombatId && activeRoll.value?.combatId !== expectedCombatId) return
     activeRoll.value = null
@@ -211,6 +239,7 @@ export const useCombatStore = defineStore('combat', () => {
   }
 
   function $reset() {
+    clearReactionReveal()
     clearRoll()
   }
 
@@ -219,6 +248,7 @@ export const useCombatStore = defineStore('combat', () => {
     rollStep,
     pendingCombatContext,
     reactionWindow,
+    reactionReveal,
     isActive,
     isRolling,
     isReactionOpen,
@@ -230,6 +260,8 @@ export const useCombatStore = defineStore('combat', () => {
     setReactionResponse,
     consumeReactionResponse,
     finishRoll,
+    showReactionReveal,
+    clearReactionReveal,
     clearRoll,
     $reset
   }

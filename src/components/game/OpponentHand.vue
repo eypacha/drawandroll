@@ -24,7 +24,11 @@ const connection = useConnectionStore()
 const players = usePlayersStore()
 
 const opponentPlayerId = computed(() => connection.isHost ? 'player_b' : 'player_a')
-const opponentHand = computed(() => players.players[opponentPlayerId.value].hand)
+const opponentHand = computed(() => {
+  const player = players.players[opponentPlayerId.value]
+  const hiddenSet = new Set(player.hiddenHandCardIds || [])
+  return player.hand.filter((card) => !hiddenSet.has(card.id))
+})
 const opponentMulliganReveal = computed(() => players.players[opponentPlayerId.value].mulliganRevealCards || [])
 const isMulliganRevealActive = computed(() => opponentMulliganReveal.value.length > 0)
 const displayedOpponentHand = computed(() => (

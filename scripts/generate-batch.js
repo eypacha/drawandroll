@@ -99,8 +99,7 @@ function evaluateCardPower(type, template, stats) {
     const defBonus = Number(stats.defBonus || 0);
     const atkModifier = Number(stats.atkModifier || 0);
     const defModifier = Number(stats.defModifier || 0);
-    const durability = Number(stats.durability || 0);
-    return ((atkBonus + defBonus) * 1.2) + ((atkModifier + defModifier) * 0.8) + (durability * 0.6);
+    return ((atkBonus + defBonus) * 1.2) + ((atkModifier + defModifier) * 0.8);
   }
 
   if (type === 'healing') {
@@ -210,8 +209,7 @@ function generateItemCard(template) {
       atkBonus: stats.atkBonus || 0,
       defBonus: stats.defBonus || 0,
       atkModifier: stats.atkModifier || 0,
-      defModifier: stats.defModifier || 0,
-      durability: stats.durability
+      defModifier: stats.defModifier || 0
     },
     cost: calculateCardCost('item', template, stats)
   };

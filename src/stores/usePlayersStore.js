@@ -18,6 +18,7 @@ export const usePlayersStore = defineStore('players', () => {
     draggedCardId: null,
     hoveredCardId: null,
     discardSelectionIds: [],
+    hiddenHandCardIds: [],
     mulliganRevealCards: [],
     pendingHealingCardId: null
   })
@@ -101,12 +102,7 @@ export const usePlayersStore = defineStore('players', () => {
   }
 
   function createItemInstance(card) {
-    const instance = { ...card }
-    const durability = Number(card?.stats?.durability)
-    if (Number.isFinite(durability) && durability > 0) {
-      instance.currentDurability = durability
-    }
-    return instance
+    return { ...card }
   }
 
   function getHeroAt(playerId, slotIndex) {
@@ -177,7 +173,32 @@ export const usePlayersStore = defineStore('players', () => {
     if (player.pendingHealingCardId === cardId) {
       player.pendingHealingCardId = null
     }
+    unhideHandCard(playerId, cardId)
     return removed || null
+  }
+
+  function hideHandCard(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player || !cardId) return false
+    if (!player.hand.some((card) => card.id === cardId)) return false
+    if (player.hiddenHandCardIds.includes(cardId)) return true
+    player.hiddenHandCardIds = [...player.hiddenHandCardIds, cardId]
+    return true
+  }
+
+  function unhideHandCard(playerId, cardId) {
+    const player = players.value[playerId]
+    if (!player || !cardId) return false
+    const prevLength = player.hiddenHandCardIds.length
+    player.hiddenHandCardIds = player.hiddenHandCardIds.filter((id) => id !== cardId)
+    return player.hiddenHandCardIds.length !== prevLength
+  }
+
+  function clearHiddenHandCards(playerId) {
+    const player = players.value[playerId]
+    if (!player) return false
+    player.hiddenHandCardIds = []
+    return true
   }
 
   function removeDiscardSelectionCard(playerId, cardId) {
@@ -379,40 +400,6 @@ export const usePlayersStore = defineStore('players', () => {
     }
   }
 
-  function consumeHeroItemDurability(hero) {
-    const readyHero = ensureHeroState(hero)
-    if (!readyHero) return false
-    let didChange = false
-    const nextItems = []
-
-    for (const item of readyHero.items || []) {
-      const baseDurability = Number(item?.stats?.durability)
-      if (!Number.isFinite(baseDurability) || baseDurability <= 0) {
-        nextItems.push(item)
-        continue
-      }
-
-      const currentDurability = Number.isFinite(Number(item.currentDurability))
-        ? Number(item.currentDurability)
-        : baseDurability
-      const nextDurability = Math.max(0, currentDurability - 1)
-      if (nextDurability > 0) {
-        item.currentDurability = nextDurability
-        nextItems.push(item)
-      } else {
-        didChange = true
-      }
-      if (nextDurability !== currentDurability) {
-        didChange = true
-      }
-    }
-
-    readyHero.items = nextItems
-    const maxHp = getHeroMaxHp(readyHero)
-    readyHero.currentHp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
-    return didChange
-  }
-
   function applyCombatResult(payload) {
     const {
       attackerPlayerId,
@@ -499,11 +486,6 @@ export const usePlayersStore = defineStore('players', () => {
       defenderPlayer.heroes[defenderSlot] = null
       defenderPlayer.heroesLost += 1
     }
-
-    const attackerAfterCombat = getHeroAt(attackerPlayerId, attackerSlot)
-    const defenderAfterCombat = getHeroAt(defenderPlayerId, defenderSlot)
-    consumeHeroItemDurability(attackerAfterCombat)
-    consumeHeroItemDurability(defenderAfterCombat)
 
     return true
   }
@@ -826,6 +808,7 @@ export const usePlayersStore = defineStore('players', () => {
     const selectedSet = new Set(uniqueIds)
     player.hand = player.hand.filter((card) => !selectedSet.has(card.id))
     player.discardSelectionIds = player.discardSelectionIds.filter((id) => !selectedSet.has(id))
+    player.hiddenHandCardIds = player.hiddenHandCardIds.filter((id) => !selectedSet.has(id))
     return discardedCards
   }
 
@@ -852,6 +835,9 @@ export const usePlayersStore = defineStore('players', () => {
     // Actions
     addToHand,
     removeCardFromHand,
+    hideHandCard,
+    unhideHandCard,
+    clearHiddenHandCards,
     playHeroFromHand,
     addHeroFromRemote,
     playItemFromHand,

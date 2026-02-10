@@ -92,7 +92,6 @@
       "attackPenalty": "Attack penalty",
       "defenseBonus": "Defense bonus",
       "defensePenalty": "Defense penalty",
-      "durability": "Durability",
       "counterDamage": "Counter damage",
       "hpShort": "HP"
     }

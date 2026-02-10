@@ -46,7 +46,6 @@
           <span v-if="card.stats.atkModifier < 0" :title="t('card.stats.attackPenalty')">⚔️ {{ card.stats.atkModifier }}</span>
           <span v-if="card.stats.defBonus" :title="t('card.stats.defenseBonus')">🛡️ +{{ card.stats.defBonus }}</span>
           <span v-if="card.stats.defModifier < 0" :title="t('card.stats.defensePenalty')">🛡️ {{ card.stats.defModifier }}</span>
-          <span :title="t('card.stats.durability')">🔋 {{ getDisplayedDurability() }}</span>
         </span>
         <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} {{ t('card.stats.hpShort') }}</span>
         <span v-else-if="card.type === 'reactive'" class="text-xs">{{ formatTemplate(card.effect) }}</span>
@@ -121,11 +120,5 @@ function getStatClass(statKey) {
   if (delta > 0) return 'text-emerald-600'
   if (delta < 0) return 'text-red-600'
   return 'text-gray-700'
-}
-
-function getDisplayedDurability() {
-  const current = Number(props.card?.currentDurability)
-  if (Number.isFinite(current)) return current
-  return props.card?.stats?.durability ?? 0
 }
 </script>
