@@ -4,13 +4,13 @@
       <section class="p-2">
         <button
           type="button"
-          class="h-24 w-full border transition-colors"
+          class="h-24 w-full overflow-hidden border border-2 transition-colors rounded-full"
           :class="opponentDieClass"
           :disabled="!canClickOpponentDie"
           @click="onClickOpponentDie"
         >
-          <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
-            <div class="h-24 w-24">
+          <div class="flex h-full w-full items-center justify-center">
+            <div class="h-20 w-20">
               <ThreeDie
                 :value="getRoleRoll(opponentRole)"
                 :rolling="isRoleRolling(opponentRole)"
@@ -27,13 +27,13 @@
       <section class="p-2">
         <button
           type="button"
-          class="h-24 w-full border transition-colors"
+          class="h-24 w-full overflow-hidden border border-2 transition-colors rounded-full"
           :class="ownDieClass"
           :disabled="!canClickOwnDie"
           @click="onClickOwnDie"
         >
-          <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
-            <div class="h-24 w-24">
+          <div class="flex h-full w-full items-center justify-center">
+            <div class="h-20 w-20">
               <ThreeDie
                 :value="getRoleRoll(myRole)"
                 :rolling="isRoleRolling(myRole)"
