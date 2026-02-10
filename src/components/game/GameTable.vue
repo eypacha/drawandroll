@@ -9,7 +9,9 @@
           :class="{
             'slot-attack-target': isAttackTarget(slot.index)
           }"
-          @click="onOpponentSlotClick(slot.index)"
+          @dragover="onOpponentSlotDragOver(slot.index, $event)"
+          @dragleave="onOpponentSlotDragLeave(slot.index)"
+          @drop="onOpponentSlotDrop(slot.index, $event)"
         >
           <div v-if="slot.hero" class="hero-stack">
             <div
@@ -20,7 +22,12 @@
             >
               <Card :card="item" :hide-cost="true" />
             </div>
-            <Card :card="getHeroDisplay(slot.hero)" :hide-cost="true" class="hero-card" />
+            <Card
+              :card="getHeroDisplay(slot.hero)"
+              :hide-cost="true"
+              class="hero-card"
+              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase }"
+            />
           </div>
         </div>
       </div>
@@ -31,8 +38,7 @@
           class="table-slot"
           :class="{
             'slot-drop-valid': isActiveDropSlot(slot.index),
-            'slot-attack-selectable': canSelectAttacker(slot.index),
-            'slot-attack-selected': selectedAttackerSlot === slot.index
+            'slot-attack-selectable': canSelectAttacker(slot.index)
           }"
           :style="getSlotStyle(slot.index)"
           @click="onMySlotClick(slot.index)"
@@ -54,6 +60,9 @@
               :hide-cost="true"
               class="hero-card"
               :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase }"
+              :draggable="canSelectAttacker(slot.index)"
+              @dragstart="onHeroAttackDragStart(slot.index, $event)"
+              @dragend="onHeroAttackDragEnd"
             />
           </div>
         </div>
@@ -89,7 +98,8 @@ const canReactionHeal = computed(() => (
 const draggedCardId = computed(() => players.players[myPlayerId.value].draggedCardId)
 const pendingHealingCardId = computed(() => players.players[myPlayerId.value].pendingHealingCardId)
 const activeDropSlot = ref(null)
-const selectedAttackerSlot = ref(null)
+const draggedAttackerSlot = ref(null)
+const activeAttackTargetSlot = ref(null)
 
 watch(
   () => draggedCardId.value,
@@ -104,7 +114,8 @@ watch(
   () => [canCombat.value, combat.isRolling],
   ([nextCanCombat, nextIsRolling]) => {
     if (!nextCanCombat || nextIsRolling) {
-      selectedAttackerSlot.value = null
+      draggedAttackerSlot.value = null
+      activeAttackTargetSlot.value = null
     }
   }
 )
@@ -267,10 +278,7 @@ function canSelectAttacker(slotIndex) {
 }
 
 function isAttackTarget(slotIndex) {
-  if (!canCombat.value) return false
-  if (combat.isRolling) return false
-  if (selectedAttackerSlot.value === null) return false
-  return Boolean(opponentHeroes.value[slotIndex])
+  return activeAttackTargetSlot.value === slotIndex
 }
 
 function onMySlotClick(slotIndex) {
@@ -288,20 +296,71 @@ function onMySlotClick(slotIndex) {
     }
     return
   }
-  if (!canCombat.value) return
-  if (!canSelectAttacker(slotIndex)) return
-  if (selectedAttackerSlot.value === slotIndex) {
-    selectedAttackerSlot.value = null
-    return
-  }
-  selectedAttackerSlot.value = slotIndex
 }
 
-async function onOpponentSlotClick(slotIndex) {
-  if (!isAttackTarget(slotIndex)) return
-  const attackerSlot = selectedAttackerSlot.value
-  if (attackerSlot === null) return
-  selectedAttackerSlot.value = null
+function getDraggedAttackSlot(event) {
+  const value = event.dataTransfer?.getData('application/x-attack-slot')
+  if (!value && value !== '0') return draggedAttackerSlot.value
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed)) return null
+  if (parsed < 0 || parsed > 2) return null
+  return parsed
+}
+
+function canAttackTarget(slotIndex, attackerSlot = draggedAttackerSlot.value) {
+  if (!canCombat.value) return false
+  if (combat.isRolling) return false
+  if (!Number.isInteger(attackerSlot)) return false
+  if (!canSelectAttacker(attackerSlot)) return false
+  return Boolean(opponentHeroes.value[slotIndex])
+}
+
+function onHeroAttackDragStart(slotIndex, event) {
+  if (!canSelectAttacker(slotIndex)) {
+    event.preventDefault()
+    return
+  }
+  draggedAttackerSlot.value = slotIndex
+  activeAttackTargetSlot.value = null
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-attack-slot', String(slotIndex))
+  }
+}
+
+function onHeroAttackDragEnd() {
+  draggedAttackerSlot.value = null
+  activeAttackTargetSlot.value = null
+}
+
+function onOpponentSlotDragOver(slotIndex, event) {
+  const attackerSlot = getDraggedAttackSlot(event)
+  if (!canAttackTarget(slotIndex, attackerSlot)) {
+    if (activeAttackTargetSlot.value === slotIndex) {
+      activeAttackTargetSlot.value = null
+    }
+    return
+  }
+
+  event.preventDefault()
+  activeAttackTargetSlot.value = slotIndex
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+}
+
+function onOpponentSlotDragLeave(slotIndex) {
+  if (activeAttackTargetSlot.value === slotIndex) {
+    activeAttackTargetSlot.value = null
+  }
+}
+
+async function onOpponentSlotDrop(slotIndex, event) {
+  event.preventDefault()
+  const attackerSlot = getDraggedAttackSlot(event)
+  activeAttackTargetSlot.value = null
+  draggedAttackerSlot.value = null
+  if (!canAttackTarget(slotIndex, attackerSlot)) return
   await gameActions.attackHero(attackerSlot, slotIndex)
 }
 
@@ -352,12 +411,6 @@ function getHeroDisplay(hero) {
   cursor: pointer;
 }
 
-.table-slot.slot-attack-selected {
-  border-color: rgba(29, 78, 216, 1);
-  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.38);
-  transform: translateY(-2px);
-}
-
 .table-slot.slot-attack-target {
   border-color: rgba(220, 38, 38, 0.92);
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
@@ -376,7 +429,7 @@ function getHeroDisplay(hero) {
 }
 
 .hero-card.hero-card-exhausted {
-  opacity: 0.78;
+  filter: grayscale(1);
 }
 
 .item-under {

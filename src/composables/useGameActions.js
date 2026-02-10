@@ -250,6 +250,23 @@ export function useGameActions() {
     return players.getPlayableReactiveCards(playerId).length > 0
   }
 
+  function hasAnyHero(playerId) {
+    const heroSlots = players.players[playerId]?.heroes || []
+    return heroSlots.some(Boolean)
+  }
+
+  function finishGameIfBoardEmptyAfterCombat(attackerPlayerId, defenderPlayerId) {
+    const attackerHasHeroes = hasAnyHero(attackerPlayerId)
+    const defenderHasHeroes = hasAnyHero(defenderPlayerId)
+
+    if (attackerHasHeroes && defenderHasHeroes) return false
+
+    // Keep same winner priority as endTurn(): if active attacker has no heroes, defender wins.
+    const winner = attackerHasHeroes ? attackerPlayerId : defenderPlayerId
+    const ended = game.endGame(winner)
+    return syncAdvanceResult(ended)
+  }
+
   async function waitForReactionChoice(combatId) {
     while (true) {
       const active = getActiveCombatOrNull()
@@ -313,6 +330,7 @@ export function useGameActions() {
       type: 'combat_roll_result',
       payload: resultPayload
     })
+    finishGameIfBoardEmptyAfterCombat(active.attackerPlayerId, active.defenderPlayerId)
     return true
   }
 

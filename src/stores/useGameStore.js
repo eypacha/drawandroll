@@ -119,6 +119,7 @@ export const useGameStore = defineStore('game', () => {
       return endedResult
     }
 
+    players.resetCombatActions(activePlayer)
     currentTurn.value = currentTurn.value === 'player_a' ? 'player_b' : 'player_a'
     if (currentTurn.value === 'player_a') {
       turn.value += 1
@@ -130,9 +131,13 @@ export const useGameStore = defineStore('game', () => {
 
   function setTurnState(nextTurn, nextCurrent, nextPhase) {
     if (phase.value !== 'playing') return
+    const previousCurrent = currentTurn.value
     turn.value = nextTurn
     currentTurn.value = nextCurrent
     turnPhase.value = nextPhase
+    if (nextPhase === 'draw' && previousCurrent !== nextCurrent) {
+      players.resetCombatActions(previousCurrent)
+    }
     if (nextPhase === 'combat') {
       players.resetCombatActions(nextCurrent)
     }
