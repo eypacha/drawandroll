@@ -10,7 +10,7 @@ import {
 const MAX_HERO_SLOTS = 3
 const MAX_ITEMS_PER_HERO = 3
 const PLAYER_IDS = ['player_a', 'player_b']
-const DEFAULT_MAX_RESOURCES = 5
+const DEFAULT_MAX_RESOURCES = 6
 const COMBAT_CRITICAL_BONUS = 2
 
 function cloneCard(card) {

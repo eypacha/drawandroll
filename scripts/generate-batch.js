@@ -48,6 +48,7 @@ const MIN_CARDS = {
   healing: 5,
   counterattack: 5
 };
+const HERO_ATK_DEF_AVG_MAX_GAP = 1.0;
 
 // Output directory (relative to project root)
 const OUTPUT_DIR = 'data/batches';
@@ -70,6 +71,10 @@ function randomPick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 /**
  * Generate stats from template ranges
  */
@@ -79,6 +84,67 @@ function generateStats(ranges) {
     stats[key] = randomInt(range.min, range.max);
   }
   return stats;
+}
+
+function evaluateCardPower(type, template, stats) {
+  if (type === 'hero') {
+    const atk = Number(stats.atk || 0);
+    const def = Number(stats.def || 0);
+    const hp = Number(stats.hp || 0);
+    return (atk * 1.0) + (def * 1.0) + (hp * 0.8);
+  }
+
+  if (type === 'item') {
+    const atkBonus = Number(stats.atkBonus || 0);
+    const defBonus = Number(stats.defBonus || 0);
+    const atkModifier = Number(stats.atkModifier || 0);
+    const defModifier = Number(stats.defModifier || 0);
+    const durability = Number(stats.durability || 0);
+    return ((atkBonus + defBonus) * 1.2) + ((atkModifier + defModifier) * 0.8) + (durability * 0.6);
+  }
+
+  if (type === 'healing') {
+    return Number(stats.healAmount || 0);
+  }
+
+  if (type === 'counterattack') {
+    return Number(stats.counterDamage || 0);
+  }
+
+  if (type === 'reactive') {
+    if (template.effect === 'reduce_damage') return Number(stats.damageReduction || 0);
+    if (template.effect === 'cancel_critical') return 2;
+    if (template.effect === 'prevent_death') return 3;
+  }
+
+  return 0;
+}
+
+function getDerivedCostByType(type, power) {
+  if (type === 'hero') {
+    return clamp(Math.round((power / 3.2) - 2), 2, 6);
+  }
+  if (type === 'item') {
+    return clamp(Math.round(power), 1, 4);
+  }
+  if (type === 'healing') {
+    return clamp(Math.round(power * 0.8), 1, 3);
+  }
+  if (type === 'counterattack') {
+    return clamp(Math.round(power * 1.2), 1, 3);
+  }
+  if (type === 'reactive') {
+    return clamp(Math.round(power), 1, 4);
+  }
+  return 1;
+}
+
+function calculateCardCost(type, template, stats) {
+  const power = evaluateCardPower(type, template, stats);
+  const derivedCost = getDerivedCostByType(type, power);
+  const baseCost = Number(template.baseCost || 0);
+  // Weighted blend: keep template intent while making stronger rolls cost more.
+  return clamp(Math.round(((derivedCost * 2) + baseCost) / 3), 1, 10);
 }
 
 /**
@@ -128,7 +194,7 @@ function generateHeroCard(template) {
       def: stats.def,
       hp: stats.hp
     },
-    cost: template.baseCost
+    cost: calculateCardCost('hero', template, stats)
   };
 }
 
@@ -147,7 +213,7 @@ function generateItemCard(template) {
       defModifier: stats.defModifier || 0,
       durability: stats.durability
     },
-    cost: template.baseCost
+    cost: calculateCardCost('item', template, stats)
   };
 }
 
@@ -163,7 +229,7 @@ function generateReactiveCard(template) {
     stats: {
       damageReduction: stats.damageReduction || null
     },
-    cost: template.baseCost
+    cost: calculateCardCost('reactive', template, stats)
   };
 }
 
@@ -178,7 +244,7 @@ function generateHealingCard(template) {
     stats: {
       healAmount: stats.healAmount
     },
-    cost: template.baseCost
+    cost: calculateCardCost('healing', template, stats)
   };
 }
 
@@ -193,7 +259,7 @@ function generateCounterattackCard(template) {
     stats: {
       counterDamage: stats.counterDamage
     },
-    cost: template.baseCost
+    cost: calculateCardCost('counterattack', template, stats)
   };
 }
 
@@ -336,6 +402,19 @@ function validateBatch(batch) {
       errors.push(`Duplicate card ID found: ${card.id}`);
     }
     ids.add(card.id);
+  }
+
+  // Check hero attack/defense average balance
+  const heroes = batch.cards.filter((card) => card.type === 'hero');
+  if (heroes.length > 0) {
+    const atkAvg = heroes.reduce((sum, card) => sum + (Number(card?.stats?.atk) || 0), 0) / heroes.length;
+    const defAvg = heroes.reduce((sum, card) => sum + (Number(card?.stats?.def) || 0), 0) / heroes.length;
+    const gap = Math.abs(atkAvg - defAvg);
+    if (gap > HERO_ATK_DEF_AVG_MAX_GAP) {
+      errors.push(
+        `Hero atk/def average gap too high (${gap.toFixed(2)}). atk=${atkAvg.toFixed(2)}, def=${defAvg.toFixed(2)}`
+      );
+    }
   }
   
   return {
