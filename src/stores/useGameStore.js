@@ -88,10 +88,6 @@ export const useGameStore = defineStore('game', () => {
       return createAdvanceResult('advanced')
     }
     if (turnPhase.value === 'recruit') {
-      // Only the very first player of the match skips combat once.
-      if (turn.value === 1 && currentTurn.value === firstTurnPlayer.value) {
-        return advanceToTurnEnd(currentTurn.value)
-      }
       turnPhase.value = 'combat'
       players.resetCombatActions(currentTurn.value)
       return createAdvanceResult('advanced')
@@ -127,6 +123,7 @@ export const useGameStore = defineStore('game', () => {
       turn.value += 1
     }
     turnPhase.value = 'draw'
+    players.clearSummoningSickness(currentTurn.value)
     players.refreshResources(currentTurn.value)
     return createAdvanceResult('advanced')
   }
@@ -144,6 +141,7 @@ export const useGameStore = defineStore('game', () => {
       players.resetCombatActions(nextCurrent)
     }
     if (nextPhase === 'draw') {
+      players.clearSummoningSickness(nextCurrent)
       players.refreshResources(nextCurrent)
     }
   }

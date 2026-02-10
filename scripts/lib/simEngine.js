@@ -62,6 +62,9 @@ function ensureHeroState(hero) {
   if (typeof hero.hasAttackedThisPhase !== 'boolean') {
     hero.hasAttackedThisPhase = false
   }
+  if (typeof hero.summoningSick !== 'boolean') {
+    hero.summoningSick = false
+  }
   return hero
 }
 
@@ -90,7 +93,8 @@ function createHeroInstance(card) {
     card,
     items: [],
     currentHp: getCardBaseHp(card),
-    hasAttackedThisPhase: false
+    hasAttackedThisPhase: false,
+    summoningSick: true
   }
 }
 
@@ -230,6 +234,7 @@ function canHeroAttack(state, playerId, slotIndex) {
   const hero = ensureHeroState(player.heroes[slotIndex])
   if (!hero) return false
   if (hero.currentHp <= 0) return false
+  if (hero.summoningSick) return false
   return !hero.hasAttackedThisPhase
 }
 
@@ -239,7 +244,17 @@ function resetCombatActions(state, playerId) {
   for (const hero of player.heroes) {
     if (!hero) continue
     ensureHeroState(hero)
-    hero.hasAttackedThisPhase = false
+      hero.hasAttackedThisPhase = false
+  }
+}
+
+function clearSummoningSickness(state, playerId) {
+  const player = state.players[playerId]
+  if (!player) return
+  for (const hero of player.heroes) {
+    if (!hero) continue
+    ensureHeroState(hero)
+    hero.summoningSick = false
   }
 }
 
@@ -742,6 +757,7 @@ function finishTurn(state) {
     state.game.turn += 1
   }
   state.game.turnPhase = 'draw'
+  clearSummoningSickness(state, nextPlayer)
   state.players[nextPlayer].resources = state.players[nextPlayer].maxResources
   return { ended: false }
 }

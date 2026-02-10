@@ -26,7 +26,7 @@
               :card="getHeroDisplay(slot.hero)"
               :hide-cost="true"
               class="hero-card"
-              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase }"
+              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
             />
           </div>
         </div>
@@ -59,7 +59,7 @@
               :card="getHeroDisplay(slot.hero)"
               :hide-cost="true"
               class="hero-card"
-              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase }"
+              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
               :draggable="canSelectAttacker(slot.index)"
               @dragstart="onHeroAttackDragStart(slot.index, $event)"
               @dragend="onHeroAttackDragEnd"

@@ -54,11 +54,7 @@ const phaseLabel = computed(() => {
 const advanceLabel = computed(() => {
   if (game.turnPhase === 'discard') return t('turn.action.discard')
   if (game.turnPhase === 'combat') return t('turn.action.endTurn')
-  if (game.turnPhase === 'recruit') {
-    const isFirstPlayerOpeningTurn =
-      game.turn === 1 && game.currentTurn === game.firstTurnPlayer
-    return isFirstPlayerOpeningTurn ? t('turn.action.endTurn') : t('turn.action.toCombat')
-  }
+  if (game.turnPhase === 'recruit') return t('turn.action.toCombat')
   if (game.turnPhase === 'end') return t('turn.action.endTurn')
   return ''
 })

@@ -64,6 +64,9 @@ export const usePlayersStore = defineStore('players', () => {
     if (typeof hero.hasAttackedThisPhase !== 'boolean') {
       hero.hasAttackedThisPhase = false
     }
+    if (typeof hero.summoningSick !== 'boolean') {
+      hero.summoningSick = false
+    }
     return hero
   }
 
@@ -92,7 +95,8 @@ export const usePlayersStore = defineStore('players', () => {
       card,
       items: [],
       currentHp: getCardBaseHp(card),
-      hasAttackedThisPhase: false
+      hasAttackedThisPhase: false,
+      summoningSick: true
     }
   }
 
@@ -351,6 +355,7 @@ export const usePlayersStore = defineStore('players', () => {
     const hero = ensureHeroState(getHeroAt(playerId, slotIndex))
     if (!hero) return false
     if (hero.currentHp <= 0) return false
+    if (hero.summoningSick) return false
     return !hero.hasAttackedThisPhase
   }
 
@@ -361,6 +366,16 @@ export const usePlayersStore = defineStore('players', () => {
       if (!hero) continue
       ensureHeroState(hero)
       hero.hasAttackedThisPhase = false
+    }
+  }
+
+  function clearSummoningSickness(playerId) {
+    const player = players.value[playerId]
+    if (!player) return
+    for (const hero of player.heroes) {
+      if (!hero) continue
+      ensureHeroState(hero)
+      hero.summoningSick = false
     }
   }
 
@@ -848,6 +863,7 @@ export const usePlayersStore = defineStore('players', () => {
     canHeroAttack,
     getPlayableReactiveCards,
     resetCombatActions,
+    clearSummoningSickness,
     applyCombatResult,
     resolveCombatAsHost,
     setDraggedCard,
