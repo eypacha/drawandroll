@@ -139,7 +139,7 @@ function getCardStyle(index) {
   const rotation = centerOffset * maxRotation * 2
   const maxVerticalOffset = 25 // pixels
   const verticalOffset = Math.pow(centerOffset * 2, 2) * maxVerticalOffset
-  const zIndex = index + 1
+  const zIndex = total - index
   
   return {
     '--rotation': `${rotation}deg`,
