@@ -4,12 +4,23 @@
       <section class="p-2">
         <button
           type="button"
-          class="h-20 w-full border text-2xl font-black transition-colors"
+          class="h-24 w-full border transition-colors"
           :class="opponentDieClass"
           :disabled="!canClickOpponentDie"
           @click="onClickOpponentDie"
         >
-          {{ opponentRollDisplay }}
+          <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
+            <div class="h-14 w-14">
+              <ThreeDie
+                :value="getRoleRoll(opponentRole)"
+                :rolling="isRoleRolling(opponentRole)"
+                tone="emerald"
+              />
+            </div>
+            <div class="text-xs font-bold">
+              {{ opponentRollDisplay }}
+            </div>
+          </div>
         </button>
         <div v-if="opponentFormula" class="mt-2 text-xs text-gray-700">
           {{ opponentFormula }}
@@ -19,12 +30,23 @@
       <section class="p-2">
         <button
           type="button"
-          class="h-20 w-full border text-2xl font-black transition-colors"
+          class="h-24 w-full border transition-colors"
           :class="ownDieClass"
           :disabled="!canClickOwnDie"
           @click="onClickOwnDie"
         >
-          {{ ownRollDisplay }}
+          <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
+            <div class="h-14 w-14">
+              <ThreeDie
+                :value="getRoleRoll(myRole)"
+                :rolling="isRoleRolling(myRole)"
+                tone="blue"
+              />
+            </div>
+            <div class="text-xs font-bold">
+              {{ ownRollDisplay }}
+            </div>
+          </div>
         </button>
         <div v-if="ownFormula" class="mt-2 text-xs text-gray-700">
           {{ ownFormula }}
@@ -60,10 +82,11 @@
 </template>
 
 <script setup>
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCombatStore, useConnectionStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
+import ThreeDie from '@/components/game/ThreeDie.vue'
 
 const combat = useCombatStore()
 const connection = useConnectionStore()
@@ -72,11 +95,6 @@ const { t } = useI18n()
 
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const active = computed(() => combat.activeRoll)
-const animatedOpponentRoll = ref(null)
-const animatedOwnRoll = ref(null)
-const ownRollStartedAt = ref(0)
-const opponentRollStartedAt = ref(0)
-const MIN_ROLL_ANIMATION_MS = 550
 const myRole = computed(() => {
   if (!active.value) return null
   if (active.value.attackerPlayerId === myPlayerId.value) return 'attacker'
@@ -123,13 +141,9 @@ function isRoleRolling(role) {
   return false
 }
 
-const ownRollDisplay = computed(() => (
-  animatedOwnRoll.value ?? getRoleRoll(myRole.value) ?? t('combat.dieIdle')
-))
+const ownRollDisplay = computed(() => getRoleRoll(myRole.value) ?? t('combat.dieIdle'))
 
-const opponentRollDisplay = computed(() => (
-  animatedOpponentRoll.value ?? getRoleRoll(opponentRole.value) ?? t('combat.dieIdle')
-))
+const opponentRollDisplay = computed(() => getRoleRoll(opponentRole.value) ?? t('combat.dieIdle'))
 
 const ownFormula = computed(() => {
   const stat = getRoleStat(myRole.value)
@@ -219,97 +233,11 @@ const opponentDieClass = computed(() => ({
 }))
 
 let clearTimer = null
-let ownRollTimer = null
-let opponentRollTimer = null
-let ownRollStopTimer = null
-let opponentRollStopTimer = null
 
 function stopClearTimer() {
   if (!clearTimer) return
   clearTimeout(clearTimer)
   clearTimer = null
-}
-
-function randomDie() {
-  return Math.floor(Math.random() * 20) + 1
-}
-
-function stopOwnRollAnimation() {
-  if (ownRollStopTimer) {
-    clearTimeout(ownRollStopTimer)
-    ownRollStopTimer = null
-  }
-  if (ownRollTimer) {
-    clearInterval(ownRollTimer)
-    ownRollTimer = null
-  }
-  animatedOwnRoll.value = null
-  ownRollStartedAt.value = 0
-}
-
-function stopOpponentRollAnimation() {
-  if (opponentRollStopTimer) {
-    clearTimeout(opponentRollStopTimer)
-    opponentRollStopTimer = null
-  }
-  if (opponentRollTimer) {
-    clearInterval(opponentRollTimer)
-    opponentRollTimer = null
-  }
-  animatedOpponentRoll.value = null
-  opponentRollStartedAt.value = 0
-}
-
-function startOwnRollAnimation() {
-  stopOwnRollAnimation()
-  animatedOwnRoll.value = randomDie()
-  ownRollStartedAt.value = Date.now()
-  ownRollTimer = setInterval(() => {
-    animatedOwnRoll.value = randomDie()
-  }, 65)
-}
-
-function startOpponentRollAnimation() {
-  stopOpponentRollAnimation()
-  animatedOpponentRoll.value = randomDie()
-  opponentRollStartedAt.value = Date.now()
-  opponentRollTimer = setInterval(() => {
-    animatedOpponentRoll.value = randomDie()
-  }, 65)
-}
-
-function stopOwnRollAnimationWithMinDuration() {
-  if (!ownRollStartedAt.value) {
-    stopOwnRollAnimation()
-    return
-  }
-  const elapsed = Date.now() - ownRollStartedAt.value
-  const remaining = Math.max(0, MIN_ROLL_ANIMATION_MS - elapsed)
-  if (remaining === 0) {
-    stopOwnRollAnimation()
-    return
-  }
-  if (ownRollStopTimer) clearTimeout(ownRollStopTimer)
-  ownRollStopTimer = setTimeout(() => {
-    stopOwnRollAnimation()
-  }, remaining)
-}
-
-function stopOpponentRollAnimationWithMinDuration() {
-  if (!opponentRollStartedAt.value) {
-    stopOpponentRollAnimation()
-    return
-  }
-  const elapsed = Date.now() - opponentRollStartedAt.value
-  const remaining = Math.max(0, MIN_ROLL_ANIMATION_MS - elapsed)
-  if (remaining === 0) {
-    stopOpponentRollAnimation()
-    return
-  }
-  if (opponentRollStopTimer) clearTimeout(opponentRollStopTimer)
-  opponentRollStopTimer = setTimeout(() => {
-    stopOpponentRollAnimation()
-  }, remaining)
 }
 
 watch(
@@ -329,8 +257,6 @@ watch(
 
 onUnmounted(() => {
   stopClearTimer()
-  stopOwnRollAnimation()
-  stopOpponentRollAnimation()
 })
 
 function onClickOwnDie() {
@@ -347,48 +273,4 @@ function passReaction() {
   if (!isMyReactionWindow.value) return
   gameActions.submitCombatReaction(null)
 }
-
-watch(
-  () => active.value?.attackerRoll,
-  (nextRoll) => {
-    if (nextRoll === null || nextRoll === undefined) return
-    if (myRole.value === 'attacker') stopOwnRollAnimationWithMinDuration()
-    if (opponentRole.value === 'attacker') stopOpponentRollAnimationWithMinDuration()
-  }
-)
-
-watch(
-  () => active.value?.defenderRoll,
-  (nextRoll) => {
-    if (nextRoll === null || nextRoll === undefined) return
-    if (myRole.value === 'defender') stopOwnRollAnimationWithMinDuration()
-    if (opponentRole.value === 'defender') stopOpponentRollAnimationWithMinDuration()
-  }
-)
-
-watch(
-  () => isRoleRolling(myRole.value),
-  (isRollingNow) => {
-    if (isRollingNow) {
-      startOwnRollAnimation()
-    }
-  }
-)
-
-watch(
-  () => isRoleRolling(opponentRole.value),
-  (isRollingNow) => {
-    if (isRollingNow) {
-      startOpponentRollAnimation()
-    }
-  }
-)
-
-watch(
-  () => active.value?.combatId,
-  () => {
-    stopOwnRollAnimation()
-    stopOpponentRollAnimation()
-  }
-)
 </script>
