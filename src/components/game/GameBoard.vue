@@ -9,6 +9,7 @@
     <PlayerHand
       :opening-flow="openingFlow"
       :my-player-id="myPlayerId"
+      :is-drawing="isDrawing"
       :opening-action-pending="openingActionPending"
       @accept-opening-hand="$emit('accept-opening-hand')"
       @request-opening-mulligan="$emit('request-opening-mulligan')"
@@ -35,6 +36,10 @@ defineProps({
     required: true
   },
   myPlayerId: {
+    type: Object,
+    required: true
+  },
+  isDrawing: {
     type: Object,
     required: true
   },

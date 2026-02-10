@@ -20,7 +20,6 @@ function createOpeningFlowState() {
   return {
     active: false,
     firstPlayerId: null,
-    currentPlayerId: null,
     mulliganCountByPlayer: {
       player_a: 0,
       player_b: 0
@@ -39,9 +38,6 @@ function cloneOpeningFlowState(state) {
   return {
     active: Boolean(state?.active),
     firstPlayerId: safeFirstPlayerId,
-    currentPlayerId: state?.currentPlayerId === 'player_a' || state?.currentPlayerId === 'player_b'
-      ? state.currentPlayerId
-      : null,
     mulliganCountByPlayer: {
       player_a: Number(state?.mulliganCountByPlayer?.player_a || 0),
       player_b: Number(state?.mulliganCountByPlayer?.player_b || 0)
@@ -87,10 +83,12 @@ export function useGameSession() {
   let unsubscribeMessages = null
   let waitForReady = null
   let waitForConnect = null
+  let openingHostActionChain = Promise.resolve(false)
 
   function resetLocalGameState() {
     drawGeneration.value += 1
     isDrawing.value = false
+    openingHostActionChain = Promise.resolve(false)
     openingActionPending.value = false
     openingFlow.value = createOpeningFlowState()
     game.$reset()
@@ -105,10 +103,6 @@ export function useGameSession() {
 
   function isValidPlayerId(playerId) {
     return playerId === 'player_a' || playerId === 'player_b'
-  }
-
-  function canActInOpeningFlow(playerId) {
-    return openingFlow.value.active && openingFlow.value.currentPlayerId === playerId
   }
 
   function getOpeningHandTargetSize(playerId) {
@@ -127,9 +121,8 @@ export function useGameSession() {
 
   function startOpeningMulliganFlow(firstPlayerId) {
     openingFlow.value = cloneOpeningFlowState({
-      active: true,
+      active: false,
       firstPlayerId,
-      currentPlayerId: firstPlayerId,
       mulliganCountByPlayer: {
         player_a: 0,
         player_b: 0
@@ -139,7 +132,6 @@ export function useGameSession() {
         player_b: false
       }
     })
-    emitOpeningMulliganState()
   }
 
   async function initGame() {
@@ -169,6 +161,7 @@ export function useGameSession() {
         }
       })
 
+      const secondPlayerId = getOpponentPlayerId(initialTurn)
       startOpeningMulliganFlow(initialTurn)
       await drawSequence(OPENING_HAND_SIZE, {
         playerId: initialTurn,
@@ -176,6 +169,14 @@ export function useGameSession() {
         advancePhaseAfterDraw: false,
         delayMs: DRAW_DELAY_MS
       })
+      await drawSequence(OPENING_HAND_SIZE, {
+        playerId: secondPlayerId,
+        syncEachDraw: true,
+        advancePhaseAfterDraw: false,
+        delayMs: DRAW_DELAY_MS
+      })
+      openingFlow.value.active = true
+      emitOpeningMulliganState()
     } finally {
       isRestarting.value = false
     }
@@ -280,37 +281,16 @@ export function useGameSession() {
     return actionPayload
   }
 
-  async function advanceOpeningFlowToNextPlayerOrFinish() {
-    const firstPlayerId = openingFlow.value.firstPlayerId
-    const secondPlayerId = getOpponentPlayerId(firstPlayerId)
+  async function finishOpeningFlowIfReady() {
     const acceptedByPlayer = openingFlow.value.acceptedByPlayer
     const hasFinished = acceptedByPlayer.player_a && acceptedByPlayer.player_b
-    if (hasFinished) {
-      openingFlow.value.active = false
-      openingFlow.value.currentPlayerId = null
-      emitOpeningMulliganState()
-      sendMessage({
-        type: 'opening_mulligan_done',
-        payload: {}
-      })
-      return true
-    }
-
-    if (acceptedByPlayer[firstPlayerId] && !acceptedByPlayer[secondPlayerId]) {
-      openingFlow.value.currentPlayerId = secondPlayerId
-      if (players.players[secondPlayerId].hand.length === 0) {
-        await drawSequence(OPENING_HAND_SIZE, {
-          playerId: secondPlayerId,
-          syncEachDraw: true,
-          advancePhaseAfterDraw: false,
-          delayMs: DRAW_DELAY_MS
-        })
-      }
-      emitOpeningMulliganState()
-      return true
-    }
-
+    if (!hasFinished) return false
+    openingFlow.value.active = false
     emitOpeningMulliganState()
+    sendMessage({
+      type: 'opening_mulligan_done',
+      payload: {}
+    })
     return true
   }
 
@@ -318,8 +298,8 @@ export function useGameSession() {
     if (!connection.isHost) return false
     if (!openingFlow.value.active) return false
     if (!isValidPlayerId(playerId)) return false
-    if (!canActInOpeningFlow(playerId)) return false
     if (action !== 'accept' && action !== 'mulligan') return false
+    if (openingFlow.value.acceptedByPlayer[playerId]) return false
 
     if (action === 'accept') {
       openingFlow.value.acceptedByPlayer[playerId] = true
@@ -332,7 +312,8 @@ export function useGameSession() {
           newHandSize: players.players[playerId]?.hand?.length || 0
         }
       })
-      await advanceOpeningFlowToNextPlayerOrFinish()
+      emitOpeningMulliganState()
+      await finishOpeningFlowIfReady()
       return true
     }
 
@@ -343,13 +324,20 @@ export function useGameSession() {
     return true
   }
 
+  function enqueueOpeningActionAsHost(action, playerId) {
+    openingHostActionChain = openingHostActionChain
+      .catch(() => false)
+      .then(() => processOpeningActionAsHost(action, playerId))
+    return openingHostActionChain
+  }
+
   async function acceptOpeningHand() {
     if (!openingFlow.value.active) return false
-    if (openingFlow.value.currentPlayerId !== myPlayerId.value) return false
+    if (openingFlow.value.acceptedByPlayer[myPlayerId.value]) return false
     if (openingActionPending.value) return false
 
     if (connection.isHost) {
-      return processOpeningActionAsHost('accept', myPlayerId.value)
+      return enqueueOpeningActionAsHost('accept', myPlayerId.value)
     }
 
     openingActionPending.value = true
@@ -369,11 +357,11 @@ export function useGameSession() {
 
   async function requestOpeningMulligan() {
     if (!openingFlow.value.active) return false
-    if (openingFlow.value.currentPlayerId !== myPlayerId.value) return false
+    if (openingFlow.value.acceptedByPlayer[myPlayerId.value]) return false
     if (openingActionPending.value) return false
 
     if (connection.isHost) {
-      return processOpeningActionAsHost('mulligan', myPlayerId.value)
+      return enqueueOpeningActionAsHost('mulligan', myPlayerId.value)
     }
 
     openingActionPending.value = true
@@ -499,7 +487,7 @@ export function useGameSession() {
     if (data.type === 'opening_mulligan_action' && connection.isHost) {
       const action = data.payload?.action
       const playerId = data.payload?.playerId
-      void processOpeningActionAsHost(action, playerId)
+      void enqueueOpeningActionAsHost(action, playerId)
       return true
     }
 
@@ -627,6 +615,7 @@ export function useGameSession() {
     connection,
     game,
     myPlayerId,
+    isDrawing,
     openingFlow,
     openingActionPending,
     initGame,

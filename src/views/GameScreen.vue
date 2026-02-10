@@ -9,6 +9,7 @@
       v-else
       :opening-flow="openingFlow"
       :my-player-id="myPlayerId"
+      :is-drawing="isDrawing"
       :opening-action-pending="openingActionPending"
       @accept-opening-hand="acceptOpeningHand"
       @request-opening-mulligan="requestOpeningMulligan"
@@ -90,6 +91,7 @@ const {
   connection,
   game,
   myPlayerId,
+  isDrawing,
   openingFlow,
   openingActionPending,
   initGame,

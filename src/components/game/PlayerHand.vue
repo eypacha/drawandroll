@@ -28,6 +28,8 @@
         :key="card.id" 
         class="card-wrapper"
         :class="{ 
+          'is-opening-layout': isOpeningLayout,
+          'is-draw-locked': isDrawLocked,
           'is-draggable': canDragCard(card),
           'is-dragging': draggedCardId === card.id,
           'is-discard-selectable': canSelectForDiscard,
@@ -65,6 +67,10 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  isDrawing: {
+    type: Object,
+    required: true
+  },
   openingActionPending: {
     type: Boolean,
     default: false
@@ -84,8 +90,10 @@ const localPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b'
 const myPlayerId = computed(() => props.myPlayerId?.value || localPlayerId.value)
 const myHand = computed(() => players.players[myPlayerId.value].hand)
 const openingFlowActive = computed(() => Boolean(props.openingFlow?.active))
-const openingCurrentPlayerId = computed(() => props.openingFlow?.currentPlayerId || null)
-const showOpeningButtons = computed(() => openingFlowActive.value && openingCurrentPlayerId.value === myPlayerId.value)
+const isOpeningAcceptedByMe = computed(() => Boolean(props.openingFlow?.acceptedByPlayer?.[myPlayerId.value]))
+const showOpeningButtons = computed(() => openingFlowActive.value && !isOpeningAcceptedByMe.value)
+const isOpeningLayout = computed(() => openingFlowActive.value && !isOpeningAcceptedByMe.value)
+const isDrawLocked = computed(() => Boolean(props.isDrawing?.value))
 const canAct = computed(() => !openingFlowActive.value && game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
 const canSelectForDiscard = computed(() => !openingFlowActive.value && game.turnPhase === 'discard' && game.currentTurn === myPlayerId.value)
 const isReactionDefender = computed(() => combat.reactionWindow?.defenderPlayerId === myPlayerId.value)
@@ -287,13 +295,13 @@ onUnmounted(() => {
 
 .opening-mulligan-controls {
   position: fixed;
-  bottom: 150px;
+  bottom: 49.8%;
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 20px;
   pointer-events: auto;
   z-index: 130;
 }
@@ -301,7 +309,7 @@ onUnmounted(() => {
 .opening-btn {
   padding: 8px 12px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 18px;
   transition: background-color 0.2s ease;
 }
 
@@ -352,12 +360,29 @@ onUnmounted(() => {
   margin-left: 0;
 }
 
+.card-wrapper.is-opening-layout {
+  transform: translateY(-50px) rotate(var(--rotation, 0deg)) !important;
+}
+
 .card-wrapper:hover {
   transform: 
     translateY(-0px) 
     rotate(0deg) 
     scale(1.08);
   z-index: var(--hover-z-index, 100);
+}
+
+/* .card-wrapper.is-opening-layout:hover {
+  transform: translateY(-20px) rotate(var(--rotation, 0deg)) !important;
+  z-index: var(--z-index, 1);
+} */
+
+.card-wrapper.is-draw-locked:hover {
+  transform:
+    translateY(calc(50% + var(--vertical-offset, 0px)))
+    rotate(var(--rotation, 0deg))
+    scale(1);
+  z-index: var(--z-index, 1);
 }
 
 .card-wrapper.is-draggable {
