@@ -10,19 +10,16 @@
           @click="onClickOpponentDie"
         >
           <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
-            <div class="h-14 w-14">
+            <div class="h-24 w-24">
               <ThreeDie
                 :value="getRoleRoll(opponentRole)"
                 :rolling="isRoleRolling(opponentRole)"
                 tone="emerald"
               />
             </div>
-            <div class="text-xs font-bold">
-              {{ opponentRollDisplay }}
-            </div>
           </div>
         </button>
-        <div v-if="opponentFormula" class="mt-2 text-xs text-gray-700">
+        <div v-if="opponentFormula" class="text-center font-semibold">
           {{ opponentFormula }}
         </div>
       </section>
@@ -36,19 +33,16 @@
           @click="onClickOwnDie"
         >
           <div class="flex h-full w-full flex-col items-center justify-center gap-1 py-1">
-            <div class="h-14 w-14">
+            <div class="h-24 w-24">
               <ThreeDie
                 :value="getRoleRoll(myRole)"
                 :rolling="isRoleRolling(myRole)"
                 tone="blue"
               />
             </div>
-            <div class="text-xs font-bold">
-              {{ ownRollDisplay }}
-            </div>
           </div>
         </button>
-        <div v-if="ownFormula" class="mt-2 text-xs text-gray-700">
+        <div v-if="ownFormula" class="text-center font-semibold">
           {{ ownFormula }}
         </div>
       </section>
@@ -221,14 +215,14 @@ const canClickOwnDie = computed(() => isRoleClickable(myRole.value))
 const canClickOpponentDie = computed(() => isRoleClickable(opponentRole.value))
 
 const ownDieClass = computed(() => ({
-  'border-blue-400 bg-blue-50 text-blue-700 cursor-pointer': canClickOwnDie.value,
-  'border-gray-300 bg-white text-gray-900': !canClickOwnDie.value,
+  'border-blue-400 text-blue-700 cursor-pointer': canClickOwnDie.value,
+  'border-transparent': !canClickOwnDie.value,
   'opacity-70 cursor-not-allowed': !canClickOwnDie.value
 }))
 
 const opponentDieClass = computed(() => ({
-  'border-emerald-400 bg-emerald-50 text-emerald-700 cursor-pointer': canClickOpponentDie.value,
-  'border-gray-300 bg-white text-gray-900': !canClickOpponentDie.value,
+  'border-emerald-400 text-emerald-700 cursor-pointer': canClickOpponentDie.value,
+  'border-transparent': !canClickOpponentDie.value,
   'opacity-70 cursor-not-allowed': !canClickOpponentDie.value
 }))
 
