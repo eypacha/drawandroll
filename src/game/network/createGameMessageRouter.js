@@ -1,6 +1,14 @@
 import batchData from '@/../data/batches/batch.json'
 
-export function createGameMessageRouter({ deck, game, players, resetLocalGameState }) {
+export function createGameMessageRouter({
+  deck,
+  game,
+  players,
+  resetLocalGameState,
+  applyOpeningMulliganState,
+  applyOpeningMulliganAction,
+  applyOpeningMulliganDone
+}) {
   const handlers = {
     game_init(payload) {
       if (typeof resetLocalGameState === 'function') {
@@ -51,26 +59,21 @@ export function createGameMessageRouter({ deck, game, players, resetLocalGameSta
       }
     },
 
-    mulligan_reveal(payload) {
-      const { playerId, cards } = payload
-      players.setMulliganReveal(playerId, cards)
+    opening_mulligan_state(payload) {
+      if (typeof applyOpeningMulliganState === 'function') {
+        applyOpeningMulliganState(payload)
+      }
     },
 
-    mulligan_remove_one(payload) {
-      const { playerId, cardId } = payload
-      players.removeCardFromHand(playerId, cardId)
-      players.removeMulliganRevealCard(playerId, cardId)
+    opening_mulligan_action(payload) {
+      if (typeof applyOpeningMulliganAction === 'function') {
+        applyOpeningMulliganAction(payload)
+      }
     },
 
-    mulligan_clear(payload) {
-      const { playerId } = payload
-      players.clearMulliganReveal(playerId)
-    },
-
-    mulligan_deck_sync(payload) {
-      const { deckCards } = payload
-      if (Array.isArray(deckCards)) {
-        deck.cards = deckCards
+    opening_mulligan_done(payload) {
+      if (typeof applyOpeningMulliganDone === 'function') {
+        applyOpeningMulliganDone(payload)
       }
     },
 

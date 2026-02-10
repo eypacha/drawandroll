@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { usePlayersStore } from './usePlayersStore'
 
 
-const MAX_RESOURCES = 10
+const MAX_RESOURCES = 6
 
 /**
  * Game Store
@@ -68,6 +68,8 @@ export const useGameStore = defineStore('game', () => {
     // First player skips draw phase on turn 1
     turnPhase.value = initialTurnPhase
     winner.value = null
+    players.refreshResources('player_a')
+    players.refreshResources('player_b')
     players.refreshResources(currentTurn.value)
   }
 

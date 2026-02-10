@@ -6,12 +6,14 @@ import { defineStore } from 'pinia'
  * Manages both players: hands, heroes on board, resources, pressure
  */
 export const usePlayersStore = defineStore('players', () => {
+  const DEFAULT_MAX_RESOURCES = 6
+
   // Initial player state factory
   const createPlayer = () => ({
     hand: [],
     heroes: [null, null, null], // 3 fixed slots
-    resources: 5,
-    maxResources: 5,
+    resources: DEFAULT_MAX_RESOURCES,
+    maxResources: DEFAULT_MAX_RESOURCES,
     heroesLost: 0,
     draggedCardId: null,
     hoveredCardId: null,
@@ -813,7 +815,10 @@ export const usePlayersStore = defineStore('players', () => {
   }
 
   function refreshResources(playerId) {
-    players.value[playerId].resources = players.value[playerId].maxResources
+    const player = players.value[playerId]
+    if (!player) return
+    player.maxResources = DEFAULT_MAX_RESOURCES
+    player.resources = player.maxResources
   }
 
   function $reset() {

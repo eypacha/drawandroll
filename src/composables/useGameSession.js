@@ -13,7 +13,44 @@ import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
 import { useGameActions } from './useGameActions'
 
 const DRAW_DELAY_MS = 350
-const MULLIGAN_REMOVE_DELAY_MS = 220
+const OPENING_HAND_SIZE = 7
+
+function createOpeningFlowState() {
+  return {
+    active: false,
+    firstPlayerId: null,
+    currentPlayerId: null,
+    mulliganCountByPlayer: {
+      player_a: 0,
+      player_b: 0
+    },
+    acceptedByPlayer: {
+      player_a: false,
+      player_b: false
+    }
+  }
+}
+
+function cloneOpeningFlowState(state) {
+  const safeFirstPlayerId = state?.firstPlayerId === 'player_a' || state?.firstPlayerId === 'player_b'
+    ? state.firstPlayerId
+    : null
+  return {
+    active: Boolean(state?.active),
+    firstPlayerId: safeFirstPlayerId,
+    currentPlayerId: state?.currentPlayerId === 'player_a' || state?.currentPlayerId === 'player_b'
+      ? state.currentPlayerId
+      : null,
+    mulliganCountByPlayer: {
+      player_a: Number(state?.mulliganCountByPlayer?.player_a || 0),
+      player_b: Number(state?.mulliganCountByPlayer?.player_b || 0)
+    },
+    acceptedByPlayer: {
+      player_a: Boolean(state?.acceptedByPlayer?.player_a),
+      player_b: Boolean(state?.acceptedByPlayer?.player_b)
+    }
+  }
+}
 
 export function useGameSession() {
   const route = useRoute()
@@ -33,12 +70,17 @@ export function useGameSession() {
   const isRestartRequestPending = ref(false)
   const restartRequestStatus = ref('idle')
   const isRestarting = ref(false)
+  const openingFlow = ref(createOpeningFlowState())
+  const openingActionPending = ref(false)
 
   const routeGameMessage = createGameMessageRouter({
     deck,
     game,
     players,
-    resetLocalGameState
+    resetLocalGameState,
+    applyOpeningMulliganState,
+    applyOpeningMulliganAction,
+    applyOpeningMulliganDone
   })
 
   let unsubscribeMessages = null
@@ -48,10 +90,55 @@ export function useGameSession() {
   function resetLocalGameState() {
     drawGeneration.value += 1
     isDrawing.value = false
+    openingActionPending.value = false
+    openingFlow.value = createOpeningFlowState()
     game.$reset()
     deck.$reset()
     players.$reset()
     combat.$reset()
+  }
+
+  function getOpponentPlayerId(playerId) {
+    return playerId === 'player_a' ? 'player_b' : 'player_a'
+  }
+
+  function isValidPlayerId(playerId) {
+    return playerId === 'player_a' || playerId === 'player_b'
+  }
+
+  function canActInOpeningFlow(playerId) {
+    return openingFlow.value.active && openingFlow.value.currentPlayerId === playerId
+  }
+
+  function getOpeningHandTargetSize(playerId) {
+    const mulliganCount = Number(openingFlow.value.mulliganCountByPlayer?.[playerId] || 0)
+    return Math.max(0, OPENING_HAND_SIZE - mulliganCount)
+  }
+
+  function emitOpeningMulliganState() {
+    sendMessage({
+      type: 'opening_mulligan_state',
+      payload: {
+        state: openingFlow.value
+      }
+    })
+  }
+
+  function startOpeningMulliganFlow(firstPlayerId) {
+    openingFlow.value = cloneOpeningFlowState({
+      active: true,
+      firstPlayerId,
+      currentPlayerId: firstPlayerId,
+      mulliganCountByPlayer: {
+        player_a: 0,
+        player_b: 0
+      },
+      acceptedByPlayer: {
+        player_a: false,
+        player_b: false
+      }
+    })
+    emitOpeningMulliganState()
   }
 
   async function initGame() {
@@ -81,76 +168,197 @@ export function useGameSession() {
         }
       })
 
-      const secondPlayerId = initialTurn === 'player_a' ? 'player_b' : 'player_a'
-      for (const playerId of [initialTurn, secondPlayerId]) {
-        await drawSequence(7, {
-          playerId,
-          syncEachDraw: true,
-          advancePhaseAfterDraw: false,
-          delayMs: DRAW_DELAY_MS
-        })
-        await runOpeningMulliganIfNeeded(playerId)
-      }
+      startOpeningMulliganFlow(initialTurn)
+      await drawSequence(OPENING_HAND_SIZE, {
+        playerId: initialTurn,
+        syncEachDraw: true,
+        advancePhaseAfterDraw: false,
+        delayMs: DRAW_DELAY_MS
+      })
     } finally {
       isRestarting.value = false
     }
   }
 
-  async function runOpeningMulliganIfNeeded(playerId) {
-    const player = players.players[playerId]
-    if (!player) return false
+  function applyOpeningMulliganState(payload = {}) {
+    const nextState = cloneOpeningFlowState(payload?.state || createOpeningFlowState())
+    openingFlow.value = nextState
+    openingActionPending.value = false
+    return true
+  }
 
-    const hasHeroInOpeningHand = player.hand.some((card) => card.type === 'hero')
-    if (hasHeroInOpeningHand) {
-      players.clearMulliganReveal(playerId)
-      return false
+  function applyOpeningMulliganDone() {
+    openingFlow.value = createOpeningFlowState()
+    openingActionPending.value = false
+    return true
+  }
+
+  function applyOpeningMulliganAction(payload = {}) {
+    const action = payload?.action
+    const playerId = payload?.playerId
+    if (!isValidPlayerId(playerId)) return false
+    if (action !== 'mulligan') {
+      openingActionPending.value = false
+      return true
     }
 
-    const openingHand = player.hand.map((card) => ({ ...card }))
-    players.setMulliganReveal(playerId, openingHand)
-    sendMessage({
-      type: 'mulligan_reveal',
-      payload: { playerId, cards: openingHand }
-    })
+    const returnedCardIds = Array.isArray(payload?.returnedCardIds) ? payload.returnedCardIds : []
+    for (const cardId of returnedCardIds) {
+      players.removeCardFromHand(playerId, cardId)
+    }
+    if (Array.isArray(payload?.deckCards)) {
+      deck.cards = payload.deckCards
+    }
+    openingActionPending.value = false
+    return true
+  }
 
+  async function replaceOpeningHand(playerId, targetSize) {
+    const player = players.players[playerId]
+    if (!player) return null
     const removedCards = []
-    while (players.players[playerId].hand.length > 0) {
-      const card = players.players[playerId].hand[0]
+    while (player.hand.length > 0) {
+      const card = player.hand[0]
       const removed = players.removeCardFromHand(playerId, card.id)
       if (!removed) break
       removedCards.push(removed)
-      players.removeMulliganRevealCard(playerId, card.id)
-      sendMessage({
-        type: 'mulligan_remove_one',
-        payload: { playerId, cardId: card.id }
-      })
-      await new Promise((resolve) => setTimeout(resolve, MULLIGAN_REMOVE_DELAY_MS))
     }
 
     if (removedCards.length > 0) {
       deck.cards.push(...removedCards)
       deck.shuffle()
-      sendMessage({
-        type: 'mulligan_deck_sync',
-        payload: {
-          deckCards: deck.cards
-        }
-      })
     }
 
-    await drawSequence(7, {
+    const actionPayload = {
+      action: 'mulligan',
+      playerId,
+      mulliganCount: openingFlow.value.mulliganCountByPlayer[playerId],
+      newHandSize: targetSize,
+      returnedCardIds: removedCards.map((card) => card.id),
+      deckCards: deck.cards
+    }
+    sendMessage({
+      type: 'opening_mulligan_action',
+      payload: actionPayload
+    })
+    await drawSequence(targetSize, {
       playerId,
       syncEachDraw: true,
       advancePhaseAfterDraw: false,
       delayMs: DRAW_DELAY_MS
     })
+    return actionPayload
+  }
 
-    players.clearMulliganReveal(playerId)
-    sendMessage({
-      type: 'mulligan_clear',
-      payload: { playerId }
-    })
+  async function advanceOpeningFlowToNextPlayerOrFinish() {
+    const firstPlayerId = openingFlow.value.firstPlayerId
+    const secondPlayerId = getOpponentPlayerId(firstPlayerId)
+    const acceptedByPlayer = openingFlow.value.acceptedByPlayer
+    const hasFinished = acceptedByPlayer.player_a && acceptedByPlayer.player_b
+    if (hasFinished) {
+      openingFlow.value.active = false
+      openingFlow.value.currentPlayerId = null
+      emitOpeningMulliganState()
+      sendMessage({
+        type: 'opening_mulligan_done',
+        payload: {}
+      })
+      return true
+    }
+
+    if (acceptedByPlayer[firstPlayerId] && !acceptedByPlayer[secondPlayerId]) {
+      openingFlow.value.currentPlayerId = secondPlayerId
+      if (players.players[secondPlayerId].hand.length === 0) {
+        await drawSequence(OPENING_HAND_SIZE, {
+          playerId: secondPlayerId,
+          syncEachDraw: true,
+          advancePhaseAfterDraw: false,
+          delayMs: DRAW_DELAY_MS
+        })
+      }
+      emitOpeningMulliganState()
+      return true
+    }
+
+    emitOpeningMulliganState()
     return true
+  }
+
+  async function processOpeningActionAsHost(action, playerId) {
+    if (!connection.isHost) return false
+    if (!openingFlow.value.active) return false
+    if (!isValidPlayerId(playerId)) return false
+    if (!canActInOpeningFlow(playerId)) return false
+    if (action !== 'accept' && action !== 'mulligan') return false
+
+    if (action === 'accept') {
+      openingFlow.value.acceptedByPlayer[playerId] = true
+      sendMessage({
+        type: 'opening_mulligan_action',
+        payload: {
+          action: 'accept',
+          playerId,
+          mulliganCount: openingFlow.value.mulliganCountByPlayer[playerId],
+          newHandSize: players.players[playerId]?.hand?.length || 0
+        }
+      })
+      await advanceOpeningFlowToNextPlayerOrFinish()
+      return true
+    }
+
+    openingFlow.value.mulliganCountByPlayer[playerId] += 1
+    const targetSize = getOpeningHandTargetSize(playerId)
+    await replaceOpeningHand(playerId, targetSize)
+    emitOpeningMulliganState()
+    return true
+  }
+
+  async function acceptOpeningHand() {
+    if (!openingFlow.value.active) return false
+    if (openingFlow.value.currentPlayerId !== myPlayerId.value) return false
+    if (openingActionPending.value) return false
+
+    if (connection.isHost) {
+      return processOpeningActionAsHost('accept', myPlayerId.value)
+    }
+
+    openingActionPending.value = true
+    const sent = sendMessage({
+      type: 'opening_mulligan_action',
+      payload: {
+        action: 'accept',
+        playerId: myPlayerId.value,
+        requestedAt: Date.now()
+      }
+    })
+    if (!sent) {
+      openingActionPending.value = false
+    }
+    return sent
+  }
+
+  async function requestOpeningMulligan() {
+    if (!openingFlow.value.active) return false
+    if (openingFlow.value.currentPlayerId !== myPlayerId.value) return false
+    if (openingActionPending.value) return false
+
+    if (connection.isHost) {
+      return processOpeningActionAsHost('mulligan', myPlayerId.value)
+    }
+
+    openingActionPending.value = true
+    const sent = sendMessage({
+      type: 'opening_mulligan_action',
+      payload: {
+        action: 'mulligan',
+        playerId: myPlayerId.value,
+        requestedAt: Date.now()
+      }
+    })
+    if (!sent) {
+      openingActionPending.value = false
+    }
+    return sent
   }
 
   function requestRestartGame() {
@@ -256,6 +464,13 @@ export function useGameSession() {
 
     if (data.type === 'discard_request') {
       return gameActions.handleDiscardRequest(data.payload || {})
+    }
+
+    if (data.type === 'opening_mulligan_action' && connection.isHost) {
+      const action = data.payload?.action
+      const playerId = data.payload?.playerId
+      void processOpeningActionAsHost(action, playerId)
+      return true
     }
 
     if (data.type === 'game_end') {
@@ -381,7 +596,12 @@ export function useGameSession() {
   return {
     connection,
     game,
+    myPlayerId,
+    openingFlow,
+    openingActionPending,
     initGame,
+    acceptOpeningHand,
+    requestOpeningMulligan,
     requestRestartGame,
     incomingRestartRequest,
     respondRestartRequest,

@@ -5,7 +5,14 @@
       v-else-if="game.phase === 'setup'" 
       @start-game="initGame" 
     />
-    <GameBoard v-else />
+    <GameBoard
+      v-else
+      :opening-flow="openingFlow"
+      :my-player-id="myPlayerId"
+      :opening-action-pending="openingActionPending"
+      @accept-opening-hand="acceptOpeningHand"
+      @request-opening-mulligan="requestOpeningMulligan"
+    />
 
     <button
       v-if="game.isPlaying"
@@ -82,7 +89,12 @@ const isPauseOpen = ref(false)
 const {
   connection,
   game,
+  myPlayerId,
+  openingFlow,
+  openingActionPending,
   initGame,
+  acceptOpeningHand,
+  requestOpeningMulligan,
   requestRestartGame,
   incomingRestartRequest,
   respondRestartRequest,

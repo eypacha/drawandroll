@@ -6,7 +6,7 @@
       {{ phaseLabel }}
     </div>
     <button
-      v-if="isMyTurn && game.isPlaying && advanceLabel"
+      v-if="isMyTurn && game.isPlaying && advanceLabel && !openingFlowActive"
       class="mt-2 px-3 py-1 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-800 transition-colors"
       :disabled="isActionDisabled"
       :class="{ 'opacity-60 cursor-not-allowed': isActionDisabled }"
@@ -29,6 +29,12 @@ const combat = useCombatStore()
 const players = usePlayersStore()
 const gameActions = useGameActions()
 const { t } = useI18n()
+const props = defineProps({
+  openingFlowActive: {
+    type: Boolean,
+    default: false
+  }
+})
 const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
 const isMyTurn = computed(() => game.currentTurn === myPlayerId.value)
 const myHand = computed(() => players.players[myPlayerId.value].hand)
@@ -58,6 +64,7 @@ const advanceLabel = computed(() => {
 })
 
 const isActionDisabled = computed(() => {
+  if (props.openingFlowActive) return true
   if (combat.isRolling) return true
   if (game.turnPhase !== 'discard') return false
   if (requiredDiscardCount.value <= 0) return false

@@ -6,8 +6,14 @@
     </div>
     <GameTable />
     <CombatDiceRail />
-    <PlayerHand />
-    <TurnStatus />
+    <PlayerHand
+      :opening-flow="openingFlow"
+      :my-player-id="myPlayerId"
+      :opening-action-pending="openingActionPending"
+      @accept-opening-hand="$emit('accept-opening-hand')"
+      @request-opening-mulligan="$emit('request-opening-mulligan')"
+    />
+    <TurnStatus :opening-flow-active="Boolean(openingFlow?.active)" />
     <ResourceDisplayPlayer />
     <ResourceDisplayOpponent />
   </div>
@@ -22,4 +28,21 @@ import PlayerHand from './PlayerHand.vue'
 import TurnStatus from './TurnStatus.vue'
 import ResourceDisplayPlayer from './ResourceDisplayPlayer.vue'
 import ResourceDisplayOpponent from './ResourceDisplayOpponent.vue'
+
+defineProps({
+  openingFlow: {
+    type: Object,
+    required: true
+  },
+  myPlayerId: {
+    type: Object,
+    required: true
+  },
+  openingActionPending: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['accept-opening-hand', 'request-opening-mulligan'])
 </script>

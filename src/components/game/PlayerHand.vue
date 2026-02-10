@@ -1,5 +1,27 @@
 <template>
   <div class="player-hand-container">
+    <div
+      v-if="showOpeningButtons"
+      class="opening-mulligan-controls"
+    >
+      <button
+        type="button"
+        class="opening-btn opening-btn-secondary"
+        :disabled="openingActionPending"
+        @click="$emit('request-opening-mulligan')"
+      >
+        {{ t('openingMulligan.mulligan') }}
+      </button>
+      <button
+        type="button"
+        class="opening-btn opening-btn-primary"
+        :disabled="openingActionPending"
+        @click="$emit('accept-opening-hand')"
+      >
+        {{ t('openingMulligan.accept') }}
+      </button>
+    </div>
+
     <div class="player-hand">
       <div 
         v-for="(card, index) in myHand" 
@@ -29,20 +51,43 @@
 
 <script setup>
 import { computed, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePlayersStore, useConnectionStore, useGameStore, useCombatStore } from '@/stores'
 import { useGameActions } from '@/composables/useGameActions'
 import Card from './Card.vue'
+
+const props = defineProps({
+  openingFlow: {
+    type: Object,
+    required: true
+  },
+  myPlayerId: {
+    type: Object,
+    required: true
+  },
+  openingActionPending: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['accept-opening-hand', 'request-opening-mulligan'])
 
 const connection = useConnectionStore()
 const players = usePlayersStore()
 const game = useGameStore()
 const combat = useCombatStore()
 const gameActions = useGameActions()
+const { t } = useI18n()
 
-const myPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
+const localPlayerId = computed(() => connection.isHost ? 'player_a' : 'player_b')
+const myPlayerId = computed(() => props.myPlayerId?.value || localPlayerId.value)
 const myHand = computed(() => players.players[myPlayerId.value].hand)
-const canAct = computed(() => game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
-const canSelectForDiscard = computed(() => game.turnPhase === 'discard' && game.currentTurn === myPlayerId.value)
+const openingFlowActive = computed(() => Boolean(props.openingFlow?.active))
+const openingCurrentPlayerId = computed(() => props.openingFlow?.currentPlayerId || null)
+const showOpeningButtons = computed(() => openingFlowActive.value && openingCurrentPlayerId.value === myPlayerId.value)
+const canAct = computed(() => !openingFlowActive.value && game.turnPhase === 'recruit' && game.currentTurn === myPlayerId.value)
+const canSelectForDiscard = computed(() => !openingFlowActive.value && game.turnPhase === 'discard' && game.currentTurn === myPlayerId.value)
 const isReactionDefender = computed(() => combat.reactionWindow?.defenderPlayerId === myPlayerId.value)
 const canReactNow = computed(() => combat.isReactionOpen && isReactionDefender.value)
 const selectedDiscardIds = computed(() => players.players[myPlayerId.value].discardSelectionIds || [])
@@ -58,6 +103,7 @@ function canDragCard(card) {
 }
 
 function canSelectReactive(card) {
+  if (openingFlowActive.value) return false
   if (!canReactNow.value) return false
   if (card?.type !== 'reactive' && card?.type !== 'counterattack' && card?.type !== 'healing') return false
   if (card?.type === 'healing' && players.getHealingTargets(myPlayerId.value).length === 0) return false
@@ -65,6 +111,7 @@ function canSelectReactive(card) {
 }
 
 function canArmHealingInRecruit(card) {
+  if (openingFlowActive.value) return false
   if (!canAct.value) return false
   if (card?.type !== 'healing') return false
   if (myResources.value < Number(card.cost || 0)) return false
@@ -170,6 +217,7 @@ function onHoverEnd(card) {
 }
 
 function onCardClick(card) {
+  if (openingFlowActive.value) return
   if (canSelectReactive(card)) {
     if (card.type === 'healing') {
       if (pendingHealingCardId.value === card.id) {
@@ -235,6 +283,50 @@ onUnmounted(() => {
   align-items: flex-end;
   pointer-events: none;
   z-index: 100;
+}
+
+.opening-mulligan-controls {
+  position: fixed;
+  bottom: 150px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: auto;
+  z-index: 130;
+}
+
+.opening-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.opening-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.opening-btn-secondary {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+}
+
+.opening-btn-secondary:hover:enabled {
+  background: #f3f4f6;
+}
+
+.opening-btn-primary {
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
+}
+
+.opening-btn-primary:hover:enabled {
+  background: #374151;
 }
 
 .player-hand {

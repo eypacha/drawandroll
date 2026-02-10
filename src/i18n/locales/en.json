@@ -110,6 +110,10 @@
     "keepPlaying": "Keep playing",
     "acceptRestart": "Accept restart"
   },
+  "openingMulligan": {
+    "accept": "Accept hand",
+    "mulligan": "Draw again"
+  },
   "endgame": {
     "titleWin": "You won the game",
     "titleLose": "You lost the game",
