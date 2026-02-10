@@ -12,6 +12,7 @@
   "dependencies": {
     "peerjs": "^1.5.5",
     "pinia": "^3.0.4",
+    "three": "^0.182.0",
     "vite-plugin-webfont-dl": "^3.10.5",
     "vue": "^3.5.13",
     "vue-i18n": "9",
