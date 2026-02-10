@@ -62,7 +62,8 @@ function generateRoomId() {
 
 function createRoom() {
   isCreating.value = true
-  const roomId = generateRoomId()
+  const devRoomId = import.meta.env.VITE_DEV_FIXED_ROOM_ID
+  const roomId = import.meta.env.DEV && devRoomId ? devRoomId : generateRoomId()
   
   // Initialize peer with room ID as peer ID
   initPeer(roomId)

@@ -282,7 +282,8 @@ export function useGameSession() {
   }
 
   onMounted(() => {
-    const roomId = route.query.id
+    const devRoomId = import.meta.env.VITE_DEV_FIXED_ROOM_ID
+    const roomId = route.query.id || (import.meta.env.DEV && devRoomId ? devRoomId : null)
     if (!roomId) {
       router.push({ name: 'Main' })
       return
