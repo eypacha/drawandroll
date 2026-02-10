@@ -13,6 +13,7 @@ import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
 import { useGameActions } from './useGameActions'
 
 const DRAW_DELAY_MS = 350
+const OPENING_MULLIGAN_REMOVE_DELAY_MS = 100
 const OPENING_HAND_SIZE = 7
 
 function createOpeningFlowState() {
@@ -197,17 +198,26 @@ export function useGameSession() {
     const action = payload?.action
     const playerId = payload?.playerId
     if (!isValidPlayerId(playerId)) return false
-    if (action !== 'mulligan') {
+    if (action === 'mulligan_remove_one') {
+      const cardId = payload?.cardId
+      if (cardId) {
+        players.removeCardFromHand(playerId, cardId)
+      }
       openingActionPending.value = false
       return true
     }
 
-    const returnedCardIds = Array.isArray(payload?.returnedCardIds) ? payload.returnedCardIds : []
-    for (const cardId of returnedCardIds) {
-      players.removeCardFromHand(playerId, cardId)
+    if (action === 'mulligan_deck_sync') {
+      if (Array.isArray(payload?.deckCards)) {
+        deck.cards = payload.deckCards
+      }
+      openingActionPending.value = false
+      return true
     }
-    if (Array.isArray(payload?.deckCards)) {
-      deck.cards = payload.deckCards
+
+    if (action !== 'mulligan') {
+      openingActionPending.value = false
+      return true
     }
     openingActionPending.value = false
     return true
@@ -217,30 +227,50 @@ export function useGameSession() {
     const player = players.players[playerId]
     if (!player) return null
     const removedCards = []
-    while (player.hand.length > 0) {
-      const card = player.hand[0]
+    const cardsToRemove = player.hand.map((card) => card.id)
+    for (const cardId of cardsToRemove) {
+      const card = player.hand.find((entry) => entry.id === cardId)
+      if (!card) continue
       const removed = players.removeCardFromHand(playerId, card.id)
-      if (!removed) break
+      if (!removed) continue
       removedCards.push(removed)
+      sendMessage({
+        type: 'opening_mulligan_action',
+        payload: {
+          action: 'mulligan_remove_one',
+          playerId,
+          cardId: card.id
+        }
+      })
+      await new Promise((resolve) => setTimeout(resolve, OPENING_MULLIGAN_REMOVE_DELAY_MS))
     }
 
     if (removedCards.length > 0) {
       deck.cards.push(...removedCards)
       deck.shuffle()
+      sendMessage({
+        type: 'opening_mulligan_action',
+        payload: {
+          action: 'mulligan_deck_sync',
+          playerId,
+          deckCards: deck.cards
+        }
+      })
     }
 
     const actionPayload = {
       action: 'mulligan',
       playerId,
       mulliganCount: openingFlow.value.mulliganCountByPlayer[playerId],
-      newHandSize: targetSize,
-      returnedCardIds: removedCards.map((card) => card.id),
-      deckCards: deck.cards
+      newHandSize: targetSize
     }
     sendMessage({
       type: 'opening_mulligan_action',
       payload: actionPayload
     })
+    if (removedCards.length > 0) {
+      await new Promise((resolve) => setTimeout(resolve, OPENING_MULLIGAN_REMOVE_DELAY_MS))
+    }
     await drawSequence(targetSize, {
       playerId,
       syncEachDraw: true,
