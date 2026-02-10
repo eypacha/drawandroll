@@ -147,6 +147,8 @@ function playHeroFromHand(state, playerId, cardId, slotIndex, stats) {
   if (player.resources < cost) return null
 
   player.resources -= cost
+  stats.resourcesSpentTotal += cost
+  stats.resourcesSpentHeroes += cost
   player.hand.splice(handIndex, 1)
   player.heroes[slotIndex] = createHeroInstance(card)
   stats.cardsRecruitedTotal += 1
@@ -172,6 +174,8 @@ function playItemFromHand(state, playerId, cardId, slotIndex, stats) {
 
   const maxHpBefore = getHeroMaxHp(hero)
   player.resources -= cost
+  stats.resourcesSpentTotal += cost
+  stats.resourcesSpentItems += cost
   player.hand.splice(handIndex, 1)
   hero.items.push(createItemInstance(card))
   const maxHpAfter = getHeroMaxHp(hero)
@@ -208,9 +212,12 @@ function playHealingFromHand(state, playerId, cardId, targetSlot, stats) {
 
   hero.currentHp = hpAfter
   player.resources -= cost
+  stats.resourcesSpentTotal += cost
+  stats.resourcesSpentHealing += cost
   player.hand.splice(handIndex, 1)
   stats.healingCardsUsed += 1
   stats.healingTotal += appliedHeal
+  stats.healingOverhealTotal += Math.max(0, healAmount - appliedHeal)
 
   return {
     card,
@@ -334,6 +341,7 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   } else if (isCritical) {
     damage += COMBAT_CRITICAL_BONUS
   }
+  const damageBeforeReactions = damage
 
   const defenderHpBefore = defenderStats.hp
   const reactionContext = resolveDefenderReactions(state, defenderPlayerId, {
@@ -380,6 +388,9 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
     defenderDefeated,
     reactions
   }
+
+  stats.reactionDamagePreventedTotal += Math.max(0, damageBeforeReactions - damage)
+  stats.overkillDamageTotal += Math.max(0, damage - defenderEffectiveHpBefore)
 
   stats.totalAttacks += 1
   stats.totalDamageDealt += damage
@@ -636,6 +647,8 @@ function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) 
   }
   defender.hand = defender.hand.filter((entry) => entry.id !== card.id)
   defender.resources = Math.max(0, defender.resources - cost)
+  stats.resourcesSpentTotal += cost
+  stats.resourcesSpentReactions += cost
   nextContext.reactions.push({
     type: card.type,
     cardId: card.id,
@@ -663,6 +676,10 @@ function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) 
     }
     stats.healingCardsUsed += 1
     stats.healingTotal += Number(bestChoice.applied.appliedHeal || 0)
+    stats.healingOverhealTotal += Math.max(
+      0,
+      Number(bestChoice.applied.healAmount || 0) - Number(bestChoice.applied.appliedHeal || 0)
+    )
     if (bestChoice.applied.preventedDeath) {
       stats.healingPreventedDeaths += 1
     }
@@ -822,7 +839,21 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     mulliganCount: 0,
     finalHeroesPlayerA: 0,
     finalHeroesPlayerB: 0,
-    deckRemaining: 0
+    deckRemaining: 0,
+    overkillDamageTotal: 0,
+    reactionDamagePreventedTotal: 0,
+    healingOverhealTotal: 0,
+    resourcesSpentTotal: 0,
+    resourcesSpentHeroes: 0,
+    resourcesSpentItems: 0,
+    resourcesSpentHealing: 0,
+    resourcesSpentReactions: 0,
+    turnsTakenPlayerA: 0,
+    turnsTakenPlayerB: 0,
+    resourcesAvailableTotal: 0,
+    heroDiffAtTurn3: null,
+    leaderAtTurn3: null,
+    leaderAtTurn3Won: false
   }
 
   drawCards(state, state.game.firstTurnPlayer, 7, stats)
@@ -845,6 +876,16 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     }
 
     if (state.game.turnPhase === 'recruit') {
+      if (activePlayer === 'player_a') stats.turnsTakenPlayerA += 1
+      if (activePlayer === 'player_b') stats.turnsTakenPlayerB += 1
+      if (stats.heroDiffAtTurn3 === null && state.game.turn >= 3) {
+        const heroesA = state.players.player_a.heroes.filter(Boolean).length
+        const heroesB = state.players.player_b.heroes.filter(Boolean).length
+        const diff = heroesA - heroesB
+        stats.heroDiffAtTurn3 = diff
+        if (diff > 0) stats.leaderAtTurn3 = 'player_a'
+        else if (diff < 0) stats.leaderAtTurn3 = 'player_b'
+      }
       runRecruitPhase(state, activePlayer, stats)
       if (state.game.turn === 1 && activePlayer === state.game.firstTurnPlayer) {
         const required = getRequiredDiscardCount(state, activePlayer)
@@ -899,6 +940,8 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
   stats.finalHeroesPlayerA = state.players.player_a.heroes.filter(Boolean).length
   stats.finalHeroesPlayerB = state.players.player_b.heroes.filter(Boolean).length
   stats.deckRemaining = state.deck.cards.length
+  stats.resourcesAvailableTotal = (stats.turnsTakenPlayerA + stats.turnsTakenPlayerB) * DEFAULT_MAX_RESOURCES
+  stats.leaderAtTurn3Won = Boolean(stats.leaderAtTurn3 && stats.winner === stats.leaderAtTurn3)
 
   return stats
 }
@@ -937,6 +980,18 @@ export function aggregateResults(games) {
   const healingCardsUsed = sum('healingCardsUsed')
   const healingTotal = sum('healingTotal')
   const healingPreventedDeaths = sum('healingPreventedDeaths')
+  const healingOverhealTotal = sum('healingOverhealTotal')
+  const resourcesSpentTotal = sum('resourcesSpentTotal')
+  const resourcesAvailableTotal = sum('resourcesAvailableTotal')
+  const resourcesSpentHeroes = sum('resourcesSpentHeroes')
+  const resourcesSpentItems = sum('resourcesSpentItems')
+  const resourcesSpentHealing = sum('resourcesSpentHealing')
+  const resourcesSpentReactions = sum('resourcesSpentReactions')
+  const overkillDamageTotal = sum('overkillDamageTotal')
+  const reactionDamagePreventedTotal = sum('reactionDamagePreventedTotal')
+  const gamesReachedTurn3 = games.filter((g) => g.heroDiffAtTurn3 !== null).length
+  const gamesWithLeaderTurn3 = games.filter((g) => g.leaderAtTurn3 === 'player_a' || g.leaderAtTurn3 === 'player_b').length
+  const leaderTurn3Wins = games.filter((g) => g.leaderAtTurn3Won).length
 
   return {
     games: gameCount,
@@ -977,14 +1032,39 @@ export function aggregateResults(games) {
       avgHealingCardsPerGame: gameCount > 0 ? healingCardsUsed / gameCount : 0,
       healingTotal,
       avgHealingPerGame: gameCount > 0 ? healingTotal / gameCount : 0,
-      healingPreventedDeaths
+      healingPreventedDeaths,
+      healingOverhealTotal,
+      avgHealingOverhealPerGame: gameCount > 0 ? healingOverhealTotal / gameCount : 0,
+      healingEfficiencyPct: (healingTotal + healingOverhealTotal) > 0
+        ? (healingTotal / (healingTotal + healingOverhealTotal)) * 100
+        : 0,
+      reactionDamagePreventedTotal,
+      avgReactionDamagePreventedPerGame: gameCount > 0 ? reactionDamagePreventedTotal / gameCount : 0
     },
     economy: {
       cardsDrawnTotal: sum('cardsDrawnTotal'),
       cardsRecruitedTotal: sum('cardsRecruitedTotal'),
       itemsEquippedTotal: sum('itemsEquippedTotal'),
       cardsDiscardedTotal: sum('cardsDiscardedTotal'),
-      avgDiscardsPerGame: gameCount > 0 ? sum('cardsDiscardedTotal') / gameCount : 0
+      avgDiscardsPerGame: gameCount > 0 ? sum('cardsDiscardedTotal') / gameCount : 0,
+      resourcesSpentTotal,
+      resourcesAvailableTotal,
+      resourceSpendPct: resourcesAvailableTotal > 0 ? (resourcesSpentTotal / resourcesAvailableTotal) * 100 : 0,
+      resourcesSpentHeroes,
+      resourcesSpentItems,
+      resourcesSpentHealing,
+      resourcesSpentReactions
+    },
+    pressure: {
+      overkillDamageTotal,
+      avgOverkillPerGame: gameCount > 0 ? overkillDamageTotal / gameCount : 0,
+      overkillPerAttack: totalAttacks > 0 ? overkillDamageTotal / totalAttacks : 0
+    },
+    snowball: {
+      gamesReachedTurn3,
+      gamesWithLeaderTurn3,
+      leaderTurn3Wins,
+      leaderWinRateWhenDefined: gamesWithLeaderTurn3 > 0 ? (leaderTurn3Wins / gamesWithLeaderTurn3) * 100 : 0
     },
     mulligan: {
       total: sum('mulliganCount'),

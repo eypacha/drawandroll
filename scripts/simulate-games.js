@@ -155,6 +155,9 @@ function printSummary({ config, aggregate }) {
     `Healing avg amount/uses: ${formatNumber(aggregate.reactions.avgHealingPerGame)} / ${formatNumber(aggregate.reactions.avgHealingCardsPerGame)}\n`
   )
   process.stdout.write(
+    `Healing efficiency: ${formatNumber(aggregate.reactions.healingEfficiencyPct)}% (overheal avg ${formatNumber(aggregate.reactions.avgHealingOverhealPerGame)})\n`
+  )
+  process.stdout.write(
     `Crits/Fumbles per 100 attacks: ${formatNumber(aggregate.combat.critsPer100Attacks)} / ${formatNumber(aggregate.combat.fumblesPer100Attacks)}\n`
   )
   process.stdout.write(
@@ -163,9 +166,21 @@ function printSummary({ config, aggregate }) {
   process.stdout.write(
     `Deaths prevented by healing: ${aggregate.reactions.healingPreventedDeaths}\n`
   )
+  process.stdout.write(
+    `Reaction damage prevented avg: ${formatNumber(aggregate.reactions.avgReactionDamagePreventedPerGame)}\n`
+  )
+  process.stdout.write(
+    `Overkill avg/attack: ${formatNumber(aggregate.pressure.avgOverkillPerGame)} / ${formatNumber(aggregate.pressure.overkillPerAttack, 3)}\n`
+  )
 
   process.stdout.write(
     `Economy draws/recruits/items/discards: ${aggregate.economy.cardsDrawnTotal} / ${aggregate.economy.cardsRecruitedTotal} / ${aggregate.economy.itemsEquippedTotal} / ${aggregate.economy.cardsDiscardedTotal}\n`
+  )
+  process.stdout.write(
+    `Resources spend: ${aggregate.economy.resourcesSpentTotal}/${aggregate.economy.resourcesAvailableTotal} (${formatNumber(aggregate.economy.resourceSpendPct)}%) [H:${aggregate.economy.resourcesSpentHeroes} I:${aggregate.economy.resourcesSpentItems} He:${aggregate.economy.resourcesSpentHealing} R:${aggregate.economy.resourcesSpentReactions}]\n`
+  )
+  process.stdout.write(
+    `Turn3 leader winrate: ${formatNumber(aggregate.snowball.leaderWinRateWhenDefined)}% (${aggregate.snowball.leaderTurn3Wins}/${aggregate.snowball.gamesWithLeaderTurn3}, reached=${aggregate.snowball.gamesReachedTurn3})\n`
   )
   process.stdout.write(
     `Mulligans: total=${aggregate.mulligan.total}, games=${aggregate.mulligan.gamesWithMulligan}/${aggregate.games} (${formatNumber(aggregate.mulligan.pctGamesWithMulligan)}%)\n`
