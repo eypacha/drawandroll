@@ -5,7 +5,6 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 import { fileURLToPath, URL } from 'node:url'
 import viteImagemin from 'vite-plugin-imagemin'
 import { qrcode } from 'vite-plugin-qrcode';
-import webfontDownload from 'vite-plugin-webfont-dl';
 
 const BASE_PATH = '/'
 
@@ -24,7 +23,6 @@ export default defineConfig({
     tailwindcss(),
     VueDevTools(),
     qrcode(),
-    webfontDownload(),
     viteImagemin({
       gifsicle: { optimizationLevel: 7 },
       optipng: { optimizationLevel: 7 },
@@ -38,4 +36,15 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'pinia', 'vue-router', 'vue-i18n'],
+          'vendor-three': ['three'],
+          'vendor-peer': ['peerjs']
+        }
+      }
+    }
+  }
 })

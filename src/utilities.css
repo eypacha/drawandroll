@@ -55,7 +55,11 @@
 }
 
 .waves {
-  background-image: url('/images/waves.png');
+  background-image:
+    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.22) 0 18%, transparent 19%),
+    radial-gradient(circle at 52% 65%, rgba(255, 255, 255, 0.18) 0 16%, transparent 17%),
+    radial-gradient(circle at 82% 35%, rgba(255, 255, 255, 0.2) 0 15%, transparent 16%);
+  background-size: 240px 90px;
   background-repeat: repeat-x;
   animation: move-bg 5000s linear infinite;
 }
