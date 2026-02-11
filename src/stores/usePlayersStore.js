@@ -33,10 +33,7 @@ export const usePlayersStore = defineStore('players', () => {
   const getPlayer = computed(() => (id) => players.value[id])
   
   const getRecruitCost = computed(() => (playerId, baseCost) => {
-    const lost = players.value[playerId].heroesLost
-    // Pressure system: +1, +2, +3... for each hero lost
-    const pressure = (lost * (lost + 1)) / 2
-    return baseCost + pressure
+    return Number(baseCost || 0)
   })
 
   function getCardBaseHp(card) {

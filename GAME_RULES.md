@@ -49,6 +49,7 @@ Este documento define las reglas vigentes del juego PMV.
 
 - Máximo 3 héroes por jugador en mesa.
 - Stats base: ATK, DEF, HP.
+- Reclutar héroes cuesta exactamente `card.cost` (sin escalado por héroes perdidos).
 - Si un héroe llega a 0 HP, muere de forma permanente.
 - No hay resurrección.
 

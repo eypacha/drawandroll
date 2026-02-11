@@ -26,9 +26,7 @@ function getOpponentPlayerId(playerId) {
 }
 
 function getRecruitCost(state, playerId, baseCost) {
-  const lost = state.players[playerId].heroesLost
-  const pressure = (lost * (lost + 1)) / 2
-  return Number(baseCost || 0) + pressure
+  return Number(baseCost || 0)
 }
 
 function getCardBaseHp(card) {
