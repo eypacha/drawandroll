@@ -1,11 +1,5 @@
 import { createRng } from './rng.js'
-import {
-  pickHeroRecruitPlay,
-  pickItemEquipPlay,
-  pickHealingRecruitPlay,
-  pickAttacks,
-  pickDiscardCardIds
-} from './botBaseline.js'
+import { resolveBotProfile } from './botProfiles.js'
 
 const MAX_HERO_SLOTS = 3
 const MAX_ITEMS_PER_HERO = 3
@@ -344,6 +338,7 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   const damageBeforeReactions = damage
 
   const defenderHpBefore = defenderStats.hp
+  const defenderBot = state.bots?.[defenderPlayerId]
   const reactionContext = resolveDefenderReactions(state, defenderPlayerId, {
     damage,
     isCritical,
@@ -355,7 +350,7 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
     counterCriticalCount: 0,
     counterFumbleCount: 0,
     counterattackUsed: false
-  }, rng, stats)
+  }, rng, stats, defenderBot)
   damage = reactionContext.damage
   isCritical = reactionContext.isCritical
   const defenderEffectiveHpBefore = Number(reactionContext.defenderHpBefore || defenderHpBefore)
@@ -556,7 +551,7 @@ function evaluateReactionCandidate(state, defenderPlayerId, card, context, rng) 
   return null
 }
 
-function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
+function chooseDefenderReactionCard(state, defenderPlayerId, context, rng, botProfile) {
   const defender = state.players[defenderPlayerId]
   if (!defender) return null
 
@@ -566,6 +561,17 @@ function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
     .filter(({ card }) => defender.resources >= Number(card?.cost || 0))
 
   if (candidates.length === 0) return null
+
+  const reactionStyle = botProfile?.reactionStyle || 'baseline'
+  const lethalWithoutReaction = Number(context.damage || 0) >= Number(context.defenderHpBefore || 0)
+  const baselinePriority = ['preventedDeath', 'survives', 'damageSaved', 'healingApplied', 'counterDamage', 'remainingHp', 'handIndex']
+  const conservativePriority = ['survives', 'damageSaved', 'preventedDeath', 'healingApplied', 'remainingHp', 'counterDamage', 'handIndex']
+  const aggressivePriority = ['counterDamage', 'preventedDeath', 'survives', 'damageSaved', 'remainingHp', 'healingApplied', 'handIndex']
+  const priority = reactionStyle === 'conservative'
+    ? conservativePriority
+    : reactionStyle === 'aggressive'
+      ? aggressivePriority
+      : baselinePriority
 
   let bestChoice = null
   for (const candidate of candidates) {
@@ -584,38 +590,21 @@ function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
       handIndex: -candidate.handIndex
     }
 
+    if (reactionStyle === 'aggressive' && !lethalWithoutReaction) {
+      if (candidate.card?.type !== 'counterattack') continue
+      if (score.counterDamage <= 0) continue
+    }
+
     if (!bestChoice) {
       bestChoice = { candidate, applied, score }
       continue
     }
 
     const prevScore = bestChoice.score
-    if (score.preventedDeath !== prevScore.preventedDeath) {
-      if (score.preventedDeath > prevScore.preventedDeath) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.survives !== prevScore.survives) {
-      if (score.survives > prevScore.survives) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.damageSaved !== prevScore.damageSaved) {
-      if (score.damageSaved > prevScore.damageSaved) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.healingApplied !== prevScore.healingApplied) {
-      if (score.healingApplied > prevScore.healingApplied) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.counterDamage !== prevScore.counterDamage) {
-      if (score.counterDamage > prevScore.counterDamage) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.remainingHp !== prevScore.remainingHp) {
-      if (score.remainingHp > prevScore.remainingHp) bestChoice = { candidate, applied, score }
-      continue
-    }
-    if (score.handIndex > prevScore.handIndex) {
-      bestChoice = { candidate, applied, score }
+    for (const key of priority) {
+      if (score[key] === prevScore[key]) continue
+      if (score[key] > prevScore[key]) bestChoice = { candidate, applied, score }
+      break
     }
   }
 
@@ -624,12 +613,12 @@ function chooseDefenderReactionCard(state, defenderPlayerId, context, rng) {
   return bestChoice
 }
 
-function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats) {
+function resolveDefenderReactions(state, defenderPlayerId, context, rng, stats, botProfile) {
   const defender = state.players[defenderPlayerId]
   if (!defender) return context
 
   const nextContext = { ...context, reactions: [] }
-  const bestChoice = chooseDefenderReactionCard(state, defenderPlayerId, nextContext, rng)
+  const bestChoice = chooseDefenderReactionCard(state, defenderPlayerId, nextContext, rng, botProfile)
   if (!bestChoice) return nextContext
 
   const card = bestChoice.candidate.card
@@ -734,31 +723,36 @@ function finishTurn(state) {
   return { ended: false }
 }
 
-function runRecruitPhase(state, playerId, stats) {
+function runRecruitPhase(state, playerId, stats, botProfile) {
   while (true) {
-    const play = pickHeroRecruitPlay(state, playerId, (id, baseCost) => getRecruitCost(state, id, baseCost))
+    const play = botProfile.pickHeroRecruitPlay(state, playerId, (id, baseCost) => getRecruitCost(state, id, baseCost))
     if (!play) break
     const done = playHeroFromHand(state, playerId, play.cardId, play.slotIndex, stats)
     if (!done) break
   }
 
   while (true) {
-    const play = pickItemEquipPlay(state, playerId)
+    const play = botProfile.pickItemEquipPlay(state, playerId)
     if (!play) break
     const done = playItemFromHand(state, playerId, play.cardId, play.slotIndex, stats)
     if (!done) break
   }
 
   while (true) {
-    const play = pickHealingRecruitPlay(state, playerId, getHeroCombatStats)
+    const play = botProfile.pickHealingRecruitPlay(state, playerId, getHeroCombatStats)
     if (!play) break
     const done = playHealingFromHand(state, playerId, play.cardId, play.slotIndex, stats)
     if (!done) break
   }
 }
 
-function runCombatPhase(state, playerId, rng, stats) {
-  const attacks = pickAttacks(state, playerId, (id, slot) => canHeroAttack(state, id, slot))
+function runCombatPhase(state, playerId, rng, stats, botProfile) {
+  const attacks = botProfile.pickAttacks(
+    state,
+    playerId,
+    (id, slot) => canHeroAttack(state, id, slot),
+    getHeroCombatStats
+  )
   for (const attack of attacks) {
     const defenderPlayerId = getOpponentPlayerId(playerId)
     if (!state.players[defenderPlayerId].heroes.some(Boolean)) break
@@ -766,14 +760,14 @@ function runCombatPhase(state, playerId, rng, stats) {
   }
 }
 
-function runDiscardPhase(state, playerId, stats) {
+function runDiscardPhase(state, playerId, stats, botProfile) {
   const required = getRequiredDiscardCount(state, playerId)
   if (required <= 0) return
-  const cardIds = pickDiscardCardIds(state.players[playerId].hand, required)
+  const cardIds = botProfile.pickDiscardCardIds(state.players[playerId].hand, required)
   discardFromHand(state, playerId, cardIds, stats)
 }
 
-function createInitialState(batchCards, gameRng) {
+function createInitialState(batchCards, gameRng, botPlayerA, botPlayerB) {
   const deckCards = batchCards.map((card) => cloneCard(card))
   gameRng.shuffle(deckCards)
 
@@ -795,6 +789,10 @@ function createInitialState(batchCards, gameRng) {
     players: {
       player_a: createPlayerState(),
       player_b: createPlayerState()
+    },
+    bots: {
+      player_a: botPlayerA,
+      player_b: botPlayerB
     }
   }
 
@@ -805,14 +803,16 @@ function createInitialState(batchCards, gameRng) {
   return state
 }
 
-function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
+function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200, botPlayerA, botPlayerB }) {
   const rng = createRng(seed)
-  const state = createInitialState(batchCards, rng)
+  const state = createInitialState(batchCards, rng, botPlayerA, botPlayerB)
 
   const stats = {
     gameIndex,
     seedUsed: seed,
     startingPlayer: state.game.firstTurnPlayer,
+    botPlayerA: botPlayerA?.key || 'baseline',
+    botPlayerB: botPlayerB?.key || 'baseline',
     winner: null,
     winnerIsStarter: false,
     turnCount: 0,
@@ -886,7 +886,7 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
         if (diff > 0) stats.leaderAtTurn3 = 'player_a'
         else if (diff < 0) stats.leaderAtTurn3 = 'player_b'
       }
-      runRecruitPhase(state, activePlayer, stats)
+      runRecruitPhase(state, activePlayer, stats, state.bots[activePlayer])
       if (state.game.turn === 1 && activePlayer === state.game.firstTurnPlayer) {
         const required = getRequiredDiscardCount(state, activePlayer)
         if (required > 0) {
@@ -903,7 +903,7 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     }
 
     if (state.game.turnPhase === 'combat') {
-      runCombatPhase(state, activePlayer, rng, stats)
+      runCombatPhase(state, activePlayer, rng, stats, state.bots[activePlayer])
       const required = getRequiredDiscardCount(state, activePlayer)
       if (required > 0) {
         state.game.turnPhase = 'discard'
@@ -915,7 +915,7 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200 }) {
     }
 
     if (state.game.turnPhase === 'discard') {
-      runDiscardPhase(state, activePlayer, stats)
+      runDiscardPhase(state, activePlayer, stats, state.bots[activePlayer])
       if (getRequiredDiscardCount(state, activePlayer) > 0) {
         stats.timedOutByMaxTurns = true
         break
@@ -992,6 +992,13 @@ export function aggregateResults(games) {
   const gamesReachedTurn3 = games.filter((g) => g.heroDiffAtTurn3 !== null).length
   const gamesWithLeaderTurn3 = games.filter((g) => g.leaderAtTurn3 === 'player_a' || g.leaderAtTurn3 === 'player_b').length
   const leaderTurn3Wins = games.filter((g) => g.leaderAtTurn3Won).length
+  const winsByBotProfile = games.reduce((acc, g) => {
+    const winner = g.winner
+    if (winner !== 'player_a' && winner !== 'player_b') return acc
+    const profile = winner === 'player_a' ? g.botPlayerA : g.botPlayerB
+    acc[profile] = Number(acc[profile] || 0) + 1
+    return acc
+  }, {})
 
   return {
     games: gameCount,
@@ -999,6 +1006,11 @@ export function aggregateResults(games) {
     winsNonStarter,
     starterWinRate: gameCount > 0 ? winsStarter / gameCount : 0,
     winnerDistribution: winnerDist,
+    botProfiles: {
+      playerA: games[0]?.botPlayerA || 'baseline',
+      playerB: games[0]?.botPlayerB || 'baseline',
+      winsByProfile: winsByBotProfile
+    },
     turns: {
       min: turns[0] || 0,
       max: turns[turns.length - 1] || 0,
@@ -1076,7 +1088,24 @@ export function aggregateResults(games) {
   }
 }
 
-export function runSimulation({ games, batchCards, baseSeed, maxTurns = 200, verbose = false }) {
+export function runSimulation({
+  games,
+  batchCards,
+  baseSeed,
+  maxTurns = 200,
+  verbose = false,
+  botPlayerA = 'baseline',
+  botPlayerB = 'baseline'
+}) {
+  const resolvedBotA = resolveBotProfile(botPlayerA)
+  const resolvedBotB = resolveBotProfile(botPlayerB)
+  if (!resolvedBotA) {
+    throw new Error(`Unknown bot profile for player_a: ${botPlayerA}`)
+  }
+  if (!resolvedBotB) {
+    throw new Error(`Unknown bot profile for player_b: ${botPlayerB}`)
+  }
+
   const results = []
   for (let i = 0; i < games; i += 1) {
     const gameSeed = `${baseSeed}:${i + 1}`
@@ -1084,7 +1113,9 @@ export function runSimulation({ games, batchCards, baseSeed, maxTurns = 200, ver
       batchCards,
       gameIndex: i + 1,
       seed: gameSeed,
-      maxTurns
+      maxTurns,
+      botPlayerA: resolvedBotA,
+      botPlayerB: resolvedBotB
     })
     results.push(gameResult)
 

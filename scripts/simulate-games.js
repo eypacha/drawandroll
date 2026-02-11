@@ -16,6 +16,8 @@ function printHelp() {
     '  --verbose           Log each simulated game',
     '  --max-turns <int>   Max turns before timeout (default: 200)',
     '  --batch <path>      Batch JSON path (default: data/batches/batch.json)',
+    '  --bot-a <name>      Bot profile for player_a (baseline|aggressive|conservative)',
+    '  --bot-b <name>      Bot profile for player_b (baseline|aggressive|conservative)',
     '  --help              Show this help'
   ].join('\n') + '\n')
 }
@@ -28,7 +30,9 @@ function parseArgs(argv) {
     out: null,
     verbose: false,
     maxTurns: 200,
-    batch: 'data/batches/batch.json'
+    batch: 'data/batches/batch.json',
+    botA: 'baseline',
+    botB: 'baseline'
   }
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -78,6 +82,18 @@ function parseArgs(argv) {
       continue
     }
 
+    if (arg === '--bot-a') {
+      options.botA = argv[i + 1]
+      i += 1
+      continue
+    }
+
+    if (arg === '--bot-b') {
+      options.botB = argv[i + 1]
+      i += 1
+      continue
+    }
+
     throw new Error(`Unknown argument: ${arg}`)
   }
 
@@ -99,6 +115,14 @@ function validateOptions(options) {
 
   if (options.out && !options.json) {
     throw new Error('--out requires --json.')
+  }
+
+  const allowedBots = new Set(['baseline', 'aggressive', 'conservative'])
+  if (!allowedBots.has(String(options.botA || '').toLowerCase())) {
+    throw new Error('Invalid --bot-a. Use baseline|aggressive|conservative.')
+  }
+  if (!allowedBots.has(String(options.botB || '').toLowerCase())) {
+    throw new Error('Invalid --bot-b. Use baseline|aggressive|conservative.')
   }
 }
 
@@ -131,6 +155,10 @@ function printSummary({ config, aggregate }) {
   process.stdout.write(`Seed: ${config.seedRaw} (hash=${config.seedHash})\n`)
   process.stdout.write(`Batch: ${config.batchPath}\n`)
   process.stdout.write(`Max turns: ${config.maxTurns}\n\n`)
+  process.stdout.write(`Bots: player_a=${config.botA}, player_b=${config.botB}\n`)
+  process.stdout.write(
+    `Wins by bot profile: ${JSON.stringify(aggregate.botProfiles?.winsByProfile || {})}\n\n`
+  )
 
   process.stdout.write(`Starter wins: ${aggregate.winsStarter}/${aggregate.games} (${formatNumber(aggregate.starterWinRate * 100)}%)\n`)
   process.stdout.write(
@@ -209,7 +237,9 @@ async function main() {
     batchCards: batch.cards,
     baseSeed: seedHash,
     maxTurns: options.maxTurns,
-    verbose: options.verbose
+    verbose: options.verbose,
+    botPlayerA: options.botA,
+    botPlayerB: options.botB
   })
 
   const config = {
@@ -218,7 +248,9 @@ async function main() {
     seedHash,
     batchPath,
     maxTurns: options.maxTurns,
-    batchId: batch.batch_id || null
+    batchId: batch.batch_id || null,
+    botA: options.botA,
+    botB: options.botB
   }
 
   const report = {

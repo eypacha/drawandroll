@@ -30,7 +30,7 @@ No busca optimizar diversión por sí solo.
 
 ## 3. Bot baseline real (actual)
 
-El simulador usa un único bot determinista (`scripts/lib/botBaseline.js`) para ambos lados.
+El simulador soporta perfiles deterministas (`scripts/lib/botProfiles.js`) para ambos lados.
 
 Heurísticas vigentes:
 
@@ -41,7 +41,11 @@ Heurísticas vigentes:
 - Descarta por prioridad de tipo y costo.
 - En reacción defensiva evalúa `reactive/counterattack/healing` y elige el mayor score de supervivencia/mitigación.
 
-Bots agresivo y conservador no están implementados actualmente.
+Perfiles disponibles actualmente:
+
+- `baseline`
+- `aggressive`
+- `conservative`
 
 ---
 
