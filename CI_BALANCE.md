@@ -1,125 +1,159 @@
 # CI_BALANCE.md
 
-Este documento define **cómo se mide el balance del juego mediante simulaciones automáticas (CI)**.
-
-El objetivo del CI **no es optimizar diversión**,  
-sino **detectar roturas estructurales** del sistema.
+Este documento define cómo se mide el balance con simulación bot-vs-bot (`scripts/simulate-games.js`).
 
 ---
 
-## 1. Objetivo del CI
+## 1. Objetivo
 
-El sistema de CI existe para:
+El CI de balance sirve para detectar regresiones estructurales:
 
-- Detectar partidas demasiado cortas o demasiado largas
-- Detectar efectos dominantes (críticos, reactivos, plantillas)
-- Validar que los cambios de código no rompan el ritmo del juego
-- Proteger el PMV de regresiones graves
-
-El CI **no decide diseño**, solo **alerta problemas**.
-
----
-
-## 2. Enfoque general
-
-- Las simulaciones se realizan **bot vs bot**
-- Los bots:
-  - siguen reglas válidas
-  - no “hacen trampa”
-  - no intentan jugar óptimo
-- El objetivo es **comportamiento promedio**, no excelencia táctica
-
-El CI mide **sistemas**, no habilidad.
-
----
-
-## 3. Tipos de bots (PMV)
-
-Para el PMV se definen bots simples y deterministas.
-
-### 3.1 Bot básico (Baseline Bot)
-
-Comportamiento:
-- Recluta héroes si tiene slots libres
-- Prioriza atacar siempre que pueda
-- Usa reactivos defensivos solo si:
-  - el héroe moriría sin usarlos
-- No bluffea
-- No guarda recursos a largo plazo
-
-Este bot es la referencia mínima.
-
----
-
-### 3.2 Bot agresivo (opcional)
-
-Comportamiento:
-- Prioriza ATK alto
-- Ataca siempre que sea posible
-- Gasta reactivos tarde o nunca
-
-Sirve para detectar:
+- duración de partidas fuera de rango
+- ventaja excesiva del jugador inicial
 - snowball temprano
-- presión excesiva del d20
+- dominancia de un tipo de reacción
+- problemas de economía de recursos
+
+No busca optimizar diversión por sí solo.
 
 ---
 
-### 3.3 Bot conservador (opcional)
+## 2. Motor y alcance
 
-Comportamiento:
-- Prioriza supervivencia
-- Usa reactivos temprano
-- Evita atacar con héroes frágiles
-
-Sirve para detectar:
-- turtle infinito
-- partidas que no cierran
+- Motor de simulación: `scripts/lib/simEngine.js`
+- Entrada: `batch.cards` desde JSON
+- Salida:
+  - métricas por partida (`perGame`)
+  - agregados (`aggregate`)
 
 ---
 
-## 4. Volumen de simulaciones
+## 3. Bot baseline real (actual)
 
-Para cada ejecución de CI:
+El simulador usa un único bot determinista (`scripts/lib/botBaseline.js`) para ambos lados.
 
-- Mínimo: **50 partidas**
-- Recomendado: **100 partidas**
-- Todas las partidas:
-  - usan lotes válidos
-  - respetan las reglas del juego
+Heurísticas vigentes:
 
-Los resultados se analizan **en agregado**, nunca individualmente.
+- Recluta héroes en primer slot libre priorizando menor costo posible.
+- Equipa ítems priorizando mayor costo y primer héroe válido.
+- Cura en recruit si falta >=2 HP, priorizando héroe de mayor valor.
+- Ataca siempre con héroes habilitados al primer objetivo enemigo vivo.
+- Descarta por prioridad de tipo y costo.
+- En reacción defensiva evalúa `reactive/counterattack/healing` y elige el mayor score de supervivencia/mitigación.
 
----
-
-## 5. Métricas recolectadas
-
-### 5.1 Métricas por partida
-
-Por cada partida se registra:
-
-- `batch_id`
-- `turn_count`
-- `winner`
-- `total_attacks`
-- `total_heroes_killed`
+Bots agresivo y conservador no están implementados actualmente.
 
 ---
 
-### 5.2 Métricas por turno
+## 4. Volumen recomendado
 
-Por turno:
-
-- `turn_number`
-- `heroes_alive_player_a`
-- `heroes_alive_player_b`
-- `heroes_recruited_this_turn`
+- Smoke local: 100 partidas.
+- Check estable: 1000 partidas.
+- Gate de balance: 5000+ partidas por seed, idealmente varias seeds.
 
 ---
 
-### 5.3 Métricas por ataque
+## 5. Métricas agregadas disponibles
 
-Por ataque:
+### 5.1 Resultado y ritmo
 
-- `attacker_template`
-- `defender_template`
-- `r
+- `games`
+- `starterWinRate`
+- `winnerDistribution`
+- `turns.{min,max,avg,p50,p90}`
+- `endedByNoHeroes`
+- `timeouts`
+
+### 5.2 Combate
+
+- `combat.totalAttacks`
+- `combat.avgAttacksPerGame`
+- `combat.totalDamage`
+- `combat.avgDamagePerGame`
+- `combat.totalCounterDamage`
+- `combat.avgCounterDamagePerGame`
+- `combat.critsPer100Attacks`
+- `combat.fumblesPer100Attacks`
+
+### 5.3 Reacciones y curación
+
+- `reactions.counterattacksUsed`
+- `reactions.avgCounterattacksPerGame`
+- `reactions.attackerDeathsByCounter`
+- `reactions.healingCardsUsed`
+- `reactions.avgHealingCardsPerGame`
+- `reactions.healingTotal`
+- `reactions.avgHealingPerGame`
+- `reactions.healingPreventedDeaths`
+- `reactions.healingOverhealTotal`
+- `reactions.avgHealingOverhealPerGame`
+- `reactions.healingEfficiencyPct`
+- `reactions.reactionDamagePreventedTotal`
+- `reactions.avgReactionDamagePreventedPerGame`
+
+### 5.4 Economía
+
+- `economy.cardsDrawnTotal`
+- `economy.cardsRecruitedTotal`
+- `economy.itemsEquippedTotal`
+- `economy.cardsDiscardedTotal`
+- `economy.avgDiscardsPerGame`
+- `economy.resourcesSpentTotal`
+- `economy.resourcesAvailableTotal`
+- `economy.resourceSpendPct`
+- `economy.resourcesSpentHeroes`
+- `economy.resourcesSpentItems`
+- `economy.resourcesSpentHealing`
+- `economy.resourcesSpentReactions`
+
+### 5.5 Presión y snowball
+
+- `pressure.overkillDamageTotal`
+- `pressure.avgOverkillPerGame`
+- `pressure.overkillPerAttack`
+- `snowball.gamesReachedTurn3`
+- `snowball.gamesWithLeaderTurn3`
+- `snowball.leaderTurn3Wins`
+- `snowball.leaderWinRateWhenDefined`
+
+---
+
+## 6. Lectura rápida sugerida
+
+- `starterWinRate` alto + `snowball.leaderWinRateWhenDefined` alto: ventaja de tempo inicial.
+- `timeouts > 0`: riesgo de loops/partidas estancadas.
+- `healingEfficiencyPct` muy baja: curación mal calibrada.
+- `resourceSpendPct` baja: cartas/costos no convierten recursos en acciones útiles.
+- `overkillPerAttack` alto: exceso de burst o priorización de objetivos ineficiente.
+
+---
+
+## 7. Comandos
+
+- Simulación estándar:
+  - `npm run simulate -- --games 1000 --seed <seed>`
+- JSON para análisis externo:
+  - `npm run simulate -- --games 1000 --seed <seed> --json --out report.json`
+
+---
+
+## 8. Known Gaps (Sim vs Runtime)
+
+La simulación es útil para balance estructural, pero no replica 1:1 una partida humana en runtime.
+
+- Targeting en combate:
+  - Sim: el bot ataca siempre al primer héroe enemigo vivo.
+  - Runtime: el jugador elige objetivo libremente.
+- Reacciones defensivas:
+  - Sim: selección automática por heurística de score (supervivencia/mitigación).
+  - Runtime: decisión manual del jugador (puede ser subóptima o estratégica).
+- Mulligan inicial:
+  - Sim: mulligan automático solo si la mano inicial no tiene héroes.
+  - Runtime: flujo interactivo de opening mulligan.
+- Cierre de partida:
+  - Sim: evalúa derrota en la lógica del loop/fin de turno del motor de simulación.
+  - Runtime: puede cerrar inmediatamente tras combate cuando un lado queda sin héroes.
+- Señales no modeladas:
+  - Sim no modela UI, tiempos de reacción humanos, errores de ejecución ni efectos psicológicos.
+
+Regla práctica: usar CI para dirección de balance macro; validar cambios finos con playtests humanos.

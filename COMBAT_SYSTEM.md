@@ -1,191 +1,86 @@
 # COMBAT_SYSTEM.md
 
-Este documento define **el sistema de combate y su timing exacto**.  
-No existen interpretaciones alternativas ni ventanas implícitas.
+Sistema de combate vigente en el PMV.
 
 ---
 
-## 1. Principios del combate
+## 1. Principios
 
-- El combate es **determinista + azar controlado**.
-- El evento central del combate son **dos tiradas de 1d20** (atacante y defensor).
-- El atacante tira **1d20**.
-- El defensor tira **1d20**.
-- El combate se resuelve ataque por ataque, nunca en bloque.
+- El combate se resuelve ataque por ataque.
+- Cada ataque usa dos tiradas d20: atacante y defensor.
+- No hay ataques simultáneos.
 
 ---
 
 ## 2. Quién puede atacar
 
-- Cada héroe puede realizar **como máximo 1 ataque por turno**.
-- Un ataque siempre es:
-  - de un héroe atacante
-  - contra un héroe defensor
-- No existen ataques a jugador directamente.
-- No existen ataques simultáneos.
+- Un héroe puede atacar como máximo una vez por fase de combate.
+- No puede atacar si está muerto o con summoning sickness.
+- Solo se ataca a héroes (no daño directo a jugador).
 
 ---
 
-## 3. Secuencia exacta de un ataque
+## 3. Secuencia de un ataque
 
-Un ataque **siempre** sigue este orden y no puede alterarse.
-
----
-
-### 1️⃣ Declaración de ataque
-- El jugador atacante elige:
-  - héroe atacante
-  - héroe objetivo
-- No se pueden jugar cartas en este paso.
-- No se aplican efectos.
+1. Declaración de atacante y defensor.
+2. Tiradas d20 (atacante/defensor).
+3. Cálculo de daño base con stats e ítems.
+4. Ventana defensiva (solo defensor, una carta máximo).
+5. Resolución final: daño al defensor, contraataque si aplica, bajas.
+6. Cierre del ataque.
 
 ---
 
-### 2️⃣ Tirada
-- El atacante tira **1d20**.
-- El defensor tira **1d20**.
-- Ambos resultados son **visibles para ambos jugadores**.
-- No se pueden jugar cartas en este paso.
+## 4. Fórmula de daño principal
+
+`damage = max(0, (ATK + d20_atacante) - (DEF + d20_defensor))`
+
+- Si atacante saca 1 natural: `damage = 0`.
+- Si atacante saca 20 natural: `damage += 2` (bono crítico actual).
 
 ---
 
-### 3️⃣ Modificadores pasivos
-- Se aplican automáticamente:
-  - ATK del héroe atacante
-  - DEF del héroe defensor
-  - modificadores de ítems visibles
-- No se pueden jugar cartas en este paso.
-- No existen modificadores ocultos.
+## 5. Ventana defensiva
+
+- Solo defensor.
+- Solo una carta (`reactive`, `counterattack` o `healing`).
+- La tirada ya es conocida al reaccionar.
+
+Reactivos implementados:
+
+- `reduce_damage`: reduce daño por `stats.damageReduction`.
+- `cancel_critical`: quita bono crítico y marca el ataque como no crítico.
+- `prevent_death`: ajusta daño para dejar al defensor en 1 HP.
+
+Contraataque implementado:
+
+`counterFinal = max(0, (counterDamage + d20_contraataque) - (DEF_atacante + d20_contradefensa))`
+
+- 1 natural en contraataque: `counterFinal = 0`.
+- 20 natural en contraataque: `counterFinal += 2`.
+
+Curación reactiva:
+
+- Solo a héroes vivos.
+- No revive.
+- Puede salvar al defensor si sube su HP antes de aplicar daño final.
 
 ---
 
-### 4️⃣ Ventana de reacción defensiva
-- **Solo el defensor** puede reaccionar.
-- Puede jugar **máximo 1 carta defensiva total** por ataque (`reactive`, `counterattack` o `healing`).
-- La tirada **ya es conocida**.
-- Si el defensor no reacciona en este momento:
-  - pierde la oportunidad
-- El atacante no puede jugar cartas en esta ventana.
+## 6. Persistencia
+
+- El daño persiste entre turnos.
+- Los ítems no se desgastan ni se rompen por combate.
+- Muerte en 0 HP es permanente.
 
 ---
 
-### 5️⃣ Resolución del ataque
-- Se calcula el resultado final del ataque.
-- Se determina si el ataque impacta o falla.
-- Si impacta:
-  - se calcula daño
-  - se aplica daño inmediatamente
-- Si el HP del héroe defensor llega a **0**:
-  - el héroe muere
-  - sale del juego
-- Si la reacción fue `counterattack`, se resuelve el daño de contraataque.
-- El `counterattack` puede matar al héroe atacante.
-- No se pueden jugar cartas en este paso.
+## 7. Restricciones
 
----
-
-### 6️⃣ Cierre del ataque
-- Se descuenta 1 de durabilidad a los ítems del héroe atacante y del héroe defensor que participaron.
-- Si un ítem llega a durabilidad 0, se destruye inmediatamente.
-- El ataque termina definitivamente.
-- No se pueden aplicar efectos posteriores.
-
----
-
-## 4. Impacto y daño
-
-- El daño base se calcula como:
-  - `max(0, (ATK + d20 atacante) - (DEF + d20 defensor))`
-- El ataque impacta si el daño final es mayor que 0.
-- El daño:
-  - reduce HP
-  - **persiste entre turnos**
-- No existe mitigación automática fuera de reactivos.
-
----
-
-## 5. Críticos y fallos críticos
-
-### 5.1 Crítico
-- **20 natural** es siempre un crítico.
-- Un crítico:
-  - impacta automáticamente
-  - aplica daño aumentado (definido por plantilla)
-- Los críticos **pueden ser cancelados o mitigados** por reactivos defensivos.
-
----
-
-### 5.2 Fallo crítico
-- **1 natural** es siempre un fallo crítico.
-- Un fallo crítico:
-  - no impacta
-  - no inflige daño
-- No existen efectos adicionales por fallo crítico en el PMV.
-
----
-
-## 6. Cartas reactivas y contraataques en combate
-
-- Solo pueden jugarse en la **ventana de reacción**.
-- Solo el defensor puede jugarlas.
-- Se puede jugar una sola carta defensiva por ataque.
-- Ejemplos válidos de efectos:
-  - reducir daño
-  - cancelar crítico
-  - redirigir ataque
-  - proteger o romper un ítem
-  - evitar la muerte este turno
-- Las cartas reactivas:
-  - se destruyen al usarse
-  - no crean estados persistentes
-  - no modifican reglas base
-
-Para `counterattack`:
-- daño base bajo en `stats.counterDamage`
-- doble tirada por carta:
-  - d20 del defensor (contraataque)
-  - d20 del atacante (contradefensa)
-- fórmula:
-  - `max(0, (counterDamage + d20Contraataque) - (DEF atacante + d20Contradefensa))`
-
----
-
-## 7. Curación durante combate
-
-- La curación:
-  - puede usarse como reactivo defensivo
-  - solo cura héroes vivos
-- La curación:
-  - no revive héroes
-- Si la curación evita que el HP llegue a 0:
-  - el héroe sobrevive
-- Si el HP llega a 0:
-  - la muerte es definitiva
-
----
-
-## 8. Reglas explícitamente prohibidas en combate
-
-No existen en el PMV:
+No existen:
 
 - Pila de efectos
-- Reacciones fuera de la ventana definida
+- Reacciones fuera de ventana
 - Reacciones del atacante
 - Rerolls
-- Modificadores ocultos
-- Ataques en cadena
-- Estados persistentes complejos
 - Daño diferido
-- “Antes de morir…”
-
-Cualquier implementación de estos puntos es incorrecta.
-
----
-
-## 9. Autoridad del documento
-
-- Este documento tiene prioridad sobre:
-  - comentarios en código
-  - interpretaciones implícitas
-- Si hay conflicto entre implementación y este documento:
-  - la implementación es incorrecta

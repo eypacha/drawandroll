@@ -13,7 +13,6 @@ import { createGameMessageRouter } from '@/game/network/createGameMessageRouter'
 import { useGameActions } from './useGameActions'
 
 const DRAW_DELAY_MS = 350
-const OPENING_MULLIGAN_REMOVE_DELAY_MS = 100
 const OPENING_HAND_SIZE = 7
 
 function createOpeningFlowState() {
@@ -83,12 +82,9 @@ export function useGameSession() {
   let unsubscribeMessages = null
   let waitForReady = null
   let waitForConnect = null
-  let openingHostActionChain = Promise.resolve(false)
-
   function resetLocalGameState() {
     drawGeneration.value += 1
     isDrawing.value = false
-    openingHostActionChain = Promise.resolve(false)
     openingActionPending.value = false
     openingFlow.value = createOpeningFlowState()
     game.$reset()
@@ -238,7 +234,23 @@ export function useGameSession() {
     return true
   }
 
-  async function replaceOpeningHand(playerId, targetSize) {
+  function drawOpeningMulliganCards(playerId, drawCount) {
+    const drawnCards = []
+    for (let i = 0; i < drawCount; i += 1) {
+      const drawn = deck.draw(1)
+      if (drawn.length === 0) break
+      const card = drawn[0]
+      drawnCards.push(card)
+      players.addToHand(playerId, [card])
+      sendMessage({
+        type: 'draw_card',
+        payload: { playerId, card }
+      })
+    }
+    return drawnCards
+  }
+
+  function replaceOpeningHand(playerId, targetSize) {
     const player = players.players[playerId]
     if (!player) return null
     const removedCards = []
@@ -257,7 +269,6 @@ export function useGameSession() {
           cardId: card.id
         }
       })
-      await new Promise((resolve) => setTimeout(resolve, OPENING_MULLIGAN_REMOVE_DELAY_MS))
     }
 
     if (removedCards.length > 0) {
@@ -283,15 +294,7 @@ export function useGameSession() {
       type: 'opening_mulligan_action',
       payload: actionPayload
     })
-    if (removedCards.length > 0) {
-      await new Promise((resolve) => setTimeout(resolve, OPENING_MULLIGAN_REMOVE_DELAY_MS))
-    }
-    await drawSequence(targetSize, {
-      playerId,
-      syncEachDraw: true,
-      advancePhaseAfterDraw: false,
-      delayMs: DRAW_DELAY_MS
-    })
+    drawOpeningMulliganCards(playerId, targetSize)
     return actionPayload
   }
 
@@ -333,16 +336,9 @@ export function useGameSession() {
 
     openingFlow.value.mulliganCountByPlayer[playerId] += 1
     const targetSize = getOpeningHandTargetSize(playerId)
-    await replaceOpeningHand(playerId, targetSize)
+    replaceOpeningHand(playerId, targetSize)
     emitOpeningMulliganState()
     return true
-  }
-
-  function enqueueOpeningActionAsHost(action, playerId) {
-    openingHostActionChain = openingHostActionChain
-      .catch(() => false)
-      .then(() => processOpeningActionAsHost(action, playerId))
-    return openingHostActionChain
   }
 
   async function acceptOpeningHand() {
@@ -351,7 +347,7 @@ export function useGameSession() {
     if (openingActionPending.value) return false
 
     if (connection.isHost) {
-      return enqueueOpeningActionAsHost('accept', myPlayerId.value)
+      return processOpeningActionAsHost('accept', myPlayerId.value)
     }
 
     openingActionPending.value = true
@@ -375,7 +371,7 @@ export function useGameSession() {
     if (openingActionPending.value) return false
 
     if (connection.isHost) {
-      return enqueueOpeningActionAsHost('mulligan', myPlayerId.value)
+      return processOpeningActionAsHost('mulligan', myPlayerId.value)
     }
 
     openingActionPending.value = true
@@ -505,7 +501,7 @@ export function useGameSession() {
     if (data.type === 'opening_mulligan_action' && connection.isHost) {
       const action = data.payload?.action
       const playerId = data.payload?.playerId
-      void enqueueOpeningActionAsHost(action, playerId)
+      void processOpeningActionAsHost(action, playerId)
       return true
     }
 
