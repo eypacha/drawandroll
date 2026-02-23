@@ -544,7 +544,7 @@ export const usePlayersStore = defineStore('players', () => {
     defenderSlot,
     attackerRoll,
     defenderRoll,
-    criticalBonus = 2,
+    criticalBonus = 3,
     reactionActions = [],
     rollCounterAttack = null,
     rollCounterDefense = null

@@ -22,12 +22,13 @@
     </div>
 
     <!-- Card Image (Middle) -->
-    <div class="w-full h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-      <img 
-        v-if="card.imageUrl" 
-        :src="card.imageUrl" 
-        :alt="t('card.imageAlt')" 
+    <div class="w-full aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
+      <img
+        v-if="resolvedImageSrc && !imageLoadFailed"
+        :src="resolvedImageSrc"
+        :alt="t('card.imageAlt')"
         class="object-cover w-full h-full"
+        @error="handleImageError"
       />
       <div v-else class="text-gray-400 text-sm italic">
         {{ t('card.noImage') }}
@@ -54,9 +55,9 @@
         </span>
       </div>
       <!-- Description (Below stats) -->
-      <div class="text-[10px] text-gray-500 font-normal italic leading-tight">
+      <!-- <div class="text-[10px] text-gray-500 font-normal italic leading-tight">
         {{ localizedDescription }}
-      </div>
+      </div> -->
     </div>
 
     <!-- Card Type (Bottom) -->
@@ -67,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -82,6 +83,7 @@ const props = defineProps({
 })
 
 const { t, locale } = useI18n()
+const imageLoadFailed = ref(false)
 
 function resolveLocalizedText(value) {
   if (!value) return ''
@@ -106,6 +108,25 @@ const localizedType = computed(() => {
   const translated = t(key)
   return translated === key ? rawType : translated
 })
+
+const resolvedImageSrc = computed(() => {
+  const explicitUrl = props.card?.imageUrl
+  if (explicitUrl) return explicitUrl
+  const cardId = props.card?.id
+  if (!cardId) return ''
+  return `/images/${cardId}.png`
+})
+
+watch(
+  () => resolvedImageSrc.value,
+  () => {
+    imageLoadFailed.value = false
+  }
+)
+
+function handleImageError() {
+  imageLoadFailed.value = true
+}
 
 function formatTemplate(template) {
   if (!template) return ''

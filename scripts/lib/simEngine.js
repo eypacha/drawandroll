@@ -5,7 +5,7 @@ const MAX_HERO_SLOTS = 3
 const MAX_ITEMS_PER_HERO = 3
 const PLAYER_IDS = ['player_a', 'player_b']
 const DEFAULT_MAX_RESOURCES = 6
-const COMBAT_CRITICAL_BONUS = 2
+const COMBAT_CRITICAL_BONUS = 3
 
 function cloneCard(card) {
   return JSON.parse(JSON.stringify(card))
@@ -359,6 +359,8 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   const attackerHpBefore = attackerStats.hp
   const attackerHpAfter = Math.max(0, attackerHpBefore - counterDamageTotal)
   const attackerDefeated = attackerHpAfter <= 0
+  const defenderOneShot = defenderDefeated && defenderHpBefore >= defenderStats.maxHp
+  const attackerOneShotByCounter = attackerDefeated && attackerHpBefore >= attackerStats.maxHp
 
   const result = {
     attackerPlayerId,
@@ -391,6 +393,8 @@ function resolveCombatAsHost(state, attackerPlayerId, attackerSlot, defenderSlot
   if (isCritical) stats.criticalCount += 1
   if (isFumble) stats.fumbleCount += 1
   if (attackerDefeated) stats.attackerDeathsByCounter += 1
+  if (defenderOneShot) stats.defenderOneShots += 1
+  if (attackerOneShotByCounter) stats.attackerOneShotsByCounter += 1
 
   applyCombatResult(state, result, stats)
   return result
@@ -827,6 +831,8 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200, botPlayerA
     counterattacksUsed: 0,
     counterattackDamageDealt: 0,
     attackerDeathsByCounter: 0,
+    defenderOneShots: 0,
+    attackerOneShotsByCounter: 0,
     healingCardsUsed: 0,
     healingTotal: 0,
     healingPreventedDeaths: 0,
@@ -974,6 +980,9 @@ export function aggregateResults(games) {
   const totalCounterDamage = sum('totalCounterDamageDealt')
   const criticalCount = sum('criticalCount')
   const fumbleCount = sum('fumbleCount')
+  const defenderOneShots = sum('defenderOneShots')
+  const attackerOneShotsByCounter = sum('attackerOneShotsByCounter')
+  const oneShotsTotal = defenderOneShots + attackerOneShotsByCounter
   const counterattacksUsed = sum('counterattacksUsed')
   const healingCardsUsed = sum('healingCardsUsed')
   const healingTotal = sum('healingTotal')
@@ -1031,6 +1040,10 @@ export function aggregateResults(games) {
       avgCounterDamagePerGame: gameCount > 0 ? totalCounterDamage / gameCount : 0,
       criticalCount,
       fumbleCount,
+      oneShotsTotal,
+      defenderOneShots,
+      attackerOneShotsByCounter,
+      oneShotsPerGame: gameCount > 0 ? oneShotsTotal / gameCount : 0,
       critsPer100Attacks: totalAttacks > 0 ? (criticalCount / totalAttacks) * 100 : 0,
       fumblesPer100Attacks: totalAttacks > 0 ? (fumbleCount / totalAttacks) * 100 : 0
     },

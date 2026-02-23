@@ -192,6 +192,9 @@ function printSummary({ config, aggregate }) {
     `Attacker deaths by counter: ${aggregate.reactions.attackerDeathsByCounter}\n`
   )
   process.stdout.write(
+    `One-shots total/avg: ${aggregate.combat.oneShotsTotal} / ${formatNumber(aggregate.combat.oneShotsPerGame)} (defender:${aggregate.combat.defenderOneShots}, attacker-by-counter:${aggregate.combat.attackerOneShotsByCounter})\n`
+  )
+  process.stdout.write(
     `Deaths prevented by healing: ${aggregate.reactions.healingPreventedDeaths}\n`
   )
   process.stdout.write(

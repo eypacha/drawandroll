@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useCombatStore, useConnectionStore, useDeckStore, useGameStore, usePlayersStore } from '@/stores'
 import { sendMessage } from '@/services/peerService'
 
-const COMBAT_CRITICAL_BONUS = 2
+const COMBAT_CRITICAL_BONUS = 3
 const COMBAT_ROLL_ANIMATION_MS = 1000
 
 export function useGameActions() {
