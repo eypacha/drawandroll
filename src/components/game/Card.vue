@@ -100,7 +100,6 @@ function resolveLocalizedText(value) {
 }
 
 const localizedName = computed(() => resolveLocalizedText(props.card?.name))
-const localizedDescription = computed(() => resolveLocalizedText(props.card?.description))
 const localizedType = computed(() => {
   const rawType = props.card?.type || ''
   if (!rawType) return ''

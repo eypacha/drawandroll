@@ -30,10 +30,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atk": 5,
         "def": 7,
@@ -49,10 +45,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -63,10 +55,6 @@
       "type": "hero",
       "template": "glass_cannon",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -85,10 +73,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "healAmount": 2
       },
@@ -99,10 +83,6 @@
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -120,10 +100,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "healAmount": 2
       },
@@ -134,10 +110,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -157,10 +129,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atkBonus": 2,
         "defBonus": 0,
@@ -177,10 +145,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atk": 8,
         "def": 8,
@@ -193,10 +157,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -216,10 +176,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "healAmount": 2
       },
@@ -230,10 +186,6 @@
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -252,10 +204,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
@@ -270,10 +218,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "reduce_damage",
       "stats": {
         "damageReduction": 2
@@ -285,10 +229,6 @@
       "type": "hero",
       "template": "tank",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -307,10 +247,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -321,10 +257,6 @@
       "type": "item",
       "template": "defensive_gear",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -344,10 +276,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atk": 6,
         "def": 7,
@@ -360,10 +288,6 @@
       "type": "item",
       "template": "defensive_gear",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -383,10 +307,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atkBonus": 1,
         "defBonus": 0,
@@ -403,10 +323,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -417,10 +333,6 @@
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -436,10 +348,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -459,10 +367,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atk": 5,
         "def": 8,
@@ -478,10 +382,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
@@ -493,10 +393,6 @@
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -516,10 +412,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -530,10 +422,6 @@
       "type": "healing",
       "template": "minor_heal",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -550,10 +438,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -564,10 +448,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -587,10 +467,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atk": 8,
         "def": 8,
@@ -606,10 +482,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 2
       },
@@ -620,10 +492,6 @@
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -642,10 +510,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "prevent_death",
       "stats": {
         "damageReduction": null
@@ -657,10 +521,6 @@
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -677,10 +537,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
@@ -692,10 +548,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -715,10 +567,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 2
       },
@@ -729,10 +577,6 @@
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -751,10 +595,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "effect": "prevent_death",
       "stats": {
         "damageReduction": null
@@ -766,10 +606,6 @@
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -786,10 +622,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "counterDamage": 1
       },
@@ -800,10 +632,6 @@
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -822,10 +650,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "healAmount": 1
       },
@@ -836,10 +660,6 @@
       "type": "hero",
       "template": "tank",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -855,10 +675,6 @@
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -878,10 +694,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atkBonus": 1,
         "defBonus": 0,
@@ -895,10 +707,6 @@
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
@@ -918,10 +726,6 @@
         "en": "",
         "es": ""
       },
-      "description": {
-        "en": "",
-        "es": ""
-      },
       "stats": {
         "atkBonus": 2,
         "defBonus": 0,
@@ -935,10 +739,6 @@
       "type": "reactive",
       "template": "damage_mitigation",
       "name": {
-        "en": "",
-        "es": ""
-      },
-      "description": {
         "en": "",
         "es": ""
       },
