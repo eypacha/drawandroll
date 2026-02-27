@@ -27,91 +27,97 @@
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Aldric Stormvale",
+        "es": "Aldric Valle Tormenta"
       },
       "stats": {
         "atk": 5,
         "def": 7,
         "hp": 8
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Aldric Stormvale, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "029749d3-1427-4bb5-a8f4-616f9256f404",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Riposte of the Iron Tempest",
+        "es": "Réplica de la Tempestad de Hierro"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Riposte of the Iron Tempest, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "11653c13-0335-40b8-a98c-1c1a1aea4854",
       "type": "hero",
       "template": "glass_cannon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Seraphine Emberveil",
+        "es": "Seraphine Velo Ígneo"
       },
       "stats": {
         "atk": 6,
         "def": 7,
         "hp": 6
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Seraphine Emberveil, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "b097a336-0c71-42e7-923a-43169f5b918c",
       "type": "healing",
       "template": "minor_heal",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Blessing of the Verdant Circle",
+        "es": "Bendición del Círculo Verde"
       },
       "stats": {
         "healAmount": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Blessing of the Verdant Circle, radiant healing magic, golden light flowing over wounded warrior, serene atmosphere."
     },
     {
       "id": "2a012799-2303-4d33-b358-7dd2b631de26",
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Veil of Broken Fate",
+        "es": "Velo del Destino Quebrado"
       },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Veil of Broken Fate, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "14bcf6ab-7308-46dd-bb7b-4d3a891c2742",
       "type": "healing",
       "template": "emergency_heal",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Elixir of Dawnlight",
+        "es": "Elixir de Luz del Alba"
       },
       "stats": {
         "healAmount": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Elixir of Dawnlight, radiant healing magic, golden light flowing over wounded warrior, serene atmosphere."
     },
     {
       "id": "f1806475-53d6-4587-9f03-743de6fb154c",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Blade of the Hollow King",
+        "es": "Hoja del Rey Hueco"
       },
       "stats": {
         "atkBonus": 2,
@@ -119,15 +125,16 @@
         "atkModifier": 0,
         "defModifier": -1
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Blade of the Hollow King, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "50988a71-e614-49d7-bf50-57e986df5177",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Runed Warhammer of Khar",
+        "es": "Martillo Rúnico de Khar"
       },
       "stats": {
         "atkBonus": 2,
@@ -135,30 +142,32 @@
         "atkModifier": 0,
         "defModifier": 0
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Runed Warhammer of Khar, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "cb9f0789-6a05-41b0-a2ed-47da0b92a018",
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Thorgar Ironroot",
+        "es": "Thorgar Raíz de Hierro"
       },
       "stats": {
         "atk": 8,
         "def": 8,
         "hp": 6
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Thorgar Ironroot, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "0fbc02e3-e81b-4cfc-814b-cd2fd0113708",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Cinderfang Dagger",
+        "es": "Daga Colmillo de Brasa"
       },
       "stats": {
         "atkBonus": 2,
@@ -166,99 +175,106 @@
         "atkModifier": 0,
         "defModifier": -1
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Cinderfang Dagger, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "5f838167-4ae9-49e3-a4c1-669020146dea",
       "type": "healing",
       "template": "emergency_heal",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Whispering Renewal",
+        "es": "Renovar Susurrante"
       },
       "stats": {
         "healAmount": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Whispering Renewal, radiant healing magic, golden light flowing over wounded warrior, serene atmosphere."
     },
     {
       "id": "4f727833-e5c3-44b5-b7ac-380eabc9f9f4",
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Lyanna Moonbrook",
+        "es": "Lyanna Arroyo Lunar"
       },
       "stats": {
         "atk": 5,
         "def": 5,
         "hp": 10
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Lyanna Moonbrook, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "67a6e78d-96ce-44b0-bab6-099f41f21fb3",
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Sigil of Null Stars",
+        "es": "Sello de Estrellas Nulas"
       },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Sigil of Null Stars, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "12094291-3dd7-42a4-b18f-ef89ff0aea31",
       "type": "reactive",
       "template": "damage_mitigation",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Ward of Silent Embers",
+        "es": "Guarda de Brasas Silentes"
       },
       "effect": "reduce_damage",
       "stats": {
         "damageReduction": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Ward of Silent Embers, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "f74beaf6-1cd7-4fd2-98e8-2637e62c0d43",
       "type": "hero",
       "template": "tank",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Kaelith Duskwind",
+        "es": "Kaelith Viento Sombrío"
       },
       "stats": {
         "atk": 8,
         "def": 7,
         "hp": 10
       },
-      "cost": 5
+      "cost": 5,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Kaelith Duskwind, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "9506fa3e-ab39-414b-af71-fd198d4e3d0a",
       "type": "counterattack",
       "template": "quick_riposte",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Guardian's Retaliation",
+        "es": "Represalia del Guardián"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Guardian's Retaliation, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "356eaa0b-fe9c-4188-a04f-2206a28f0c4f",
       "type": "item",
       "template": "defensive_gear",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Aegis of Silver Oaths",
+        "es": "Égida de Juramentos Plateados"
       },
       "stats": {
         "atkBonus": 0,
@@ -266,30 +282,32 @@
         "atkModifier": 0,
         "defModifier": 0
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Aegis of Silver Oaths, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "81f5a143-8e6c-4977-8316-8c9f9ff4cb8e",
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Bromm Stonehide",
+        "es": "Bromm Piel de Piedra"
       },
       "stats": {
         "atk": 6,
         "def": 7,
         "hp": 8
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Bromm Stonehide, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "97a12bf5-01b3-4e4a-86cb-ed7168e648cd",
       "type": "item",
       "template": "defensive_gear",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Grimthorn Halberd",
+        "es": "Alabarda Espina Lúgubre"
       },
       "stats": {
         "atkBonus": 0,
@@ -297,15 +315,16 @@
         "atkModifier": -1,
         "defModifier": 0
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Grimthorn Halberd, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "266f2654-ac21-4f13-9a5e-5de8abba43fe",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Lioncrest Shield",
+        "es": "Escudo Cresta de León"
       },
       "stats": {
         "atkBonus": 1,
@@ -313,43 +332,46 @@
         "atkModifier": 0,
         "defModifier": 0
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Lioncrest Shield, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "612b373a-c6e5-4816-81a7-8e8f8fb42caa",
       "type": "counterattack",
       "template": "quick_riposte",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Thornbound Counter",
+        "es": "Contraataque Enredado"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Thornbound Counter, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "86d18aa8-bacc-4ffe-b143-ebb4651aeb0c",
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Vaelor Nightthorn",
+        "es": "Vaelor Espina Nocturna"
       },
       "stats": {
         "atk": 5,
         "def": 8,
         "hp": 8
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Vaelor Nightthorn, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "aacb4ccb-9857-4e24-921c-761bac91db76",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Crown of Withered Stars",
+        "es": "Corona de Estrellas Marchitas"
       },
       "stats": {
         "atkBonus": 2,
@@ -357,44 +379,47 @@
         "atkModifier": 0,
         "defModifier": -1
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Crown of Withered Stars, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "79ffe25d-9ad6-4922-8b6b-c15fb1e40df0",
       "type": "hero",
       "template": "skirmisher",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Isolde Brightward",
+        "es": "Isolde Guardia Luminosa"
       },
       "stats": {
         "atk": 5,
         "def": 8,
         "hp": 8
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Isolde Brightward, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "6c183a14-f223-4fc8-99e0-dc2f28bc4f2b",
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Echo of Last Breath",
+        "es": "Eco del Último Aliento"
       },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Echo of Last Breath, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "ab9f4ad8-7e98-43ae-aadd-efea29334a94",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Gilded Gauntlets of Valor",
+        "es": "Guanteletes Dorados del Valor"
       },
       "stats": {
         "atkBonus": 2,
@@ -402,54 +427,58 @@
         "atkModifier": 0,
         "defModifier": 0
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Gilded Gauntlets of Valor, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "c27073bd-cdc1-428a-9bd9-ab779ae9584c",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Riposte of the Iron Tempest",
+        "es": "Réplica de la Tempestad de Hierro"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Riposte of the Iron Tempest, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "ce002602-84d8-4f6d-966a-6d2778b1667a",
       "type": "healing",
       "template": "minor_heal",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Blessing of the Verdant Circle",
+        "es": "Bendición del Círculo Verde"
       },
       "stats": {
         "healAmount": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Blessing of the Verdant Circle, radiant healing magic, golden light flowing over wounded warrior, serene atmosphere."
     },
     {
       "id": "f589df51-c6b5-47ee-8d43-80d5e1429e0f",
       "type": "counterattack",
       "template": "quick_riposte",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Guardian's Retaliation",
+        "es": "Represalia del Guardián"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Guardian's Retaliation, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "8922d8f9-ae1d-4683-9be0-62667bfee129",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Obsidian Warbow",
+        "es": "Arco de Guerra Obsidiana"
       },
       "stats": {
         "atkBonus": 2,
@@ -457,99 +486,106 @@
         "atkModifier": 0,
         "defModifier": -1
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Obsidian Warbow, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "e3cfd3ca-cba6-4ebc-87be-134d7c69c088",
       "type": "hero",
       "template": "tank",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Rurik Ashmantle",
+        "es": "Rurik Manto de Ceniza"
       },
       "stats": {
         "atk": 8,
         "def": 8,
         "hp": 12
       },
-      "cost": 5
+      "cost": 5,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Rurik Ashmantle, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "516e0c20-57fe-4e95-a440-ff0cc09d27e1",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Thornbound Counter",
+        "es": "Contraataque Enredado"
       },
       "stats": {
         "counterDamage": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Thornbound Counter, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "3ae68327-d09a-4951-a25b-94ba67cf97f6",
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Nymera Starfall",
+        "es": "Nymera Caída Estelar"
       },
       "stats": {
         "atk": 5,
         "def": 7,
         "hp": 10
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Nymera Starfall, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "e31d5eba-a185-407d-8f80-204fdd93373a",
       "type": "reactive",
       "template": "survival_trick",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Veil of Broken Fate",
+        "es": "Velo del Destino Quebrado"
       },
       "effect": "prevent_death",
       "stats": {
         "damageReduction": null
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Veil of Broken Fate, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "687eebf2-9185-419d-9858-3aaa09305201",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Riposte of the Iron Tempest",
+        "es": "Réplica de la Tempestad de Hierro"
       },
       "stats": {
         "counterDamage": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Riposte of the Iron Tempest, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "ead9ee03-0a0e-46d2-a9c6-4d235dc21e57",
       "type": "reactive",
       "template": "critical_control",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Sigil of Null Stars",
+        "es": "Sello de Estrellas Nulas"
       },
       "effect": "cancel_critical",
       "stats": {
         "damageReduction": null
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Sigil of Null Stars, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "250665d0-ca0c-433b-8862-2a2d5a702660",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Sablecloak of the Raven Court",
+        "es": "Capa Azabache de la Corte del Cuervo"
       },
       "stats": {
         "atkBonus": 2,
@@ -557,126 +593,135 @@
         "atkModifier": 0,
         "defModifier": -2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Sablecloak of the Raven Court, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "fec4b45b-d0ae-42f0-9584-4a71a0e9560c",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Guardian's Retaliation",
+        "es": "Represalia del Guardián"
       },
       "stats": {
         "counterDamage": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Guardian's Retaliation, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "f162f3f8-076e-485d-a4af-280a42014ea8",
       "type": "hero",
       "template": "balanced_fighter",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Darian Blackfen",
+        "es": "Darian Pantano Oscuro"
       },
       "stats": {
         "atk": 5,
         "def": 6,
         "hp": 8
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Darian Blackfen, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "a0e7430f-f2bf-4247-9b68-85682cee166c",
       "type": "reactive",
       "template": "survival_trick",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Ward of Silent Embers",
+        "es": "Guarda de Brasas Silentes"
       },
       "effect": "prevent_death",
       "stats": {
         "damageReduction": null
       },
-      "cost": 3
+      "cost": 3,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Ward of Silent Embers, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     },
     {
       "id": "a87a265d-e9fa-4a45-bf47-fcf5539f4ad7",
       "type": "counterattack",
       "template": "guarded_strike",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Thornbound Counter",
+        "es": "Contraataque Enredado"
       },
       "stats": {
         "counterDamage": 2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Thornbound Counter, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "c610e783-4fcf-42ef-af54-a4674f8cc543",
       "type": "counterattack",
       "template": "quick_riposte",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Riposte of the Iron Tempest",
+        "es": "Réplica de la Tempestad de Hierro"
       },
       "stats": {
         "counterDamage": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Riposte of the Iron Tempest, dramatic mid-combat reversal, sparks and steel clash, intense motion blur."
     },
     {
       "id": "963690bc-deb4-4a20-8cfb-5e9a6e185a2d",
       "type": "hero",
       "template": "fragile_support",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Elowen Frostwhisper",
+        "es": "Elowen Susurro de Escarcha"
       },
       "stats": {
         "atk": 8,
         "def": 7,
         "hp": 8
       },
-      "cost": 4
+      "cost": 4,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Elowen Frostwhisper, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "fbf2341a-6169-4151-8cd9-1d1e0f2b5777",
       "type": "healing",
       "template": "minor_heal",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Elixir of Dawnlight",
+        "es": "Elixir de Luz del Alba"
       },
       "stats": {
         "healAmount": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Elixir of Dawnlight, radiant healing magic, golden light flowing over wounded warrior, serene atmosphere."
     },
     {
       "id": "4045e3f3-ef7e-4e25-9844-d385a35c4eac",
       "type": "hero",
       "template": "tank",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Magnus Dawnshield",
+        "es": "Magnus Escudo del Alba"
       },
       "stats": {
         "atk": 7,
         "def": 7,
         "hp": 11
       },
-      "cost": 5
+      "cost": 5,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Magnus Dawnshield, battle-hardened medieval hero, detailed armor, dynamic stance, atmospheric battlefield background."
     },
     {
       "id": "9959a2ae-4273-410b-9bb0-eff3ed5645c4",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Sunfire Relic",
+        "es": "Reliquia Fuego Solar"
       },
       "stats": {
         "atkBonus": 2,
@@ -684,15 +729,16 @@
         "atkModifier": 0,
         "defModifier": -2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Sunfire Relic, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "65daa952-09b6-4ea8-b905-51bb2ddc18b8",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Frostbound Spear",
+        "es": "Lanza de Escarcha Eterna"
       },
       "stats": {
         "atkBonus": 1,
@@ -700,15 +746,16 @@
         "atkModifier": 0,
         "defModifier": 0
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Frostbound Spear, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "51d238f7-420d-47b2-9f1b-6ee50ee01437",
       "type": "item",
       "template": "offensive_weapon",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Helm of the Deep Watch",
+        "es": "Yelmo de la Guardia Abisal"
       },
       "stats": {
         "atkBonus": 2,
@@ -716,15 +763,16 @@
         "atkModifier": 0,
         "defModifier": -1
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Helm of the Deep Watch, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "6991d4e3-a022-4bf7-8fbb-3b0251bfc8cd",
       "type": "item",
       "template": "high_risk_high_reward",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Venomspike Dirk",
+        "es": "Estilete Aguijón Venenoso"
       },
       "stats": {
         "atkBonus": 2,
@@ -732,21 +780,23 @@
         "atkModifier": 0,
         "defModifier": -2
       },
-      "cost": 2
+      "cost": 2,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Venomspike Dirk, legendary medieval artifact resting on ancient stone altar, magical glow, dramatic shadows."
     },
     {
       "id": "bea6ee3c-12b6-4876-9d60-9d5f306fb3c2",
       "type": "reactive",
       "template": "damage_mitigation",
       "name": {
-        "en": "",
-        "es": ""
+        "en": "Echo of Last Breath",
+        "es": "Eco del Último Aliento"
       },
       "effect": "reduce_damage",
       "stats": {
         "damageReduction": 1
       },
-      "cost": 1
+      "cost": 1,
+      "prompt": "STYLE_ANCHOR: high-fantasy medieval card illustration, painterly realism, rich but muted color palette, soft rim light, shallow depth of field, ornate frame hints, clean silhouette, centered composition, no text, no watermark. UNIQUE: Echo of Last Breath, arcane magical effect swirling in dark air, glowing sigils, mystical energy burst."
     }
   ]
 }

@@ -113,7 +113,7 @@ const resolvedImageSrc = computed(() => {
   if (explicitUrl) return explicitUrl
   const cardId = props.card?.id
   if (!cardId) return ''
-  return `/images/${cardId}.png`
+  return `/images/${cardId}.jpg`
 })
 
 watch(
