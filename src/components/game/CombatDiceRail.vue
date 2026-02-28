@@ -1,16 +1,16 @@
 <template>
-  <aside v-if="active" class="absolute right-4 top-1/2 z-[170] w-32 -translate-y-1/2 p-3">
+  <aside v-if="active" class="absolute right-4 top-1/2 z-[170] w-48 -translate-y-1/2 p-3">
     <div class="space-y-3">
-      <section class="p-2">
+      <section>
         <button
           type="button"
-          class="h-24 w-full overflow-hidden border border-2 transition-colors rounded-full"
+          class="h-36 w-full overflow-hidden border border-2 transition-colors rounded-full"
           :class="opponentDieClass"
           :disabled="!canClickOpponentDie"
           @click="onClickOpponentDie"
         >
           <div class="flex h-full w-full items-center justify-center">
-            <div class="h-20 w-20">
+            <div class="h-[7.5rem] w-[7.5rem]">
               <ThreeDie
                 :value="getRoleRoll(opponentRole)"
                 :rolling="isRoleRolling(opponentRole)"
@@ -24,16 +24,16 @@
         </div>
       </section>
 
-      <section class="p-2">
+      <section>
         <button
           type="button"
-          class="h-24 w-full overflow-hidden border border-2 transition-colors rounded-full"
+          class="h-36 w-full overflow-hidden border border-2 transition-colors rounded-full"
           :class="ownDieClass"
           :disabled="!canClickOwnDie"
           @click="onClickOwnDie"
         >
           <div class="flex h-full w-full items-center justify-center">
-            <div class="h-20 w-20">
+            <div class="h-[7.5rem] w-[7.5rem]">
               <ThreeDie
                 :value="getRoleRoll(myRole)"
                 :rolling="isRoleRolling(myRole)"
