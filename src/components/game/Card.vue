@@ -10,7 +10,16 @@
     }"
   >
     <!-- Card Name (Top) -->
-    <div class="px-2 py-1 bg-gray-50 text-xs leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200">
+    <div
+      class="px-2 py-1 text-xs leading-4 font-bold text-gray-800 text-center uppercase tracking-wide border-b border-gray-200"
+      :class="{
+        'bg-amber-300': card.type === 'hero',
+        'bg-violet-300': card.type === 'item',
+        'bg-emerald-300': card.type === 'healing',
+        'bg-blue-300': card.type === 'reactive',
+        'bg-rose-300': card.type === 'counterattack'
+      }"
+    >
       {{ localizedName }}
     </div>
 
@@ -22,12 +31,13 @@
     </div>
 
     <!-- Card Image (Middle) -->
-    <div class="w-full aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
+    <div
+      class="w-full aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
       <img
         v-if="resolvedImageSrc && !imageLoadFailed"
         :src="resolvedImageSrc"
         :alt="t('card.imageAlt')"
-        class="object-cover w-full h-full"
+        class="object-cover w-full h-full object-[0px_-20px]"
         @error="handleImageError"
       />
       <div v-else class="text-gray-400 text-sm italic">
@@ -35,7 +45,15 @@
       </div>
     </div>
     <!-- Card Stats & Template (Middle) -->
-    <div class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1">
+    <div
+      class="flex-1 flex flex-col justify-center items-center px-2 py-3 text-center gap-1"
+      :class="{
+        'bg-amber-100': card.type === 'hero',
+        'bg-violet-100': card.type === 'item',
+        'bg-emerald-100': card.type === 'healing',
+        'bg-blue-100': card.type === 'reactive',
+        'bg-rose-100': card.type === 'counterattack'
+      }">
       <div class="flex flex-col gap-1 font-semibold text-gray-700">
         <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
           <span :title="t('card.stats.attack')" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
@@ -61,7 +79,15 @@
     </div>
 
     <!-- Card Type (Bottom) -->
-    <div class="px-2 py-1 bg-gray-100 text-xs uppercase tracking-widest text-gray-500 border-t border-gray-200 text-center">
+    <div
+      class="px-2 py-1 text-xs uppercase tracking-widest text-gray-500 border-t border-gray-200 text-center"
+      :class="{
+        'bg-amber-300': card.type === 'hero',
+        'bg-violet-300': card.type === 'item',
+        'bg-emerald-300': card.type === 'healing',
+        'bg-blue-300': card.type === 'reactive',
+        'bg-rose-300': card.type === 'counterattack'
+      }">
       {{ localizedType }}
     </div>
   </div>
@@ -113,7 +139,7 @@ const resolvedImageSrc = computed(() => {
   if (explicitUrl) return explicitUrl
   const cardId = props.card?.id
   if (!cardId) return ''
-  return `/images/${cardId}.jpg`
+  return `/images/${cardId}.png`
 })
 
 watch(

@@ -7,6 +7,7 @@
           :key="slot.key"
           class="table-slot"
           :class="{
+            'slot-occupied': Boolean(slot.hero),
             'slot-attack-target': isAttackTarget(slot.index)
           }"
           @dragover="onOpponentSlotDragOver(slot.index, $event)"
@@ -18,6 +19,7 @@
               v-for="(item, index) in slot.hero.items"
               :key="item.id"
               class="item-under"
+              :class="{ 'item-under-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
               :style="{ '--item-offset': `${-(index + 1) * 25}px`, '--item-z': `${9 - index}` }"
             >
               <Card :card="item" :hide-cost="true" />
@@ -26,7 +28,7 @@
               :card="getHeroDisplay(slot.hero)"
               :hide-cost="true"
               class="hero-card"
-              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
+              :class="{ 'hero-card-exhausted-opponent': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
             />
           </div>
         </div>
@@ -37,6 +39,7 @@
           :key="slot.key"
           class="table-slot"
           :class="{
+            'slot-occupied': Boolean(slot.hero),
             'slot-drop-valid': isActiveDropSlot(slot.index),
             'slot-attack-selectable': canSelectAttacker(slot.index)
           }"
@@ -51,6 +54,7 @@
               v-for="(item, index) in slot.hero.items"
               :key="item.id"
               class="item-under"
+              :class="{ 'item-under-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
               :style="{ '--item-offset': `${-(index + 1) * 25}px`, '--item-z': `${9 - index}` }"
             >
               <Card :card="item" :hide-cost="true" />
@@ -59,7 +63,7 @@
               :card="getHeroDisplay(slot.hero)"
               :hide-cost="true"
               class="hero-card"
-              :class="{ 'hero-card-exhausted': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
+              :class="{ 'hero-card-exhausted-player': slot.hero?.hasAttackedThisPhase || slot.hero?.summoningSick }"
               :draggable="canSelectAttacker(slot.index)"
               @dragstart="onHeroAttackDragStart(slot.index, $event)"
               @dragend="onHeroAttackDragEnd"
@@ -417,6 +421,12 @@ function getHeroDisplay(hero) {
   cursor: crosshair;
 }
 
+.table-slot.slot-occupied {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
 .hero-stack {
   position: relative;
   width: 176px;
@@ -426,10 +436,15 @@ function getHeroDisplay(hero) {
 .hero-card {
   position: relative;
   z-index: 10;
+  transition: transform 0.25s ease;
 }
 
-.hero-card.hero-card-exhausted {
-  filter: grayscale(1);
+.hero-card.hero-card-exhausted-player {
+  transform: rotate(15deg);
+}
+
+.hero-card.hero-card-exhausted-opponent {
+  transform: rotate(15deg);
 }
 
 .item-under {
@@ -438,5 +453,10 @@ function getHeroDisplay(hero) {
   transform: translateY(var(--item-offset, 16px));
   z-index: var(--item-z, 1);
   pointer-events: none;
+  transition: transform 0.25s ease;
+}
+
+.item-under.item-under-exhausted {
+  transform: translateY(var(--item-offset, 16px)) rotate(15deg);
 }
 </style>
