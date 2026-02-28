@@ -4,6 +4,7 @@
     :class="{
       'border-amber-400': card.type === 'hero',
       'border-violet-400': card.type === 'item',
+      'border-orange-400': card.type === 'weapon',
       'border-emerald-400': card.type === 'healing',
       'border-blue-400': card.type === 'reactive',
       'border-rose-400': card.type === 'counterattack'
@@ -15,6 +16,7 @@
       :class="{
         'bg-amber-300': card.type === 'hero',
         'bg-violet-300': card.type === 'item',
+        'bg-orange-300': card.type === 'weapon',
         'bg-emerald-300': card.type === 'healing',
         'bg-blue-300': card.type === 'reactive',
         'bg-rose-300': card.type === 'counterattack'
@@ -50,6 +52,7 @@
       :class="{
         'bg-amber-100': card.type === 'hero',
         'bg-violet-100': card.type === 'item',
+        'bg-orange-100': card.type === 'weapon',
         'bg-emerald-100': card.type === 'healing',
         'bg-blue-100': card.type === 'reactive',
         'bg-rose-100': card.type === 'counterattack'
@@ -57,14 +60,26 @@
       <div class="flex flex-col gap-1 font-semibold text-gray-700">
         <span v-if="card.type === 'hero'" class="flex flex-row gap-2 items-center justify-center">
           <span :title="t('card.stats.attack')" :class="getStatClass('atk')">⚔️ {{ card.stats.atk }}</span>
+          <span :title="t('card.stats.dexterity')" :class="getStatClass('dex')">⚡ {{ card.stats.dex }}</span>
           <span :title="t('card.stats.defense')" :class="getStatClass('def')">🛡️ {{ card.stats.def }}</span>
           <span :title="t('card.stats.health')" :class="getStatClass('hp')">❤️ {{ card.stats.hp }}</span>
         </span>
         <span v-else-if="card.type === 'item'" class="flex flex-row gap-2 items-center justify-center">
           <span v-if="card.stats.atkBonus" :title="t('card.stats.attackBonus')">⚔️ +{{ card.stats.atkBonus }}</span>
           <span v-if="card.stats.atkModifier < 0" :title="t('card.stats.attackPenalty')">⚔️ {{ card.stats.atkModifier }}</span>
+          <span v-if="card.stats.dexBonus" :title="t('card.stats.dexterityBonus')">⚡ +{{ card.stats.dexBonus }}</span>
+          <span v-if="card.stats.dexModifier < 0" :title="t('card.stats.dexterityPenalty')">⚡ {{ card.stats.dexModifier }}</span>
           <span v-if="card.stats.defBonus" :title="t('card.stats.defenseBonus')">🛡️ +{{ card.stats.defBonus }}</span>
           <span v-if="card.stats.defModifier < 0" :title="t('card.stats.defensePenalty')">🛡️ {{ card.stats.defModifier }}</span>
+        </span>
+        <span v-else-if="card.type === 'weapon'" class="flex flex-row gap-2 items-center justify-center">
+          <span v-if="card.stats.atkBonus" :title="t('card.stats.attackBonus')">⚔️ +{{ card.stats.atkBonus }}</span>
+          <span v-if="card.stats.atkModifier < 0" :title="t('card.stats.attackPenalty')">⚔️ {{ card.stats.atkModifier }}</span>
+          <span v-if="card.stats.dexBonus" :title="t('card.stats.dexterityBonus')">⚡ +{{ card.stats.dexBonus }}</span>
+          <span v-if="card.stats.dexModifier < 0" :title="t('card.stats.dexterityPenalty')">⚡ {{ card.stats.dexModifier }}</span>
+          <span v-if="card.stats.defBonus" :title="t('card.stats.defenseBonus')">🛡️ +{{ card.stats.defBonus }}</span>
+          <span v-if="card.stats.defModifier < 0" :title="t('card.stats.defensePenalty')">🛡️ {{ card.stats.defModifier }}</span>
+          <span v-if="card.stats.damageDieSides" :title="t('card.stats.damageDie')">💥 {{ formatDie(card.stats.damageDieSides) }}</span>
         </span>
         <span v-else-if="card.type === 'healing'" class="leading-none">+{{ card.stats.healAmount }} {{ t('card.stats.hpShort') }}</span>
         <span v-else-if="card.type === 'reactive'" class="text-xs">{{ formatTemplate(card.effect) }}</span>
@@ -84,6 +99,7 @@
       :class="{
         'bg-amber-300': card.type === 'hero',
         'bg-violet-300': card.type === 'item',
+        'bg-orange-300': card.type === 'weapon',
         'bg-emerald-300': card.type === 'healing',
         'bg-blue-300': card.type === 'reactive',
         'bg-rose-300': card.type === 'counterattack'
@@ -159,6 +175,14 @@ function formatTemplate(template) {
   const translated = t(key)
   if (translated !== key) return translated
   return template.replace(/_/g, ' ')
+}
+
+function formatDie(sides) {
+  const numeric = Number(sides)
+  const safeSides = Number.isFinite(numeric)
+    ? (numeric >= 6 ? 6 : (numeric >= 4 ? 4 : 2))
+    : 2
+  return `1d${safeSides}`
 }
 
 function getStatClass(statKey) {

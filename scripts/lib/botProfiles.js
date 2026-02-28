@@ -88,6 +88,7 @@ const AGGRESSIVE_DISCARD_PRIORITY = {
   reactive: 1,
   counterattack: 2,
   item: 3,
+  weapon: 3,
   hero: 4
 }
 
@@ -109,10 +110,22 @@ function pickDiscardCardIdsAggressive(hand, requiredCount) {
 
 function pickItemEquipPlayConservative(state, playerId) {
   const player = state.players[playerId]
-  const candidates = player.hand
+  const allCandidates = player.hand
     .map((card, index) => ({ card, index }))
-    .filter(({ card }) => card.type === 'item')
+    .filter(({ card }) => card.type === 'item' || card.type === 'weapon')
     .filter(({ card }) => player.resources >= Number(card.cost || 0))
+
+  const weaponCandidates = allCandidates
+    .filter(({ card }) => card.type === 'weapon')
+    .sort((a, b) => {
+      const costA = Number(a.card?.cost || 0)
+      const costB = Number(b.card?.cost || 0)
+      if (costA !== costB) return costB - costA
+      return a.index - b.index
+    })
+
+  const itemCandidates = allCandidates
+    .filter(({ card }) => card.type === 'item')
     .sort((a, b) => {
       const defA = Number(a.card?.stats?.defBonus || 0) + Number(a.card?.stats?.defModifier || 0)
       const defB = Number(b.card?.stats?.defBonus || 0) + Number(b.card?.stats?.defModifier || 0)
@@ -123,13 +136,19 @@ function pickItemEquipPlayConservative(state, playerId) {
       return a.index - b.index
     })
 
-  if (candidates.length === 0) return null
+  if (allCandidates.length === 0) return null
+
+  const candidates = [...weaponCandidates, ...itemCandidates]
 
   for (const choice of candidates) {
     for (let slotIndex = 0; slotIndex < player.heroes.length; slotIndex += 1) {
       const hero = player.heroes[slotIndex]
       if (!hero) continue
       if ((hero.items || []).length >= 3) continue
+      if (choice.card.type === 'weapon') {
+        const weaponCount = (hero.items || []).filter((entry) => entry?.type === 'weapon').length
+        if (weaponCount >= 1) continue
+      }
       return { cardId: choice.card.id, slotIndex }
     }
   }
@@ -205,6 +224,7 @@ function pickAttacksConservative(state, attackerPlayerId, canHeroAttack, getHero
 const CONSERVATIVE_DISCARD_PRIORITY = {
   hero: 0,
   item: 1,
+  weapon: 1,
   counterattack: 2,
   reactive: 3,
   healing: 4

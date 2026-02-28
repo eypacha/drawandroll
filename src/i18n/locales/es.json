@@ -48,6 +48,7 @@
     "opponentAttackResult": "Resultado del ataque rival",
     "attackerDie": "Dado atacante",
     "defenderDie": "Dado defensor",
+    "damageDie": "Dado de daño",
     "formulaAtk": "ATK + d20",
     "formulaDef": "DEF + d20",
     "rollingHint": "Tirando dados...",
@@ -66,6 +67,8 @@
     "statusWaitAttacker": "Esperando tirada del atacante.",
     "statusRollDefender": "Tira el dado defensor.",
     "statusWaitDefender": "Esperando tirada del defensor.",
+    "statusRollDamage": "Tira tu dado de daño.",
+    "statusWaitDamage": "Esperando tirada de daño del atacante.",
     "statusWaitReaction": "Esperando reacción del defensor.",
     "statusResolved": "Ataque resuelto."
   },
@@ -75,6 +78,7 @@
     "types": {
       "hero": "Héroe",
       "item": "Ítem",
+      "weapon": "Arma",
       "healing": "Curación",
       "reactive": "Reactiva",
       "counterattack": "Contraataque"
@@ -86,12 +90,17 @@
     },
     "stats": {
       "attack": "Ataque",
+      "dexterity": "Destreza",
       "defense": "Defensa",
       "health": "Vida",
       "attackBonus": "Ataque extra",
       "attackPenalty": "Penalización de ataque",
+      "dexterityBonus": "Destreza extra",
+      "dexterityPenalty": "Penalización de destreza",
       "defenseBonus": "Defensa extra",
       "defensePenalty": "Penalización de defensa",
+      "attackDie": "Dado de ataque",
+      "damageDie": "Dado de daño",
       "counterDamage": "Daño contra",
       "hpShort": "HP"
     }

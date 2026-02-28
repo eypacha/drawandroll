@@ -4,6 +4,17 @@ import { sendMessage } from '@/services/peerService'
 
 const COMBAT_CRITICAL_BONUS = 3
 const COMBAT_ROLL_ANIMATION_MS = 1000
+const ATTACK_ROLL_DIE_SIDES = 20
+const DEFAULT_DAMAGE_DIE_SIDES = 2
+const DEFENSE_DIE_SIDES = 20
+
+function normalizeDamageDieSides(value) {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) return DEFAULT_DAMAGE_DIE_SIDES
+  if (numeric >= 6) return 6
+  if (numeric >= 4) return 4
+  return 2
+}
 
 export function useGameActions() {
   const connection = useConnectionStore()
@@ -248,8 +259,13 @@ export function useGameActions() {
     return playerId === 'player_a' ? 'player_b' : 'player_a'
   }
 
+  function randomDie(sides) {
+    const safeSides = Math.max(2, Number(sides) || 20)
+    return Math.floor(Math.random() * safeSides) + 1
+  }
+
   function randomD20() {
-    return Math.floor(Math.random() * 20) + 1
+    return randomDie(DEFENSE_DIE_SIDES)
   }
 
   async function sleep(ms) {
@@ -330,6 +346,8 @@ export function useGameActions() {
       defenderSlot: active.defenderSlot,
       attackerRoll: active.attackerRoll,
       defenderRoll: active.defenderRoll,
+      damageRoll: active.damageRoll,
+      damageDieSides: Number(active.attackerDamageDieSides) || DEFAULT_DAMAGE_DIE_SIDES,
       criticalBonus: COMBAT_CRITICAL_BONUS,
       reactionActions: selectedReactionActions,
       rollCounterAttack: randomD20,
@@ -381,7 +399,9 @@ export function useGameActions() {
       defenderPlayerId,
       defenderSlot: safeDefenderSlot,
       attackerStat: attackerStats.atk,
-      defenderStat: defenderStats.def,
+      defenderStat: defenderStats.ac,
+      defenderArmor: defenderStats.def,
+      attackerDamageDieSides: normalizeDamageDieSides(attackerStats.damageDieSides),
       startedAt: Date.now()
     }
 
@@ -435,7 +455,7 @@ export function useGameActions() {
   function requestCombatRollClick(step) {
     const active = getActiveCombatOrNull()
     if (!active) return false
-    if (step !== 'attacker' && step !== 'defender') return false
+    if (step !== 'attacker' && step !== 'defender' && step !== 'damage') return false
 
     const payload = {
       combatId: active.combatId,
@@ -462,7 +482,7 @@ export function useGameActions() {
     const step = payload?.step
     const byPlayerId = payload?.byPlayerId
     if (combatId !== active.combatId) return false
-    if (step !== 'attacker' && step !== 'defender') return false
+    if (step !== 'attacker' && step !== 'defender' && step !== 'damage') return false
     if (game.turnPhase !== 'combat' || game.currentTurn !== active.attackerPlayerId) return false
 
     const attackerHero = players.players[active.attackerPlayerId]?.heroes?.[active.attackerSlot]
@@ -490,7 +510,7 @@ export function useGameActions() {
       if (combat.rollStep !== 'attacker_pending') return false
       if (!refreshed.rollingAttacker) return false
 
-      const roll = randomD20()
+      const roll = randomDie(ATTACK_ROLL_DIE_SIDES)
       const stepPayload = {
         combatId: refreshed.combatId,
         step: 'attacker',
@@ -502,12 +522,43 @@ export function useGameActions() {
       return true
     }
 
-    if (combat.rollStep !== 'defender_pending') return false
-    if (byPlayerId !== active.defenderPlayerId) return false
-    if (active.rollingDefender) return false
+    if (step === 'defender') {
+      if (combat.rollStep !== 'defender_pending') return false
+      if (byPlayerId !== active.defenderPlayerId) return false
+      if (active.rollingDefender) return false
+      const rollStartPayload = {
+        combatId: active.combatId,
+        step: 'defender',
+        startedAt: Date.now()
+      }
+      combat.markRollStepStart(rollStartPayload)
+      sendMessage({ type: 'combat_roll_step_start', payload: rollStartPayload })
+      await sleep(COMBAT_ROLL_ANIMATION_MS)
+
+      const refreshed = getActiveCombatOrNull()
+      if (!refreshed || refreshed.combatId !== active.combatId) return false
+      if (combat.rollStep !== 'defender_pending') return false
+      if (!refreshed.rollingDefender) return false
+
+      const roll = randomDie(DEFENSE_DIE_SIDES)
+      const defenderTotal = (Number(refreshed.defenderStat) || 0) + roll
+      const stepPayload = {
+        combatId: refreshed.combatId,
+        step: 'defender',
+        roll,
+        defenderTotal
+      }
+      if (!combat.setRollStepResult(stepPayload)) return false
+      sendMessage({ type: 'combat_roll_step_result', payload: stepPayload })
+      return true
+    }
+
+    if (combat.rollStep !== 'damage_pending') return false
+    if (byPlayerId !== active.attackerPlayerId) return false
+    if (active.rollingDamage) return false
     const rollStartPayload = {
       combatId: active.combatId,
-      step: 'defender',
+      step: 'damage',
       startedAt: Date.now()
     }
     combat.markRollStepStart(rollStartPayload)
@@ -516,28 +567,30 @@ export function useGameActions() {
 
     const refreshed = getActiveCombatOrNull()
     if (!refreshed || refreshed.combatId !== active.combatId) return false
-    if (combat.rollStep !== 'defender_pending') return false
-    if (!refreshed.rollingDefender) return false
+    if (combat.rollStep !== 'damage_pending') return false
+    if (!refreshed.rollingDamage) return false
 
-    const roll = randomD20()
+    const damageDieSides = normalizeDamageDieSides(refreshed.attackerDamageDieSides)
+    const roll = randomDie(damageDieSides)
     const attackerRoll = Number(refreshed.attackerRoll) || 0
     const attackerTotal = Number(refreshed.attackerTotal) || ((Number(refreshed.attackerStat) || 0) + attackerRoll)
-    const defenderTotal = (Number(refreshed.defenderStat) || 0) + roll
+    const defenderTotal = Number(refreshed.defenderTotal) || ((Number(refreshed.defenderStat) || 0) + (Number(refreshed.defenderRoll) || 0))
     const isFumble = attackerRoll === 1
-    const isCritical = attackerRoll === 20
-    let baseDamage = Math.max(0, attackerTotal - defenderTotal)
+    const isCritical = attackerRoll === ATTACK_ROLL_DIE_SIDES
+    const hitSuccess = attackerTotal >= defenderTotal
+    let baseDamage = hitSuccess ? Math.max(0, (Number(refreshed.attackerStat) || 0) + roll - (Number(refreshed.defenderArmor) || 0)) : 0
     if (isFumble) {
       baseDamage = 0
     } else if (isCritical) {
-      baseDamage += COMBAT_CRITICAL_BONUS
+      baseDamage += Math.max(1, Math.round((damageDieSides / 2) + COMBAT_CRITICAL_BONUS))
     }
 
     const stepPayload = {
       combatId: refreshed.combatId,
-      step: 'defender',
+      step: 'damage',
       roll,
-      defenderTotal,
       baseDamage,
+      hitSuccess,
       isCritical,
       isFumble
     }
@@ -552,7 +605,9 @@ export function useGameActions() {
       defenderPlayerId: updated.defenderPlayerId,
       attackerRoll: updated.attackerRoll,
       defenderRoll: updated.defenderRoll,
+      damageRoll: updated.damageRoll,
       baseDamage: updated.baseDamage,
+      hitSuccess: Boolean(updated.hitSuccess),
       isCritical: updated.isCritical,
       isFumble: updated.isFumble,
       startedAt: Date.now()

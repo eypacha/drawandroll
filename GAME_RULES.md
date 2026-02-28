@@ -30,9 +30,10 @@ Este documento define las reglas vigentes del juego PMV.
 
 1. Héroes
 2. Ítems
-3. Curación
-4. Reactivas defensivas
-5. Contraataques
+3. Armas
+4. Curación
+5. Reactivas defensivas
+6. Contraataques
 
 ---
 
@@ -41,14 +42,15 @@ Este documento define las reglas vigentes del juego PMV.
 - Cada jugador tiene recursos fijos por turno (`6`).
 - Se refrescan por completo al inicio de su turno.
 - No se acumulan entre turnos.
-- Gastan recursos: héroes, ítems, curación y reacciones defensivas.
+- Gastan recursos: héroes, ítems, armas, curación y reacciones defensivas.
 
 ---
 
 ## 6. Héroes
 
 - Máximo 3 héroes por jugador en mesa.
-- Stats base: ATK, DEF, HP.
+- Stats base: ATK, DEX, DEF, HP.
+- AC (armor class) se calcula como `10 + DEX`.
 - Reclutar héroes cuesta exactamente `card.cost` (sin escalado por héroes perdidos).
 - Si un héroe llega a 0 HP, muere de forma permanente.
 - No hay resurrección.
@@ -76,9 +78,24 @@ Reglas especiales vigentes:
 ## 8. Ítems
 
 - Los ítems modifican stats del héroe equipado.
-- Cada héroe puede tener hasta 3 ítems.
+- Los ítems no pueden modificar el dado de daño del héroe.
 - Los ítems no tienen durabilidad.
 - Los ítems permanecen hasta que el héroe muere.
+
+## 8.1 Armas
+
+- Cada héroe tiene 3 slots de equipamiento total compartidos entre armas e ítems.
+- Máximo 1 arma por héroe.
+- Combinaciones válidas: `1 arma + 2 ítems` o `3 ítems`.
+- El dado de daño del héroe lo define el arma equipada (si no hay arma, usa base `1d2`).
+
+---
+
+## 11. Resolución de ataque
+
+- Tirada de impacto: `1d20` del atacante contra AC del defensor.
+- Si impacta, se tira daño con el dado actual del héroe (`1d2`, `1d4` o `1d6`) y se aplica mitigación por DEF.
+- Si no impacta, el daño es 0.
 
 ---
 

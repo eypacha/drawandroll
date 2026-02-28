@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import * as THREE from 'three'
 
 const props = defineProps({
@@ -18,10 +18,23 @@ const props = defineProps({
   tone: {
     type: String,
     default: 'blue'
+  },
+  sides: {
+    type: Number,
+    default: 20
   }
 })
 
 const containerRef = ref(null)
+
+const normalizedSides = computed(() => {
+  const numeric = Number(props.sides)
+  if (!Number.isFinite(numeric)) return 20
+  if (numeric >= 20) return 20
+  if (numeric >= 6) return 6
+  if (numeric >= 4) return 4
+  return 2
+})
 
 let scene = null
 let camera = null
@@ -42,6 +55,9 @@ function getToneColors(tone) {
   if (tone === 'emerald') {
     return { face: '#6ee7b7', edge: '#065f46', ambient: '#ecfdf5' }
   }
+  if (tone === 'amber') {
+    return { face: '#fde68a', edge: '#92400e', ambient: '#fffbeb' }
+  }
   return { face: '#93c5fd', edge: '#1e3a8a', ambient: '#eff6ff' }
 }
 
@@ -53,7 +69,8 @@ function getCameraDirection() {
 function getTargetQuaternionForValue(value) {
   if (faceNormals.length === 0) return new THREE.Quaternion()
   const numericValue = Number(value)
-  const safe = Number.isFinite(numericValue) ? Math.max(1, Math.min(20, Math.round(numericValue))) : 1
+  const maxFace = faceNormals.length
+  const safe = Number.isFinite(numericValue) ? Math.max(1, Math.min(maxFace, Math.round(numericValue))) : 1
   const normal = faceNormals[safe - 1] || faceNormals[0]
   const cameraDirection = getCameraDirection()
   const q = new THREE.Quaternion().setFromUnitVectors(normal, cameraDirection)
@@ -122,26 +139,81 @@ function initScene() {
   scene.add(dieGroup)
 
   const toneColors = getToneColors(props.tone)
-  const geometry = new THREE.IcosahedronGeometry(1.2, 0).toNonIndexed()
-  const position = geometry.attributes.position
-  faceNormals.length = 0
-  for (let i = 0; i < position.count; i += 3) {
-    const a = new THREE.Vector3().fromBufferAttribute(position, i)
-    const b = new THREE.Vector3().fromBufferAttribute(position, i + 1)
-    const c = new THREE.Vector3().fromBufferAttribute(position, i + 2)
-    faceNormals.push(
-      new THREE.Vector3()
+  const sides = normalizedSides.value
+  const faceEntries = []
+  let geometry = null
+
+  if (sides === 20) {
+    geometry = new THREE.IcosahedronGeometry(1.2, 0).toNonIndexed()
+    const position = geometry.attributes.position
+    for (let i = 0; i < position.count; i += 3) {
+      const a = new THREE.Vector3().fromBufferAttribute(position, i)
+      const b = new THREE.Vector3().fromBufferAttribute(position, i + 1)
+      const c = new THREE.Vector3().fromBufferAttribute(position, i + 2)
+      const normal = new THREE.Vector3()
         .subVectors(b, a)
         .cross(new THREE.Vector3().subVectors(c, a))
         .normalize()
+      const center = new THREE.Vector3().addVectors(a, b).add(c).multiplyScalar(1 / 3)
+      faceEntries.push({ normal, center, label: (i / 3) + 1 })
+    }
+  } else if (sides === 6) {
+    geometry = new THREE.BoxGeometry(1.72, 1.72, 1.72)
+    const faceData = [
+      { normal: new THREE.Vector3(0, 0, 1), label: 1 },
+      { normal: new THREE.Vector3(1, 0, 0), label: 2 },
+      { normal: new THREE.Vector3(0, 1, 0), label: 3 },
+      { normal: new THREE.Vector3(0, -1, 0), label: 4 },
+      { normal: new THREE.Vector3(-1, 0, 0), label: 5 },
+      { normal: new THREE.Vector3(0, 0, -1), label: 6 }
+    ]
+    for (const entry of faceData) {
+      faceEntries.push({
+        normal: entry.normal,
+        center: entry.normal.clone().multiplyScalar(1.0),
+        label: entry.label
+      })
+    }
+  } else if (sides === 4) {
+    geometry = new THREE.TetrahedronGeometry(1.35, 0).toNonIndexed()
+    const position = geometry.attributes.position
+    for (let i = 0; i < position.count; i += 3) {
+      const a = new THREE.Vector3().fromBufferAttribute(position, i)
+      const b = new THREE.Vector3().fromBufferAttribute(position, i + 1)
+      const c = new THREE.Vector3().fromBufferAttribute(position, i + 2)
+      const normal = new THREE.Vector3()
+        .subVectors(b, a)
+        .cross(new THREE.Vector3().subVectors(c, a))
+        .normalize()
+      const center = new THREE.Vector3().addVectors(a, b).add(c).multiplyScalar(1 / 3)
+      faceEntries.push({ normal, center, label: (i / 3) + 1 })
+    }
+  } else {
+    geometry = new THREE.CylinderGeometry(0.98, 0.98, 0.24, 48)
+    faceEntries.push(
+      {
+        normal: new THREE.Vector3(0, 1, 0),
+        center: new THREE.Vector3(0, 0.21, 0),
+        label: 1
+      },
+      {
+        normal: new THREE.Vector3(0, -1, 0),
+        center: new THREE.Vector3(0, -0.21, 0),
+        label: 2
+      }
     )
+  }
+
+  faceNormals.length = 0
+  for (const entry of faceEntries) {
+    faceNormals.push(entry.normal.clone().normalize())
   }
 
   const material = new THREE.MeshStandardMaterial({
     color: toneColors.face,
     roughness: 0.52,
     metalness: 0.12,
-    flatShading: true
+    flatShading: sides !== 6
   })
   die = new THREE.Mesh(geometry, material)
   dieGroup.add(die)
@@ -153,13 +225,12 @@ function initScene() {
   )
   dieGroup.add(dieEdges)
 
-  for (let i = 0; i < position.count; i += 3) {
-    const a = new THREE.Vector3().fromBufferAttribute(position, i)
-    const b = new THREE.Vector3().fromBufferAttribute(position, i + 1)
-    const c = new THREE.Vector3().fromBufferAttribute(position, i + 2)
-    const center = new THREE.Vector3().addVectors(a, b).add(c).multiplyScalar(1 / 3)
-    const normal = faceNormals[i / 3]
-    const texture = createFaceLabelTexture((i / 3) + 1, props.tone)
+  const labelSize = sides === 20 ? 0.62 : (sides === 6 ? 0.8 : (sides === 4 ? 0.72 : 0.62))
+
+  for (const entry of faceEntries) {
+    const center = entry.center
+    const normal = entry.normal
+    const texture = createFaceLabelTexture(entry.label, props.tone)
     if (!texture) continue
     const material = new THREE.MeshBasicMaterial({
       map: texture,
@@ -169,7 +240,7 @@ function initScene() {
       depthWrite: false
     })
     labelMaterials.push(material)
-    const label = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.62), material)
+    const label = new THREE.Mesh(new THREE.PlaneGeometry(labelSize, labelSize), material)
     label.position.copy(center.addScaledVector(normal, 0.09))
     label.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal)
     labelMeshes.push(label)
@@ -261,6 +332,14 @@ watch(
     dieGroup.rotation.x += Math.random() * Math.PI * 1.5
     dieGroup.rotation.y += Math.random() * Math.PI * 1.5
     dieGroup.rotation.z += Math.random() * Math.PI * 1.5
+  }
+)
+
+watch(
+  () => [normalizedSides.value, props.tone],
+  () => {
+    destroyScene()
+    initScene()
   }
 )
 

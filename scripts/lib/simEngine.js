@@ -2,7 +2,8 @@ import { createRng } from './rng.js'
 import { resolveBotProfile } from './botProfiles.js'
 
 const MAX_HERO_SLOTS = 3
-const MAX_ITEMS_PER_HERO = 3
+const MAX_EQUIPMENT_SLOTS = 3
+const MAX_WEAPONS_PER_HERO = 1
 const PLAYER_IDS = ['player_a', 'player_b']
 const DEFAULT_MAX_RESOURCES = 6
 const COMBAT_CRITICAL_BONUS = 3
@@ -154,16 +155,21 @@ function playItemFromHand(state, playerId, cardId, slotIndex, stats) {
 
   const hero = ensureHeroState(player.heroes[slotIndex])
   if (!hero) return null
-  if ((hero.items || []).length >= MAX_ITEMS_PER_HERO) return null
+  if ((hero.items || []).length >= MAX_EQUIPMENT_SLOTS) return null
 
   const handIndex = player.hand.findIndex((card) => card.id === cardId)
   if (handIndex === -1) return null
   const card = player.hand[handIndex]
-  if (card.type !== 'item') return null
+  if (card.type !== 'item' && card.type !== 'weapon') return null
+  if (card.type === 'weapon') {
+    const weaponCount = (hero.items || []).filter((entry) => entry?.type === 'weapon').length
+    if (weaponCount >= MAX_WEAPONS_PER_HERO) return null
+  }
 
   const cost = Number(card.cost || 0)
   if (player.resources < cost) return null
 
+  const equipmentCountBefore = Array.isArray(hero.items) ? hero.items.length : 0
   const maxHpBefore = getHeroMaxHp(hero)
   player.resources -= cost
   stats.resourcesSpentTotal += cost
@@ -176,6 +182,16 @@ function playItemFromHand(state, playerId, cardId, slotIndex, stats) {
   }
   hero.currentHp = Math.max(0, Math.min(hero.currentHp, maxHpAfter))
   stats.itemsEquippedTotal += 1
+  if (equipmentCountBefore === 0) {
+    stats.equipmentFirstEquipTotal += 1
+    if (playerId === 'player_a') stats.equipmentFirstEquipByPlayerA += 1
+    if (playerId === 'player_b') stats.equipmentFirstEquipByPlayerB += 1
+    if (card.type === 'weapon') {
+      stats.weaponFirstEquipTotal += 1
+      if (playerId === 'player_a') stats.weaponFirstEquipByPlayerA += 1
+      if (playerId === 'player_b') stats.weaponFirstEquipByPlayerB += 1
+    }
+  }
   return { card, cost, slotIndex }
 }
 
@@ -839,6 +855,12 @@ function runSingleGame({ batchCards, gameIndex, seed, maxTurns = 200, botPlayerA
     cardsDrawnTotal: 0,
     cardsRecruitedTotal: 0,
     itemsEquippedTotal: 0,
+    equipmentFirstEquipTotal: 0,
+    weaponFirstEquipTotal: 0,
+    equipmentFirstEquipByPlayerA: 0,
+    equipmentFirstEquipByPlayerB: 0,
+    weaponFirstEquipByPlayerA: 0,
+    weaponFirstEquipByPlayerB: 0,
     cardsDiscardedTotal: 0,
     mulliganCount: 0,
     finalHeroesPlayerA: 0,
@@ -992,6 +1014,8 @@ export function aggregateResults(games) {
   const resourcesAvailableTotal = sum('resourcesAvailableTotal')
   const resourcesSpentHeroes = sum('resourcesSpentHeroes')
   const resourcesSpentItems = sum('resourcesSpentItems')
+  const equipmentFirstEquipTotal = sum('equipmentFirstEquipTotal')
+  const weaponFirstEquipTotal = sum('weaponFirstEquipTotal')
   const resourcesSpentHealing = sum('resourcesSpentHealing')
   const resourcesSpentReactions = sum('resourcesSpentReactions')
   const overkillDamageTotal = sum('overkillDamageTotal')
@@ -1007,6 +1031,32 @@ export function aggregateResults(games) {
     return acc
   }, {})
 
+  const weaponFirstByProfile = games.reduce((acc, g) => {
+    const profileA = g.botPlayerA || 'baseline'
+    const profileB = g.botPlayerB || 'baseline'
+
+    if (!acc[profileA]) {
+      acc[profileA] = { equipmentFirst: 0, weaponFirst: 0, weaponEquippedFirstRate: 0 }
+    }
+    if (!acc[profileB]) {
+      acc[profileB] = { equipmentFirst: 0, weaponFirst: 0, weaponEquippedFirstRate: 0 }
+    }
+
+    acc[profileA].equipmentFirst += Number(g.equipmentFirstEquipByPlayerA || 0)
+    acc[profileA].weaponFirst += Number(g.weaponFirstEquipByPlayerA || 0)
+    acc[profileB].equipmentFirst += Number(g.equipmentFirstEquipByPlayerB || 0)
+    acc[profileB].weaponFirst += Number(g.weaponFirstEquipByPlayerB || 0)
+
+    return acc
+  }, {})
+
+  for (const profile of Object.keys(weaponFirstByProfile)) {
+    const entry = weaponFirstByProfile[profile]
+    entry.weaponEquippedFirstRate = entry.equipmentFirst > 0
+      ? entry.weaponFirst / entry.equipmentFirst
+      : 0
+  }
+
   return {
     games: gameCount,
     winsStarter,
@@ -1016,7 +1066,8 @@ export function aggregateResults(games) {
     botProfiles: {
       playerA: games[0]?.botPlayerA || 'baseline',
       playerB: games[0]?.botPlayerB || 'baseline',
-      winsByProfile: winsByBotProfile
+      winsByProfile: winsByBotProfile,
+      weaponFirstByProfile
     },
     turns: {
       min: turns[0] || 0,
@@ -1068,6 +1119,9 @@ export function aggregateResults(games) {
       cardsDrawnTotal: sum('cardsDrawnTotal'),
       cardsRecruitedTotal: sum('cardsRecruitedTotal'),
       itemsEquippedTotal: sum('itemsEquippedTotal'),
+      equipmentFirstEquipTotal,
+      weaponFirstEquipTotal,
+      weaponEquippedFirstRate: equipmentFirstEquipTotal > 0 ? weaponFirstEquipTotal / equipmentFirstEquipTotal : 0,
       cardsDiscardedTotal: sum('cardsDiscardedTotal'),
       avgDiscardsPerGame: gameCount > 0 ? sum('cardsDiscardedTotal') / gameCount : 0,
       resourcesSpentTotal,

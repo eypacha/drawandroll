@@ -10,6 +10,7 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 5, max: 8 },
+      dex: { min: 2, max: 4 },
       def: { min: 5, max: 8 },
       hp: { min: 8, max: 10 }
     },
@@ -21,7 +22,8 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 5, max: 8 },
-      def: { min: 5, max: 8 },
+      dex: { min: 3, max: 5 },
+      def: { min: 4, max: 7 },
       hp: { min: 6, max: 8 }
     },
     baseCost: 3
@@ -32,7 +34,8 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 5, max: 8 },
-      def: { min: 5, max: 8 },
+      dex: { min: 1, max: 3 },
+      def: { min: 7, max: 9 },
       hp: { min: 10, max: 12 }
     },
     baseCost: 4
@@ -43,7 +46,8 @@ export const heroTemplates = {
     type: 'hero',
     ranges: {
       atk: { min: 5, max: 8 },
-      def: { min: 5, max: 8 },
+      dex: { min: 4, max: 6 },
+      def: { min: 4, max: 6 },
       hp: { min: 7, max: 9 }
     },
     baseCost: 2
@@ -53,8 +57,9 @@ export const heroTemplates = {
     id: 'fragile_support',
     type: 'hero',
     ranges: {
-      atk: { min: 5, max: 8 },
-      def: { min: 5, max: 8 },
+      atk: { min: 4, max: 7 },
+      dex: { min: 3, max: 5 },
+      def: { min: 4, max: 6 },
       hp: { min: 6, max: 8 }
     },
     baseCost: 2

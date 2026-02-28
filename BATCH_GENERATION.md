@@ -9,7 +9,8 @@ Contrato operativo del generador de lotes (`scripts/generate-batch.js`).
 - Tamaño de lote: `50` cartas.
 - Distribución objetivo:
   - hero: 25%
-  - item: 30%
+  - item: 18%
+  - weapon: 12%
   - reactive: 15%
   - healing: 10%
   - counterattack: 20%
@@ -25,6 +26,13 @@ Por cada tipo:
 2. Generar stats aleatorios dentro de rangos del template.
 3. Calcular costo derivado por poder + baseCost.
 4. Emitir carta con `id` único.
+
+Notas de esquema vigentes:
+
+- Héroes incluyen `atk`, `dex`, `def`, `hp`, `damageDieSides`.
+- Ítems incluyen modificadores de `atk/dex/def` (no modifican `damageDieSides`).
+- Armas incluyen modificadores de `atk/dex/def` y `damageDieSides`.
+- El impacto en combate se tira siempre con `1d20`; `damageDieSides` afecta solo daño (`1d4`/`1d6`).
 
 ---
 
@@ -44,6 +52,7 @@ Validaciones activas:
 - Mínimos por tipo (`MIN_CARDS` en código).
 - IDs únicos.
 - Brecha promedio `ATK` vs `DEF` de héroes bajo umbral (`HERO_ATK_DEF_AVG_MAX_GAP`).
+- Dados de daño normalizados a `2`, `4` o `6` caras.
 
 No se valida actualmente ausencia absoluta de duplicados de stats.
 

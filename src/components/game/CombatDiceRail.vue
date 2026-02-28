@@ -14,6 +14,7 @@
               <ThreeDie
                 :value="getRoleRoll(opponentRole)"
                 :rolling="isRoleRolling(opponentRole)"
+                :sides="20"
                 tone="emerald"
               />
             </div>
@@ -37,6 +38,7 @@
               <ThreeDie
                 :value="getRoleRoll(myRole)"
                 :rolling="isRoleRolling(myRole)"
+                :sides="20"
                 tone="blue"
               />
             </div>
@@ -44,6 +46,30 @@
         </button>
         <div v-if="ownFormula" class="text-center font-semibold">
           {{ ownFormula }}
+        </div>
+      </section>
+
+      <section>
+        <button
+          type="button"
+          class="h-36 w-full overflow-hidden border border-2 transition-colors rounded-full"
+          :class="damageDieClass"
+          :disabled="!canClickDamageDie"
+          @click="onClickDamageDie"
+        >
+          <div class="flex h-full w-full items-center justify-center">
+            <div class="h-[7.5rem] w-[7.5rem]">
+              <ThreeDie
+                :value="active?.damageRoll"
+                :rolling="Boolean(active?.rollingDamage)"
+                :sides="Number(active?.attackerDamageDieSides || 2)"
+                tone="amber"
+              />
+            </div>
+          </div>
+        </button>
+        <div v-if="damageRollFormula" class="text-center font-semibold">
+          {{ damageRollFormula }}
         </div>
       </section>
 
@@ -135,6 +161,10 @@ function isRoleRolling(role) {
   return false
 }
 
+const canClickDamageDie = computed(() => (
+  combat.rollStep === 'damage_pending' && myRole.value === 'attacker'
+))
+
 const ownRollDisplay = computed(() => getRoleRoll(myRole.value) ?? t('combat.dieIdle'))
 
 const opponentRollDisplay = computed(() => getRoleRoll(opponentRole.value) ?? t('combat.dieIdle'))
@@ -166,6 +196,13 @@ const damageFormulaLabel = computed(() => {
     return ''
   }
   return `${t('combat.damage')}: ${baseDamageDisplay.value} + ${damageModifier.value} = ${finalDamageDisplay.value}`
+})
+
+const damageRollFormula = computed(() => {
+  const sides = Number(active.value?.attackerDamageDieSides || 2)
+  const roll = Number(active.value?.damageRoll)
+  if (!Number.isFinite(roll) || roll <= 0) return ''
+  return `${t('combat.damageDie')}: 1d${sides} = ${roll}`
 })
 
 const showCritical = computed(() => Boolean(active.value?.isCritical))
@@ -204,6 +241,11 @@ const statusLabel = computed(() => {
       ? t('combat.statusRollDefender')
       : t('combat.statusWaitDefender')
   }
+  if (combat.rollStep === 'damage_pending') {
+    return canClickDamageDie.value
+      ? t('combat.statusRollDamage')
+      : t('combat.statusWaitDamage')
+  }
   if (combat.rollStep === 'reaction_pending') {
     return t('combat.statusWaitReaction')
   }
@@ -224,6 +266,12 @@ const opponentDieClass = computed(() => ({
   'border-emerald-400 text-emerald-700 cursor-pointer': canClickOpponentDie.value,
   'border-transparent': !canClickOpponentDie.value,
   'opacity-70 cursor-not-allowed': !canClickOpponentDie.value
+}))
+
+const damageDieClass = computed(() => ({
+  'border-amber-400 text-amber-700 cursor-pointer': canClickDamageDie.value,
+  'border-transparent': !canClickDamageDie.value,
+  'opacity-70 cursor-not-allowed': !canClickDamageDie.value
 }))
 
 let clearTimer = null
@@ -261,6 +309,11 @@ function onClickOwnDie() {
 function onClickOpponentDie() {
   if (!canClickOpponentDie.value) return
   gameActions.requestCombatRollClick(opponentRole.value)
+}
+
+function onClickDamageDie() {
+  if (!canClickDamageDie.value) return
+  gameActions.requestCombatRollClick('damage')
 }
 
 function passReaction() {

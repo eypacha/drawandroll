@@ -185,7 +185,7 @@ function canDropOnSlot(slotIndex, cardId) {
     return playerResources >= cost
   }
 
-  if (card.type === 'item') {
+  if (card.type === 'item' || card.type === 'weapon') {
     if (!slotHero) return false
     if ((slotHero.items || []).length >= 3) return false
     return playerResources >= card.cost
@@ -213,6 +213,10 @@ function getSlotStyle(slotIndex) {
     item: {
       '--slot-highlight': 'rgba(139, 92, 246, 0.9)',
       '--slot-highlight-soft': 'rgba(139, 92, 246, 0.35)'
+    },
+    weapon: {
+      '--slot-highlight': 'rgba(234, 88, 12, 0.9)',
+      '--slot-highlight-soft': 'rgba(234, 88, 12, 0.35)'
     }
   }
   return map[card.type] || {}
@@ -268,7 +272,7 @@ function onSlotDrop(slotIndex, event) {
   if (card.type === 'hero') {
     gameActions.playHeroToSlot(slotIndex, cardId)
   }
-  if (card.type === 'item') {
+  if (card.type === 'item' || card.type === 'weapon') {
     gameActions.playItemToSlot(slotIndex, cardId)
   }
 
@@ -369,18 +373,20 @@ async function onOpponentSlotDrop(slotIndex, event) {
 }
 
 function getHeroDisplay(hero) {
-  const base = hero.card.stats || { atk: 0, def: 0, hp: 0 }
+  const base = hero.card.stats || { atk: 0, dex: 0, def: 0, hp: 0 }
   const current = players.getHeroCombatStats(hero)
   return {
     ...hero.card,
     baseStats: base,
     statDelta: {
       atk: current.atk - (base.atk || 0),
+      dex: current.dex - (base.dex || 0),
       def: current.def - (base.def || 0),
       hp: current.hp - (base.hp || 0)
     },
     stats: {
       atk: current.atk,
+      dex: current.dex,
       def: current.def,
       hp: current.hp
     }

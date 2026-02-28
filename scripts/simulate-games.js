@@ -208,6 +208,20 @@ function printSummary({ config, aggregate }) {
     `Economy draws/recruits/items/discards: ${aggregate.economy.cardsDrawnTotal} / ${aggregate.economy.cardsRecruitedTotal} / ${aggregate.economy.itemsEquippedTotal} / ${aggregate.economy.cardsDiscardedTotal}\n`
   )
   process.stdout.write(
+    `Weapon-first equips: ${aggregate.economy.weaponFirstEquipTotal}/${aggregate.economy.equipmentFirstEquipTotal} (${formatNumber((aggregate.economy.weaponEquippedFirstRate || 0) * 100)}%)\n`
+  )
+  const byProfile = aggregate.botProfiles?.weaponFirstByProfile || {}
+  const profileEntries = Object.entries(byProfile)
+    .map(([profile, values]) => {
+      const weaponFirst = Number(values?.weaponFirst || 0)
+      const equipmentFirst = Number(values?.equipmentFirst || 0)
+      const rate = Number(values?.weaponEquippedFirstRate || 0) * 100
+      return `${profile}: ${weaponFirst}/${equipmentFirst} (${formatNumber(rate)}%)`
+    })
+  if (profileEntries.length > 0) {
+    process.stdout.write(`Weapon-first by profile: ${profileEntries.join(' | ')}\n`)
+  }
+  process.stdout.write(
     `Resources spend: ${aggregate.economy.resourcesSpentTotal}/${aggregate.economy.resourcesAvailableTotal} (${formatNumber(aggregate.economy.resourceSpendPct)}%) [H:${aggregate.economy.resourcesSpentHeroes} I:${aggregate.economy.resourcesSpentItems} He:${aggregate.economy.resourcesSpentHealing} R:${aggregate.economy.resourcesSpentReactions}]\n`
   )
   process.stdout.write(

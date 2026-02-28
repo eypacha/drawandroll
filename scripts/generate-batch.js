@@ -17,6 +17,7 @@ import {
   heroTemplateIds,
   itemTemplates,
   itemTemplateIds,
+  weaponTemplateIds,
   reactiveTemplates,
   reactiveTemplateIds,
   healingTemplates,
@@ -34,7 +35,8 @@ const BATCH_SIZE = 50;
 // Distribution percentages (must sum to 1.0)
 const DISTRIBUTION = {
   hero: 0.25,      // ~25% = 12-13 cards
-  item: 0.30,      // ~30% = 15 cards
+  item: 0.18,      // ~18% = 9 cards
+  weapon: 0.12,    // ~12% = 6 cards
   reactive: 0.15,  // ~15% = 7-8 cards
   healing: 0.10,   // ~10% = 5 cards
   counterattack: 0.20 // ~20% = 10 cards
@@ -43,7 +45,8 @@ const DISTRIBUTION = {
 // Minimum cards per type (validation)
 const MIN_CARDS = {
   hero: 10,
-  item: 10,
+  item: 6,
+  weapon: 5,
   reactive: 6,
   healing: 5,
   counterattack: 5
@@ -75,6 +78,14 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function normalizeDamageDieSides(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 2;
+  if (numeric >= 6) return 6;
+  if (numeric >= 4) return 4;
+  return 2;
+}
+
 /**
  * Generate stats from template ranges
  */
@@ -89,17 +100,32 @@ function generateStats(ranges) {
 function evaluateCardPower(type, template, stats) {
   if (type === 'hero') {
     const atk = Number(stats.atk || 0);
+    const dex = Number(stats.dex || 0);
     const def = Number(stats.def || 0);
     const hp = Number(stats.hp || 0);
-    return (atk * 1.0) + (def * 1.0) + (hp * 0.8);
+    return (atk * 1.0) + (dex * 1.0) + (def * 0.9) + (hp * 0.8);
   }
 
   if (type === 'item') {
     const atkBonus = Number(stats.atkBonus || 0);
+    const dexBonus = Number(stats.dexBonus || 0);
     const defBonus = Number(stats.defBonus || 0);
     const atkModifier = Number(stats.atkModifier || 0);
+    const dexModifier = Number(stats.dexModifier || 0);
     const defModifier = Number(stats.defModifier || 0);
-    return ((atkBonus + defBonus) * 1.2) + ((atkModifier + defModifier) * 0.8);
+    return ((atkBonus + dexBonus + defBonus) * 1.2) + ((atkModifier + dexModifier + defModifier) * 0.8);
+  }
+
+  if (type === 'weapon') {
+    const atkBonus = Number(stats.atkBonus || 0);
+    const dexBonus = Number(stats.dexBonus || 0);
+    const defBonus = Number(stats.defBonus || 0);
+    const atkModifier = Number(stats.atkModifier || 0);
+    const dexModifier = Number(stats.dexModifier || 0);
+    const defModifier = Number(stats.defModifier || 0);
+    const damageDieSides = Number(stats.damageDieSides || 2);
+    const diePower = Math.max(0, ((damageDieSides - 2) * 0.45));
+    return ((atkBonus + dexBonus + defBonus) * 1.1) + ((atkModifier + dexModifier + defModifier) * 0.8) + diePower;
   }
 
   if (type === 'healing') {
@@ -125,6 +151,9 @@ function getDerivedCostByType(type, power) {
   }
   if (type === 'item') {
     return clamp(Math.round(power), 1, 4);
+  }
+  if (type === 'weapon') {
+    return clamp(Math.round(power), 1, 5);
   }
   if (type === 'healing') {
     return clamp(Math.round(power * 0.8), 1, 3);
@@ -190,8 +219,10 @@ function generateHeroCard(template) {
     description: { en: '', es: '' },
     stats: {
       atk: stats.atk,
+      dex: stats.dex,
       def: stats.def,
-      hp: stats.hp
+      hp: stats.hp,
+      damageDieSides: 2
     },
     cost: calculateCardCost('hero', template, stats)
   };
@@ -207,11 +238,34 @@ function generateItemCard(template) {
     description: { en: '', es: '' },
     stats: {
       atkBonus: stats.atkBonus || 0,
+      dexBonus: stats.dexBonus || 0,
       defBonus: stats.defBonus || 0,
       atkModifier: stats.atkModifier || 0,
+      dexModifier: stats.dexModifier || 0,
       defModifier: stats.defModifier || 0
     },
     cost: calculateCardCost('item', template, stats)
+  };
+}
+
+function generateWeaponCard(template) {
+  const stats = generateStats(template.ranges);
+  return {
+    id: randomUUID(),
+    type: 'weapon',
+    template: template.id,
+    name: { en: '', es: '' },
+    description: { en: '', es: '' },
+    stats: {
+      atkBonus: stats.atkBonus || 0,
+      dexBonus: stats.dexBonus || 0,
+      defBonus: stats.defBonus || 0,
+      atkModifier: stats.atkModifier || 0,
+      dexModifier: stats.dexModifier || 0,
+      defModifier: stats.defModifier || 0,
+      damageDieSides: normalizeDamageDieSides(stats.damageDieSides)
+    },
+    cost: calculateCardCost('weapon', template, stats)
   };
 }
 
@@ -269,6 +323,7 @@ function calculateDistribution(batchSize) {
   const counts = {
     hero: Math.round(batchSize * DISTRIBUTION.hero),
     item: Math.round(batchSize * DISTRIBUTION.item),
+    weapon: Math.round(batchSize * DISTRIBUTION.weapon),
     reactive: Math.round(batchSize * DISTRIBUTION.reactive),
     healing: Math.round(batchSize * DISTRIBUTION.healing),
     counterattack: Math.round(batchSize * DISTRIBUTION.counterattack)
@@ -293,6 +348,7 @@ function generateBatch() {
   const signaturesByType = {
     hero: new Set(),
     item: new Set(),
+    weapon: new Set(),
     reactive: new Set(),
     healing: new Set(),
     counterattack: new Set()
@@ -302,6 +358,7 @@ function generateBatch() {
   const generators = {
     hero: () => generateHeroCard(heroTemplates[randomPick(heroTemplateIds)]),
     item: () => generateItemCard(itemTemplates[randomPick(itemTemplateIds)]),
+    weapon: () => generateWeaponCard(itemTemplates[randomPick(weaponTemplateIds)]),
     reactive: () => generateReactiveCard(reactiveTemplates[randomPick(reactiveTemplateIds)]),
     healing: () => generateHealingCard(healingTemplates[randomPick(healingTemplateIds)]),
     counterattack: () => generateCounterattackCard(counterattackTemplates[randomPick(counterattackTemplateIds)])
@@ -310,7 +367,8 @@ function generateBatch() {
   // Calculate max unique cards per type
   const maxUnique = {
     hero: maxUniqueCards(heroTemplates),
-    item: maxUniqueCards(itemTemplates),
+    item: itemTemplateIds.reduce((sum, id) => sum + countCombinations(itemTemplates[id]), 0),
+    weapon: weaponTemplateIds.reduce((sum, id) => sum + countCombinations(itemTemplates[id]), 0),
     reactive: maxUniqueCards(reactiveTemplates),
     healing: maxUniqueCards(healingTemplates),
     counterattack: maxUniqueCards(counterattackTemplates)
@@ -364,6 +422,7 @@ function generateBatch() {
       by_type: {
         hero: cards.filter(c => c.type === 'hero').length,
         item: cards.filter(c => c.type === 'item').length,
+        weapon: cards.filter(c => c.type === 'weapon').length,
         reactive: cards.filter(c => c.type === 'reactive').length,
         healing: cards.filter(c => c.type === 'healing').length,
         counterattack: cards.filter(c => c.type === 'counterattack').length
@@ -459,6 +518,7 @@ function main() {
   console.log('   Summary:');
   console.log(`   - Heroes:   ${batch.summary.by_type.hero}`);
   console.log(`   - Items:    ${batch.summary.by_type.item}`);
+  console.log(`   - Weapons:  ${batch.summary.by_type.weapon}`);
   console.log(`   - Reactive: ${batch.summary.by_type.reactive}`);
   console.log(`   - Healing:  ${batch.summary.by_type.healing}`);
   console.log(`   - Counter:  ${batch.summary.by_type.counterattack}`);

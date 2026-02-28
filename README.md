@@ -1,6 +1,6 @@
 # Tactical Card Combat - PMV
 
-Juego táctico por turnos basado en cartas, combate con d20 y muerte permanente.  
+Juego táctico por turnos basado en cartas, impacto con `1d20`, daño con `1d4`/`1d6` y muerte permanente.  
 Diseñado software-first, con generación procedural controlada y foco en partidas cortas, tensas y repetibles.
 
 Este repositorio implementa un PMV (Producto Mínimo Viable).  
@@ -21,7 +21,7 @@ No es un TCG, no es MTG-like, no es un deckbuilder.
 
 - 2 jugadores
 - Un único mazo compartido por partida
-- Combate táctico con 1d20
+- Impacto táctico con 1d20 y daño por dado de arma (1d4/1d6)
 - Muerte permanente de héroes
 - Presión creciente por pérdidas de héroes
 - Partidas cortas (en simulación bot-vs-bot promedian ~6 turnos)

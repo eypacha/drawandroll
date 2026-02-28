@@ -48,6 +48,7 @@
     "opponentAttackResult": "Opponent attack result",
     "attackerDie": "Attacker die",
     "defenderDie": "Defender die",
+    "damageDie": "Damage die",
     "formulaAtk": "ATK + d20",
     "formulaDef": "DEF + d20",
     "rollingHint": "Rolling dice...",
@@ -66,6 +67,8 @@
     "statusWaitAttacker": "Waiting attacker roll.",
     "statusRollDefender": "Roll defender die.",
     "statusWaitDefender": "Waiting defender roll.",
+    "statusRollDamage": "Roll your damage die.",
+    "statusWaitDamage": "Waiting attacker damage roll.",
     "statusWaitReaction": "Waiting defender reaction.",
     "statusResolved": "Attack resolved."
   },
@@ -75,6 +78,7 @@
     "types": {
       "hero": "Hero",
       "item": "Item",
+      "weapon": "Weapon",
       "healing": "Healing",
       "reactive": "Reactive",
       "counterattack": "Counterattack"
@@ -86,12 +90,17 @@
     },
     "stats": {
       "attack": "Attack",
+      "dexterity": "Dexterity",
       "defense": "Defense",
       "health": "Health",
       "attackBonus": "Attack bonus",
       "attackPenalty": "Attack penalty",
+      "dexterityBonus": "Dexterity bonus",
+      "dexterityPenalty": "Dexterity penalty",
       "defenseBonus": "Defense bonus",
       "defensePenalty": "Defense penalty",
+      "attackDie": "Attack die",
+      "damageDie": "Damage die",
       "counterDamage": "Counter damage",
       "hpShort": "HP"
     }

@@ -7,7 +7,8 @@ Sistema de combate vigente en el PMV.
 ## 1. Principios
 
 - El combate se resuelve ataque por ataque.
-- Cada ataque usa dos tiradas d20: atacante y defensor.
+- Cada ataque usa tirada de impacto con `1d20`.
+- Si impacta, el daño se resuelve con tirada de daño `1d4` o `1d6` según equipo.
 - No hay ataques simultáneos.
 
 ---
@@ -23,20 +24,28 @@ Sistema de combate vigente en el PMV.
 ## 3. Secuencia de un ataque
 
 1. Declaración de atacante y defensor.
-2. Tiradas d20 (atacante/defensor).
-3. Cálculo de daño base con stats e ítems.
+2. Tirada de impacto del atacante (`1d20`) contra AC del defensor.
+3. Si impacta, tirada de daño (`1d4`/`1d6`) y mitigación por DEF.
 4. Ventana defensiva (solo defensor, una carta máximo).
 5. Resolución final: daño al defensor, contraataque si aplica, bajas.
 6. Cierre del ataque.
 
 ---
 
-## 4. Fórmula de daño principal
+## 4. Fórmulas principales
 
-`damage = max(0, (ATK + d20_atacante) - (DEF + d20_defensor))`
+Impacto:
+
+`hit = (ATK + d20_atacante) >= AC_defensor`
+
+Daño (si hay impacto):
+
+`damage = max(0, (ATK + dX_daño) - DEF_defensor)`
+
+Donde `dX_daño` es `1d4` por defecto o `1d6` si el equipo lo mejora.
 
 - Si atacante saca 1 natural: `damage = 0`.
-- Si atacante saca 20 natural: `damage += 2` (bono crítico actual).
+- Si atacante saca 20 natural: se aplica crítico (bono de daño adicional).
 
 ---
 

@@ -7,6 +7,19 @@ import { defineStore } from 'pinia'
  */
 export const usePlayersStore = defineStore('players', () => {
   const DEFAULT_MAX_RESOURCES = 6
+  const BASE_ARMOR_CLASS = 10
+  const ATTACK_ROLL_DIE_SIDES = 20
+  const DEFAULT_DAMAGE_DIE_SIDES = 2
+  const MAX_EQUIPMENT_SLOTS = 3
+  const MAX_WEAPONS_PER_HERO = 1
+
+  function normalizeDamageDieSides(value) {
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return DEFAULT_DAMAGE_DIE_SIDES
+    if (numeric >= 6) return 6
+    if (numeric >= 4) return 4
+    return 2
+  }
 
   // Initial player state factory
   const createPlayer = () => ({
@@ -71,21 +84,33 @@ export const usePlayersStore = defineStore('players', () => {
   function getHeroCombatStats(hero) {
     const readyHero = ensureHeroState(hero)
     if (!readyHero) {
-      return { atk: 0, def: 0, hp: 0, maxHp: 0 }
+      return { atk: 0, dex: 0, def: 0, ac: BASE_ARMOR_CLASS, hp: 0, maxHp: 0, damageDieSides: DEFAULT_DAMAGE_DIE_SIDES }
     }
     const baseStats = readyHero.card?.stats || {}
     let atk = Number(baseStats.atk || 0)
+    let dex = Number(baseStats.dex || 0)
     let def = Number(baseStats.def || 0)
+    let damageDieSides = normalizeDamageDieSides(baseStats.damageDieSides)
+    let weaponCount = 0
     for (const item of readyHero.items || []) {
       const stats = item?.stats || {}
       if (typeof stats.atkBonus === 'number') atk += stats.atkBonus
       if (typeof stats.atkModifier === 'number') atk += stats.atkModifier
+      if (typeof stats.dexBonus === 'number') dex += stats.dexBonus
+      if (typeof stats.dexModifier === 'number') dex += stats.dexModifier
       if (typeof stats.defBonus === 'number') def += stats.defBonus
       if (typeof stats.defModifier === 'number') def += stats.defModifier
+      if (item?.type === 'weapon' && typeof stats.damageDieSides === 'number') {
+        weaponCount += 1
+        if (weaponCount <= MAX_WEAPONS_PER_HERO) {
+          damageDieSides = normalizeDamageDieSides(stats.damageDieSides)
+        }
+      }
     }
     const maxHp = getHeroMaxHp(readyHero)
     const hp = Math.max(0, Math.min(readyHero.currentHp, maxHp))
-    return { atk, def, hp, maxHp }
+    const ac = BASE_ARMOR_CLASS + dex
+    return { atk, dex, def, ac, hp, maxHp, damageDieSides }
   }
 
   function createHeroInstance(card) {
@@ -254,11 +279,15 @@ export const usePlayersStore = defineStore('players', () => {
     if (slotIndex === null || slotIndex === undefined) return null
     const hero = ensureHeroState(player.heroes[slotIndex])
     if (!hero) return null
-    if (hero.items.length >= 3) return null
+    if (hero.items.length >= MAX_EQUIPMENT_SLOTS) return null
     const index = player.hand.findIndex((card) => card.id === cardId)
     if (index === -1) return null
     const card = player.hand[index]
-    if (card.type !== 'item') return null
+    if (card.type !== 'item' && card.type !== 'weapon') return null
+    if (card.type === 'weapon') {
+      const weaponCount = (hero.items || []).filter((entry) => entry?.type === 'weapon').length
+      if (weaponCount >= MAX_WEAPONS_PER_HERO) return null
+    }
     const cost = card.cost
     if (player.resources < cost) return null
     const maxHpBefore = getHeroMaxHp(hero)
@@ -278,7 +307,12 @@ export const usePlayersStore = defineStore('players', () => {
     const player = players.value[playerId]
     const hero = ensureHeroState(player.heroes[slotIndex])
     if (!hero) return false
-    if (hero.items.length >= 3) return false
+    if (hero.items.length >= MAX_EQUIPMENT_SLOTS) return false
+    if (card?.type !== 'item' && card?.type !== 'weapon') return false
+    if (card?.type === 'weapon') {
+      const weaponCount = (hero.items || []).filter((entry) => entry?.type === 'weapon').length
+      if (weaponCount >= MAX_WEAPONS_PER_HERO) return false
+    }
     const index = player.hand.findIndex((c) => c.id === card.id)
     if (index !== -1) {
       player.hand.splice(index, 1)
@@ -544,6 +578,8 @@ export const usePlayersStore = defineStore('players', () => {
     defenderSlot,
     attackerRoll,
     defenderRoll,
+    damageRoll,
+    damageDieSides = DEFAULT_DAMAGE_DIE_SIDES,
     criticalBonus = 3,
     reactionActions = [],
     rollCounterAttack = null,
@@ -558,14 +594,20 @@ export const usePlayersStore = defineStore('players', () => {
     const defenderStats = getHeroCombatStats(defenderHero)
     const safeAttackerRoll = Number(attackerRoll) || 0
     const safeDefenderRoll = Number(defenderRoll) || 0
+    const safeDamageRoll = Number(damageRoll) || 0
+    const safeDamageDieSides = normalizeDamageDieSides(Number(damageDieSides) || attackerStats.damageDieSides || DEFAULT_DAMAGE_DIE_SIDES)
+    const attackerTotal = attackerStats.atk + safeAttackerRoll
+    const defenderTotal = defenderStats.ac + safeDefenderRoll
+    const hitSuccess = attackerTotal >= defenderTotal
 
-    let damage = Math.max(0, attackerStats.atk + safeAttackerRoll - (defenderStats.def + safeDefenderRoll))
+    let damage = hitSuccess ? Math.max(0, safeDamageRoll + attackerStats.atk - defenderStats.def) : 0
     const isFumble = safeAttackerRoll === 1
-    let isCritical = safeAttackerRoll === 20
+    let isCritical = safeAttackerRoll === ATTACK_ROLL_DIE_SIDES
     if (isFumble) {
       damage = 0
     } else if (isCritical) {
-      damage += criticalBonus
+      const criticalExtra = Math.max(1, Math.round((safeDamageDieSides / 2) + criticalBonus))
+      damage += criticalExtra
     }
 
     const defenderHpBefore = defenderStats.hp
@@ -696,8 +738,10 @@ export const usePlayersStore = defineStore('players', () => {
       defenderSlot,
       attackerRoll: safeAttackerRoll,
       defenderRoll: safeDefenderRoll,
-      attackerTotal: attackerStats.atk + safeAttackerRoll,
-      defenderTotal: defenderStats.def + safeDefenderRoll,
+      damageRoll: safeDamageRoll,
+      attackerTotal,
+      defenderTotal,
+      hitSuccess,
       damage,
       counterDamageTotal,
       isCritical,

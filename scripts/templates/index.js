@@ -4,7 +4,7 @@
  */
 
 export { heroTemplates, heroTemplateIds } from './heroes.js';
-export { itemTemplates, itemTemplateIds } from './items.js';
+export { itemTemplates, itemTemplateIds, weaponTemplateIds } from './items.js';
 export { reactiveTemplates, reactiveTemplateIds } from './reactives.js';
 export { healingTemplates, healingTemplateIds } from './healing.js';
 export { counterattackTemplates, counterattackTemplateIds } from './counterattacks.js';

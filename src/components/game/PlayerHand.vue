@@ -111,7 +111,7 @@ let dragPreviewEl = null
 function canDragCard(card) {
   if (canReactNow.value) return false
   if (!canAct.value) return false
-  return card.type === 'hero' || card.type === 'item'
+  return card.type === 'hero' || card.type === 'item' || card.type === 'weapon'
 }
 
 function canSelectReactive(card) {

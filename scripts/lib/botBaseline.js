@@ -3,6 +3,7 @@ const DISCARD_TYPE_PRIORITY = {
   counterattack: 1,
   healing: 2,
   item: 3,
+  weapon: 3,
   hero: 4
 }
 
@@ -39,19 +40,30 @@ export function pickHeroRecruitPlay(state, playerId, getRecruitCost) {
 
 export function pickItemEquipPlay(state, playerId) {
   const player = state.players[playerId]
-  const candidates = player.hand
+  const allCandidates = player.hand
     .map((card, index) => ({ card, index }))
-    .filter(({ card }) => card.type === 'item')
+    .filter(({ card }) => card.type === 'item' || card.type === 'weapon')
     .filter(({ card }) => player.resources >= Number(card.cost || 0))
+  const weaponCandidates = allCandidates
+    .filter(({ card }) => card.type === 'weapon')
+    .sort(byCostThenIndexDesc)
+  const itemCandidates = allCandidates
+    .filter(({ card }) => card.type === 'item')
     .sort(byCostThenIndexDesc)
 
-  if (candidates.length === 0) return null
+  if (allCandidates.length === 0) return null
+
+  const candidates = [...weaponCandidates, ...itemCandidates]
 
   for (const choice of candidates) {
     for (let slotIndex = 0; slotIndex < player.heroes.length; slotIndex += 1) {
       const hero = player.heroes[slotIndex]
       if (!hero) continue
       if ((hero.items || []).length >= 3) continue
+      if (choice.card.type === 'weapon') {
+        const weaponCount = (hero.items || []).filter((entry) => entry?.type === 'weapon').length
+        if (weaponCount >= 1) continue
+      }
       return {
         cardId: choice.card.id,
         slotIndex

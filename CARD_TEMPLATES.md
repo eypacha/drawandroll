@@ -8,32 +8,42 @@ Plantillas procedurales vigentes usadas por `scripts/generate-batch.js`.
 
 ### balanced_fighter
 - `atk`: 5-8
+- `dex`: 2-4
 - `def`: 5-8
 - `hp`: 8-10
+- `damageDieSides`: 4
 - `baseCost`: 3
 
 ### glass_cannon
 - `atk`: 5-8
-- `def`: 5-8
+- `dex`: 3-5
+- `def`: 4-7
 - `hp`: 6-8
+- `damageDieSides`: 4
 - `baseCost`: 3
 
 ### tank
 - `atk`: 5-8
-- `def`: 5-8
+- `dex`: 1-3
+- `def`: 7-9
 - `hp`: 10-12
+- `damageDieSides`: 4
 - `baseCost`: 4
 
 ### skirmisher
 - `atk`: 5-8
-- `def`: 5-8
+- `dex`: 4-6
+- `def`: 4-6
 - `hp`: 7-9
+- `damageDieSides`: 4
 - `baseCost`: 2
 
 ### fragile_support
-- `atk`: 5-8
-- `def`: 5-8
+- `atk`: 4-7
+- `dex`: 3-5
+- `def`: 4-6
 - `hp`: 6-8
+- `damageDieSides`: 4
 - `baseCost`: 2
 
 ---
@@ -42,20 +52,25 @@ Plantillas procedurales vigentes usadas por `scripts/generate-batch.js`.
 
 Los ítems no tienen durabilidad.
 
-### offensive_weapon
-- `atkBonus`: 1-2
-- `defModifier`: -1 a 0
-- `baseCost`: 2
-
 ### defensive_gear
 - `defBonus`: 1-2
+- `dexBonus`: 1-2
 - `atkModifier`: -1 a 0
 - `baseCost`: 2
 
 ### high_risk_high_reward
 - `atkBonus`: 2-3
+- `dexModifier`: -1 a 0
 - `defModifier`: -2 a -1
 - `baseCost`: 3
+
+## 2.1 Armas
+
+### offensive_weapon
+- `atkBonus`: 1-2
+- `defModifier`: -1 a 0
+- `damageDieSides`: 6
+- `baseCost`: 2
 
 ---
 

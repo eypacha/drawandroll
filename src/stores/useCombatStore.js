@@ -20,10 +20,20 @@ export const useCombatStore = defineStore('combat', () => {
   const isRolling = computed(() => rollStep.value !== 'idle')
   const isReactionOpen = computed(() => rollStep.value === 'reaction_pending' && Boolean(reactionWindow.value))
 
+  function normalizeDamageDieSides(value) {
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return 2
+    if (numeric >= 6) return 6
+    if (numeric >= 4) return 4
+    return 2
+  }
+
   function startCombatContext(payload = {}) {
     const combatId = payload.combatId || `combat-${Date.now()}`
     const attackerStat = Number(payload.attackerStat) || 0
     const defenderStat = Number(payload.defenderStat) || 0
+    const defenderArmor = Number(payload.defenderArmor) || 0
+    const attackerDamageDieSides = normalizeDamageDieSides(payload.attackerDamageDieSides)
 
     activeRoll.value = {
       combatId,
@@ -33,14 +43,19 @@ export const useCombatStore = defineStore('combat', () => {
       defenderSlot: Number(payload.defenderSlot),
       attackerStat,
       defenderStat,
+      defenderArmor,
+      attackerDamageDieSides,
       attackerRoll: null,
       defenderRoll: null,
+      damageRoll: null,
       rollingAttacker: false,
       rollingDefender: false,
+      rollingDamage: false,
       attackerTotal: null,
       defenderTotal: null,
       baseDamage: null,
       damage: null,
+      hitSuccess: false,
       isCritical: false,
       isFumble: false,
       defenderHpBefore: null,
@@ -62,6 +77,9 @@ export const useCombatStore = defineStore('combat', () => {
       defenderSlot: Number(payload.defenderSlot),
       attackerStat,
       defenderStat
+      ,
+      defenderArmor,
+      attackerDamageDieSides
     }
     rollStep.value = 'attacker_pending'
     reactionWindow.value = null
@@ -71,7 +89,7 @@ export const useCombatStore = defineStore('combat', () => {
   function setRollStepResult(payload = {}) {
     if (!activeRoll.value || activeRoll.value.combatId !== payload.combatId) return false
     const step = payload.step
-    if (step !== 'attacker' && step !== 'defender') return false
+    if (step !== 'attacker' && step !== 'defender' && step !== 'damage') return false
 
     if (step === 'attacker' && rollStep.value === 'attacker_pending') {
       activeRoll.value = {
@@ -90,7 +108,18 @@ export const useCombatStore = defineStore('combat', () => {
         rollingDefender: false,
         defenderRoll: Number(payload.roll) || 0,
         defenderTotal: Number(payload.defenderTotal) || 0,
+      }
+      rollStep.value = 'damage_pending'
+      return true
+    }
+
+    if (step === 'damage' && rollStep.value === 'damage_pending') {
+      activeRoll.value = {
+        ...activeRoll.value,
+        rollingDamage: false,
+        damageRoll: Number(payload.roll) || 0,
         baseDamage: Number(payload.baseDamage) || 0,
+        hitSuccess: Boolean(payload.hitSuccess),
         isCritical: Boolean(payload.isCritical),
         isFumble: Boolean(payload.isFumble)
       }
@@ -104,7 +133,7 @@ export const useCombatStore = defineStore('combat', () => {
   function markRollStepStart(payload = {}) {
     if (!activeRoll.value || activeRoll.value.combatId !== payload.combatId) return false
     const step = payload.step
-    if (step !== 'attacker' && step !== 'defender') return false
+    if (step !== 'attacker' && step !== 'defender' && step !== 'damage') return false
 
     if (step === 'attacker' && rollStep.value === 'attacker_pending') {
       activeRoll.value = {
@@ -118,6 +147,14 @@ export const useCombatStore = defineStore('combat', () => {
       activeRoll.value = {
         ...activeRoll.value,
         rollingDefender: true
+      }
+      return true
+    }
+
+    if (step === 'damage' && rollStep.value === 'damage_pending') {
+      activeRoll.value = {
+        ...activeRoll.value,
+        rollingDamage: true
       }
       return true
     }
@@ -179,12 +216,15 @@ export const useCombatStore = defineStore('combat', () => {
       ...activeRoll.value,
       attackerRoll: Number(payload.attackerRoll) || 0,
       defenderRoll: Number(payload.defenderRoll) || 0,
+      damageRoll: Number(payload.damageRoll) || 0,
       rollingAttacker: false,
       rollingDefender: false,
+      rollingDamage: false,
       attackerTotal: Number(payload.attackerTotal) || 0,
       defenderTotal: Number(payload.defenderTotal) || 0,
       baseDamage: Number(payload.baseDamage ?? activeRoll.value.baseDamage ?? 0),
       damage: Number(payload.damage) || 0,
+      hitSuccess: Boolean(payload.hitSuccess),
       counterDamageTotal: Number(payload.counterDamageTotal) || 0,
       isCritical: Boolean(payload.isCritical),
       isFumble: Boolean(payload.isFumble),
